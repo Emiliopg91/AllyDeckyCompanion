@@ -1,0 +1,30 @@
+{
+    "server.says.yolo": {
+        "en": "Server says yolo",
+        "es": "Servidor dice hola"
+    },
+    "item.#": {
+        "en": "Item #{{id}}",
+        "es": "Elemento #{{id}}"
+    },
+    "router": {
+        "en": "Router",
+        "es": "Enrutador"
+    },
+    "cancel": {
+        "en": "Cancel",
+        "es": "Cancelar"
+    },
+    "panel.section": {
+        "en": "Panel section",
+        "es": "Seccion de panel"
+    },
+    "go.to.library": {
+        "en": "Go to library",
+        "es": "Ir a biblioteca"
+    },
+    "hello.world": {
+        "en": "Hello world!",
+        "es": "¡Hola mundo!"
+    }
+}

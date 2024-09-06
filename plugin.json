@@ -1,0 +1,10 @@
+{
+  "name": "Decky-Plugin-Template",
+  "author": "Emiliopg91",
+  "flags": ["debug"],
+  "publish": {
+    "tags": ["template"],
+    "description": "Template for Decky plugins.",
+    "image": "https://opengraph.githubassets.com/1/Emiliopg91/Decky-Plugin-Template"
+  }
+}
