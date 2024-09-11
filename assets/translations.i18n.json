@@ -1,4 +1,8 @@
 {
+    "profile.for": {
+        "en": "Profile for #{{name}}",
+        "es": "Perfil para #{{name}}"
+    },
     "smt.description": {
         "en": "Enable multithreading. Best disabled for no CPU intensive software",
         "es": "Habilitar multithreading. Desactivar para aplicaciones no intesivas"

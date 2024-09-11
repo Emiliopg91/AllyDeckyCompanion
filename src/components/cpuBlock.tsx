@@ -125,7 +125,7 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
   return (
     <CollapsibleItem title={Translator.translate("performance.settings")} collapsed={collapsed} onCollapse={onCollapse}>
       <PanelSectionRow>
-        <span>Profile for {name}</span>
+        <span>{Translator.translate("profile.for", { name })}</span>
       </PanelSectionRow>
       <PanelSectionRow>
         <SliderField
