@@ -5,7 +5,6 @@ import replace from '@rollup/plugin-replace';
 import typescript from '@rollup/plugin-typescript';
 import { defineConfig } from 'rollup';
 import importAssets from 'rollup-plugin-import-assets';
-import terser from '@rollup/plugin-terser';
 
 import plugin from "./plugin.json";
 import pckJson from "./package.json";

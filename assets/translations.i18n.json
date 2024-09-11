@@ -70,5 +70,5 @@
     "item.#": {
         "en": "Item #{{id}}",
         "es": "Elemento #{{id}}"
-    },
+    }
 }
