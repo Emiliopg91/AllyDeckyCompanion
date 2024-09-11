@@ -2,7 +2,7 @@ import { NotchLabel, PanelSectionRow, SliderField, ToggleField } from "decky-fro
 import { useEffect, useState, VFC } from "react"
 
 import { useProfile } from "../hooks/useProfile";
-import { Logger } from "decky-plugin-framework";
+import { Logger, Translator } from "decky-plugin-framework";
 import { Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
@@ -123,13 +123,13 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
   }
 
   return (
-    <CollapsibleItem title="CPU Settings" collapsed={collapsed} onCollapse={onCollapse}>
+    <CollapsibleItem title={Translator.translate("performance.settings")} collapsed={collapsed} onCollapse={onCollapse}>
       <PanelSectionRow>
         <span>Profile for {name}</span>
       </PanelSectionRow>
       <PanelSectionRow>
         <SliderField
-          label="Performance mode"
+          label={Translator.translate("performance.mode")}
           value={mode}
           min={0}
           max={modeIndexes.length - 1}
@@ -142,7 +142,7 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
           onChange={onModeChange}
         />
         <SliderField
-          label="Steady power limit"
+          label={Translator.translate("spl.desc")}
           value={spl}
           disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
           showValue
@@ -155,7 +155,7 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
           onChange={onSplChange}
         />
         <SliderField
-          label="Slow power limit"
+          label={Translator.translate("sppl.desc")}
           value={sppl}
           disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
           showValue
@@ -168,7 +168,7 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
           onChange={onSpplChange}
         />
         <SliderField
-          label="Fast power limit"
+          label={Translator.translate("fppl.desc")}
           value={fppl}
           disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
           showValue
@@ -183,19 +183,19 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
       </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
-          label="CPU Boost"
-          description="Allow scale CPU clock speed. Produces huge impact on battery drain"
-          checked={cpuBoost}
-          onChange={onCpuBoostChange}
+          label="SMT"
+          description={Translator.translate('smt.description')}
+          checked={smtEnabled}
+          onChange={onSmtChange}
           highlightOnFocus
         />
       </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
-          label="SMT"
-          description="Enable multithreading. Best disabled for no CPU intensive software"
-          checked={smtEnabled}
-          onChange={onSmtChange}
+          label="CPU Boost"
+          description={Translator.translate("cpu.boost.description")}
+          checked={cpuBoost}
+          onChange={onCpuBoostChange}
           highlightOnFocus
         />
       </PanelSectionRow>

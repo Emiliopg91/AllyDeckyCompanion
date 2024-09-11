@@ -1,30 +1,74 @@
 {
-    "server.says.yolo": {
-        "en": "Server says yolo",
-        "es": "Servidor dice hola"
+    "smt.description": {
+        "en": "Enable multithreading. Best disabled for no CPU intensive software",
+        "es": "Habilitar multithreading. Desactivar para aplicaciones no intesivas"
+    },
+    "cpu.boost.description":{
+        "en":"Allow scale CPU clock speed. Produces huge impact on battery drain",
+        "es":"Permitir subir reloj de CPU. Gran impacto en gasto de batería"
+    },
+    "fppl.desc":{
+        "en":"Fast power limit",
+        "es":"Límite rápido de potencia"
+    },
+    "sppl.desc":{
+        "en":"Slow power limit",
+        "es":"Límite lento de potencia"
+    },
+    "spl.desc":{
+        "en":"Steady power limit",
+        "es":"Limite sostenido de potencia"
+    },
+    "performance.mode":{
+        "en":"Performance mode",
+        "es":"Modo de rendimieno"
+    },
+    "performance.settings":{
+        "en":"Performance",
+        "es":"Rendimiento"
+    },
+    "plugin.info":{
+        "en":"Plugin",
+        "es":"Plugin"
+    },
+    "installed.version":{
+        "en":"Installed Version",
+        "es":"Versión instalada"
+    },
+    "latest.version":{
+        "en":"Latest Version",
+        "es":"Última versión"
+    },
+    "reinstalling.plugin":{
+        "en":"Reinstalling plugin",
+        "es":"Reinstalando plugin"
+    },
+    "reinstall.plugin":{
+        "en":"Reinstall plugin",
+        "es":"Reinstalar plugin"
+    },
+    "updating.plugin":{
+        "en":"Updating plugin",
+        "es":"Actualizando plugin"
+    },
+    "update.to":{
+        "en":"Update to #{{version}}",
+        "es":"Actualizar a #{{version}}"
+    },
+    "system.info":{
+        "en":"System",
+        "es":"Sistema"
+    },
+    "limit.battery":{
+        "en":"Limit battery charge",
+        "es":"Limitar carga de batería"
+    },
+    "limit.battery.desc":{
+        "en":"Increase battery lifespan setting max charge to 80%",
+        "es":"Incrementa la vida útil de batería limitando la carga al 80%"
     },
     "item.#": {
         "en": "Item #{{id}}",
         "es": "Elemento #{{id}}"
     },
-    "router": {
-        "en": "Router",
-        "es": "Enrutador"
-    },
-    "cancel": {
-        "en": "Cancel",
-        "es": "Cancelar"
-    },
-    "panel.section": {
-        "en": "Panel section",
-        "es": "Seccion de panel"
-    },
-    "go.to.library": {
-        "en": "Go to library",
-        "es": "Ir a biblioteca"
-    },
-    "hello.world": {
-        "en": "Hello world!",
-        "es": "¡Hola mundo!"
-    }
 }

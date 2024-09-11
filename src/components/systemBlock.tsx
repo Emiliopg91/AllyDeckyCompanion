@@ -1,7 +1,8 @@
-import { Button, PanelSection, PanelSectionRow, ToggleField } from "decky-frontend-lib"
-import { useEffect, useState, VFC } from "react"
+import { PanelSectionRow, ToggleField } from "decky-frontend-lib"
+import { useState, VFC } from "react"
 import { SystemSettings } from "../settings/system";
 import { CollapsibleItem } from "./collapsibleItem";
+import { Translator } from "decky-plugin-framework";
 
 export const SystemBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ collapsed, onCollapse }) => {
   const [limitBattery, setLimitBattery] = useState(SystemSettings.getLimitBattery())
@@ -13,11 +14,11 @@ export const SystemBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
 
   return (
     <>
-      <CollapsibleItem title="System settings" collapsed={collapsed} onCollapse={onCollapse}>
+      <CollapsibleItem title={Translator.translate("system.info")} collapsed={collapsed} onCollapse={onCollapse}>
         <PanelSectionRow>
           <ToggleField
-            label="Limit battery charge"
-            description="Increase battery lifespan setting max charge to 80%"
+            label={Translator.translate("limit.battery")}
+            description={Translator.translate("limit.battery.desc")}
             checked={limitBattery}
             onChange={onLimitBatteryChange}
             highlightOnFocus

@@ -3,7 +3,7 @@ import { useEffect, useState, VFC } from "react"
 import { Constants } from "../utils/constants";
 import { BackendUtils } from "../utils/backend";
 import { CollapsibleItem } from "./collapsibleItem";
-import { Toast } from "decky-plugin-framework";
+import { Toast, Translator } from "decky-plugin-framework";
 
 const getLatestVersionNum = async () => {
     const { result } = await BackendUtils.getServerApi().fetchNoCors(
@@ -34,17 +34,17 @@ export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
 
     return (
         <>
-            <CollapsibleItem title="Plugin Info" collapsed={collapsed} onCollapse={onCollapse}>
+            <CollapsibleItem title={Translator.translate('plugin.info')} collapsed={collapsed} onCollapse={onCollapse}>
                 <>
                     <PanelSectionRow>
-                        <Field label={"Installed Version"} bottomSeparator="none">
+                        <Field label={Translator.translate("installed.version")} bottomSeparator="none">
                             {Constants.PLUGIN_VERSION}
                         </Field>
                     </PanelSectionRow>
 
                     {Boolean(latestVersionNum) && (
                         <PanelSectionRow>
-                            <Field label={"Latest Version"} bottomSeparator="none">
+                            <Field label={Translator.translate("latest.version")} bottomSeparator="none">
                                 {latestVersionNum}
                             </Field>
                         </PanelSectionRow>
@@ -54,7 +54,7 @@ export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
                             <PanelSectionRow>
                                 <ButtonItem
                                     onClick={() => {
-                                        Toast.toast(isUpdated ? "Reinstalling plugin" : "Updating plugin")
+                                        Toast.toast(isUpdated ? Translator.translate("reinstalling.plugin") : Translator.translate("updating.plugin"))
                                         setIsDoingThings(true)
                                         BackendUtils.otaUpdate();
                                     }}
@@ -66,7 +66,7 @@ export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
                                     }}
                                     disabled={isDoingThings}
                                 >
-                                    {isUpdated ? "Reinstall Plugin" : "Update to " + latestVersionNum}
+                                    {isUpdated ? Translator.translate("reinstall.plugin") : Translator.translate("update.to", { "version": latestVersionNum })}
                                 </ButtonItem>
                             </PanelSectionRow>
                         </>
