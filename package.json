@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Rog Ally and Ally X Decky plugin companion",
   "scripts": {
-    "build": "clear && echo \"Building plugin\" && shx rm -rf dist && rollup -c",
-    "watch": "clear && echo \"Watching for changes with rollup\" && rollup -c -w",
-    "test": "clear && echo \"Error: no test specified\" && exit 1"
+    "build": "shx rm -rf dist && rollup -c --silent",
+    "watch": "rollup -c -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -34,15 +34,15 @@
     "@types/webpack": "^5.28.5",
     "decky-frontend-lib": "^3.25.0",
     "decky-plugin-framework": "^1.2.9",
-    "lodash": "^4.17.21",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
-    "shx": "^0.3.4",
     "tslib": "^2.6.2",
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "react-icons": "^4.12.0"
+    "lodash": "^4.17.21",
+    "react-icons": "^4.12.0",
+    "shx": "^0.3.4"
   },
   "pnpm": {
     "peerDependencyRules": {
