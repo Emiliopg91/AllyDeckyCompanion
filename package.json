@@ -1,6 +1,6 @@
 {
   "name": "ally-decky-companion",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Rog Ally and Ally X Decky plugin companion",
   "scripts": {
     "build": "clear && echo \"Building plugin\" && shx rm -rf dist && rollup -c",
