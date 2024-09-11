@@ -1,7 +1,7 @@
 {
     "profile.for": {
-        "en": "Profile for #{{name}}",
-        "es": "Perfil para #{{name}}"
+        "en": "Profile for {{name}}",
+        "es": "Perfil para {{name}}"
     },
     "smt.description": {
         "en": "Enable multithreading. Best disabled for no CPU intensive software",
@@ -56,8 +56,8 @@
         "es":"Actualizando plugin"
     },
     "update.to":{
-        "en":"Update to #{{version}}",
-        "es":"Actualizar a #{{version}}"
+        "en":"Update to {{version}}",
+        "es":"Actualizar a {{version}}"
     },
     "system.info":{
         "en":"System",
@@ -72,7 +72,7 @@
         "es":"Incrementa la vida útil de batería limitando la carga al 80%"
     },
     "item.#": {
-        "en": "Item #{{id}}",
-        "es": "Elemento #{{id}}"
+        "en": "Item {{id}}",
+        "es": "Elemento {{id}}"
     }
 }
