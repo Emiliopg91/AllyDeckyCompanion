@@ -1,7 +1,7 @@
 {
-  "name": "Decky-Plugin-Template",
+  "name": "AllyDeckyCompanion",
   "author": "Emiliopg91",
-  "flags": ["debug"],
+  "flags": ["root"],
   "publish": {
     "tags": ["template"],
     "description": "Template for Decky plugins.",

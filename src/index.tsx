@@ -1,85 +1,87 @@
 import {
   definePlugin,
+  Router,
   ServerAPI,
+  sleep,
   staticClasses,
 } from "decky-frontend-lib";
-import { FaShip } from "react-icons/fa";
+import { SiAsus } from "react-icons/si";
 import { MainMenu } from "./pages/MainMenu"
-import { RouterTest } from "./pages/RouterTest"
 import { Constants } from "./utils/constants";
 
 import translations from "../assets/translations.i18n.json";
 
 import {
-  Settings,
   Framework,
   Logger,
-  ShortcutListener,
-  Button,
-  ShortcutEventData,
-  GameLifeEventData,
-  SettingsEventData,
-  EventBus,
-  EventType,
-  EventData
+  Game,
+  Settings,
 } from "decky-plugin-framework";
-import { SuspendEventData } from "decky-plugin-framework/dist/modules/system";
+import { State } from "./utils/state";
+import { Profile, Profiles } from './settings/profiles'
+import { BackendUtils } from "./utils/backend";
+import { SystemSettings } from "./settings/system";
 
-const shortcutButtons = [Button.X, Button.B];
-
-function handleGameEvent(data: EventData) {
-  const ged = data as GameLifeEventData
-  Logger.error("Event for game " + ged.getDetails().getDisplayName());
-}
-
-function handleShortcutEvent(data: EventData) {
-  const shortcutData = data as ShortcutEventData;
-  Logger.error("Received shortcut event: " + shortcutData.toString())
-  if (shortcutData.isFor(shortcutButtons)) {
-    if (shortcutData.isPressed()) {
-      Logger.error("Pressed!")
-    }
-    else {
-      Logger.error("Released!")
-    }
-  }
-}
-
-function handleSettingsEvent(e: EventData) {
-  const settingsData = (e as SettingsEventData)
-  Logger.info("Updated configuration", JSON.stringify(settingsData.getSettings()))
-}
-
-function handleSuspendEvent(e: EventData) {
-  const suspendData = (e as SuspendEventData)
-  Logger.info(suspendData.isSuspend() ? "Go to sleep!" : "Awake!")
-}
+let gameInterval: NodeJS.Timeout | undefined = undefined;
+let onSuspendUnregister: Function | undefined;
+let onResumeUnregister: Function | undefined;
 
 export default definePlugin((serverApi: ServerAPI) => {
   (async () => {
     await Framework.initialize(serverApi, Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
+    BackendUtils.setServerApi(serverApi)
 
-    EventBus.subscribe(EventType.SHORTCUT, handleShortcutEvent)
-    EventBus.subscribe(EventType.GAME_LIFE, handleGameEvent);
-    EventBus.subscribe(EventType.SETTINGS, handleSettingsEvent);
-    EventBus.subscribe(EventType.SUSPEND, handleSuspendEvent);
+    BackendUtils.isAlly().then(isAlly => {
+      State.IS_ALLY = isAlly
 
-    Settings.setEntry<Config>("time", new Date().toLocaleString(), true)
-    ShortcutListener.watch("valid", [...shortcutButtons])
-    ShortcutListener.watch("invalid", [Button.R1, Button.Y])
+      BackendUtils.isAllyX().then(isX => {
+        State.IS_ALLY_X = isX
+        Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
+
+        Settings.setEntry(Constants.CFG_SCHEMA_PROP, Constants.CFG_SCHEMA_VERS, true)
+
+        const onGameEvent = () => {
+          const newId = Router.MainRunningApp ? Router.MainRunningApp.appid : Constants.DEFAULT_ID;
+          if (State.RUNNING_GAME_ID !== newId) {
+            const profile: Profile = Profiles.getProfileForId(newId, newId == Constants.DEFAULT_ID)
+            Logger.info("Applying CPU settings for profile " + newId + " (" + (newId == Constants.DEFAULT_ID ? Constants.DEFAULT_NAME : Game.getGameDetails(Number(newId)).getDisplayName()) + ")",
+              profile
+            )
+            BackendUtils.setTdpProfile(profile)
+            State.RUNNING_GAME_ID = newId
+          }
+        }
+        gameInterval = setInterval(onGameEvent, 500);
+
+        onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
+          Logger.info("Setting CPU profile for suspension")
+          BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
+        })
+
+        onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
+          Logger.info("Waiting 10 seconds for restoring CPU profile")
+          sleep(10000).then(() => {
+            BackendUtils.setTdpProfile(Profiles.getProfileForId(State.RUNNING_GAME_ID))
+          })
+        })
+
+        BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
+      })
+
+    });
   })()
-
-  serverApi.routerHook.addRoute(Constants.ROUTE_DECKY_PLUGIN_TEST, RouterTest, {
-    exact: true,
-  });
 
   return {
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
     content: <MainMenu />,
-    icon: <FaShip />,
+    icon: <SiAsus />,
     async onDismount() {
+      clearInterval(gameInterval)
+      if (onSuspendUnregister)
+        onSuspendUnregister()
+      if (onResumeUnregister)
+        onResumeUnregister()
       await Framework.shutdown()
-      serverApi.routerHook.removeRoute(Constants.ROUTE_DECKY_PLUGIN_TEST);
     }
   };
 });

@@ -1,7 +1,7 @@
 {
-  "name": "Decky-Plugin-Template",
+  "name": "ally-decky-companion",
   "version": "0.0.1",
-  "description": "Decky plugin template",
+  "description": "Rog Ally and Ally X Decky plugin companion",
   "scripts": {
     "build": "clear && echo \"Building plugin\" && shx rm -rf dist && rollup -c",
     "watch": "clear && echo \"Watching for changes with rollup\" && rollup -c -w",
@@ -14,7 +14,7 @@
   "keywords": [
     "decky",
     "plugin",
-    "template"
+    "ally"
   ],
   "author": "Emiliopg91",
   "license": "BSD-3-Clause",
@@ -29,10 +29,12 @@
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^8.5.0",
+    "@types/lodash": "^4.14.201",
     "@types/react": "16.14.0",
     "@types/webpack": "^5.28.5",
     "decky-frontend-lib": "^3.25.0",
-    "decky-plugin-framework": "^1.2.1",
+    "decky-plugin-framework": "^1.2.9",
+    "lodash": "^4.17.21",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
     "shx": "^0.3.4",

@@ -24,6 +24,9 @@ devDependencies:
   '@rollup/plugin-typescript':
     specifier: ^8.5.0
     version: 8.5.0(rollup@2.79.1)(tslib@2.6.2)(typescript@4.9.5)
+  '@types/lodash':
+    specifier: ^4.14.201
+    version: 4.14.201
   '@types/react':
     specifier: 16.14.0
     version: 16.14.0
@@ -34,8 +37,11 @@ devDependencies:
     specifier: ^3.25.0
     version: 3.25.0
   decky-plugin-framework:
-    specifier: ^1.2.1
-    version: 1.2.1
+    specifier: ^1.2.9
+    version: 1.2.9
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   rollup:
     specifier: ^2.79.1
     version: 2.79.1
@@ -214,6 +220,10 @@ packages:
 
   /@types/json-schema@7.0.12:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
+    dev: true
+
+  /@types/lodash@4.14.201:
+    resolution: {integrity: sha512-y9euML0cim1JrykNxADLfaG0FgD1g/yTHwUs/Jg9ZIU7WKj2/4IW9Lbb1WZbvck78W/lfGXFfe+u2EGfIJXdLQ==}
     dev: true
 
   /@types/node@20.2.5:
@@ -455,8 +465,8 @@ packages:
     resolution: {integrity: sha512-2lBoHS2AIRmuluq/bGdHBz+uyToQE7k3K/vDq1MQbDZ4eC+8CGDuh2T8yZOj3D0yjGP2MdikNNAWPA9Z5l2qDg==}
     dev: true
 
-  /decky-plugin-framework@1.2.1:
-    resolution: {integrity: sha512-kR/QhhgxrjSYU+xlpEB4sPGq4zuIvJ9ZYZQZfZWF7apZsPRIHxpqbkmQBtLvglhFkc0v7Y18BE7VFY5DVgdvNg==}
+  /decky-plugin-framework@1.2.9:
+    resolution: {integrity: sha512-92/WS8edAOByJxLyl2T/ZePczEPWFxu0fuJnA2WhAeEGmQ2iJNr3VSlDAJ+vxCJO/R+vGx/7CFLVUBxy3Cs1Tw==}
     dependencies:
       react-icons: 4.12.0
     transitivePeerDependencies:
@@ -645,6 +655,10 @@ packages:
   /loader-runner@4.3.0:
     resolution: {integrity: sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg==}
     engines: {node: '>=6.11.5'}
+    dev: true
+
+  /lodash@4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
   /magic-string@0.25.9:

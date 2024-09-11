@@ -9,6 +9,27 @@ config_dir = Path(decky_plugin.DECKY_PLUGIN_SETTINGS_DIR)
 
 cfg_property_file = config_dir / "plugin.json"
 
+def flatten_json(nested_json, parent_key=''):
+    """
+    Aplana un JSON jerárquico.
+
+    Args:
+    nested_json (dict): El JSON original con jerarquía.
+    parent_key (str): La clave base usada durante la recursión (para claves padres).
+
+    Returns:
+    dict: Un diccionario con claves jerarquizadas usando el separador.
+    """
+    items = {}
+    for key, value in nested_json.items():
+        new_key = parent_key + '.' + key if parent_key else key
+        if isinstance(value, dict):
+            # Recursión si el valor es otro diccionario
+            items.update(flatten_json(value, new_key))
+        else:
+            items[new_key] = value
+    return items
+
 def get_config(): 
     """
     Reads and parses the plugin configuration file.
@@ -17,7 +38,27 @@ def get_config():
     list: A list of key-value pairs representing the configuration.
     """
     with open(cfg_property_file, "r") as jsonFile:
-        return json.load(jsonFile)
+        config_data = json.load(jsonFile)
+
+    # Inicializamos el diccionario plano
+    flat_config = {}
+
+    # Función inline para recorrer el JSON recursivamente y aplanarlo
+    stack = [(config_data, '')]  # Pila con el JSON inicial y la clave vacía
+    while stack:
+        current, parent_key = stack.pop()
+
+        for key, value in current.items():
+            new_key = parent_key + '.' + key if parent_key else key
+
+            if isinstance(value, dict):
+                # Si el valor es otro diccionario, lo añadimos a la pila para seguir recorriendo
+                stack.append((value, new_key))
+            else:
+                # Si es un valor simple, lo agregamos al diccionario plano
+                flat_config[new_key] = value
+
+    return flat_config
 
 def set_config(key: str, value: str):
     """
@@ -27,13 +68,22 @@ def set_config(key: str, value: str):
     key (str): The key to set.
     value (str): The value to set for the key.
     """
-    with open(cfg_property_file, "r") as jsonFile:
+    with open(cfg_property_file, "r+") as jsonFile:
         data = json.load(jsonFile)
-    with open(cfg_property_file, "w") as f:
-        data[key] = value
-        json_object = json.dumps(data, indent=4)
-        with open(cfg_property_file, "w") as outfile:
-            outfile.write(json_object)
+        
+        keys = key.split(".")
+        d = data
+        
+        for k in keys[:-1]:
+            if k not in d:
+                d[k] = {}
+            d = d[k]
+        
+        d[keys[-1]] = value
+
+        jsonFile.seek(0)
+        json.dump(data, jsonFile, indent=4)
+        jsonFile.truncate()
 
 
 def get_config_item(name: str, default: str = None):
@@ -49,10 +99,17 @@ def get_config_item(name: str, default: str = None):
     """
     with open(cfg_property_file, "r") as jsonFile:
         data = json.load(jsonFile)
-        if "percentage" in data:
-            return data[name]
-        else:
-            return default
+        
+        keys = name.split(".")
+        d = data
+        
+        for k in keys:
+            if k in d:
+                d = d[k]
+            else:
+                return default
+        
+        return d
 
 def migrate():
     """
