@@ -5,6 +5,7 @@ import { SystemBlock } from "../components/systemBlock";
 import { PluginBlock } from "../components/pluginBlock";
 import { State } from "../utils/state";
 import { PanelSection, PanelSectionRow } from "decky-frontend-lib";
+import { ContributeBlock } from "../components/contributeBlock";
 
 export const MainMenu: VFC = () => {
   const [cpuCollapsed, setCpuCollapsed] = useState(false);
@@ -43,6 +44,7 @@ export const MainMenu: VFC = () => {
         setPluginCollapsed(!pluginCollapsed)
       }
       } />
+      <ContributeBlock />
     </>
   );
 };

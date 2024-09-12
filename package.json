@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Emiliopg91/decky-plugin-template.git"
+    "url": "git+https://github.com//Emiliopg91/AllyDeckyCompanion.git"
   },
   "keywords": [
     "decky",
@@ -19,9 +19,9 @@
   "author": "Emiliopg91",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/Emiliopg91/decky-plugin-template/issues"
+    "url": "https://github.com//Emiliopg91/AllyDeckyCompanion/issues"
   },
-  "homepage": "https://github.com/Emiliopg91/decky-plugin-template#readme",
+  "homepage": "https://github.com//Emiliopg91/AllyDeckyCompanion#readme",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
