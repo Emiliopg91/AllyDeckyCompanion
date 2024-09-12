@@ -74,5 +74,21 @@
     "main.menu": {
         "en": "main menu",
         "es": "menú principal"
+    },
+    "mode.SILENT":{
+        "en":"SILENT",
+        "es":"SILENCIOSO"
+    },
+    "mode.PERFORMANCE":{
+        "en":"PERFORMANCE",
+        "es":"RENDIMIENTO"
+    },
+    "mode.TURBO":{
+        "en":"TURBO",
+        "es":"TURBO"
+    },
+    "mode.CUSTOM":{
+        "en":"CUSTOM",
+        "es":"PERSONALIZADO"
     }
 }
