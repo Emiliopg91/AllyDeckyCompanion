@@ -8,13 +8,6 @@
   
 
 [![](https://img.shields.io/github/downloads/Emiliopg91/AllyDeckyCompanion/total.svg)](https://github.com/Emiliopg91/AllyDeckyCompanion/releases)
-
-  
-
-  
-
-This is a (formerly simple) Linux TDP Decky Plugin that wraps ryzenadj. Intended for devices compatible with ryzenadj.
-
   
 
   
