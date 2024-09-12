@@ -31,7 +31,7 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
       notchLabels.push({
         notchIndex: notchIdx,
         value: notchIdx,
-        label: Translator.translate("mode." + String(value).substring(0, 1))
+        label: Translator.translate("mode." + String(value))
       });
       notchIdx++;
     });
