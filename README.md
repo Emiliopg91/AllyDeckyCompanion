@@ -16,6 +16,10 @@
 
   
 
+- [Incoming features](#incoming)
+
+  
+
 - [Requirements](#requirements)
 
   
@@ -80,6 +84,16 @@
   
 
 - Battery charge limit to 80% to expand battery lifespan
+
+  
+
+  
+
+## Incoming features
+
+- Different profiles when playing on AC or battery
+
+- Check for BIOS updates
 
   
 
