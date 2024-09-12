@@ -16,6 +16,7 @@ import {
   Logger,
   Game,
   Settings,
+  Translator,
 } from "decky-plugin-framework";
 import { State } from "./utils/state";
 import { Profile, Profiles } from './settings/profiles'
@@ -44,7 +45,7 @@ export default definePlugin((serverApi: ServerAPI) => {
           const newId = Router.MainRunningApp ? Router.MainRunningApp.appid : Constants.DEFAULT_ID;
           if (State.RUNNING_GAME_ID !== newId) {
             const profile: Profile = Profiles.getProfileForId(newId, newId == Constants.DEFAULT_ID)
-            Logger.info("Applying CPU settings for profile " + newId + " (" + (newId == Constants.DEFAULT_ID ? Constants.DEFAULT_NAME : Game.getGameDetails(Number(newId)).getDisplayName()) + ")",
+            Logger.info("Applying CPU settings for profile " + newId + " (" + (newId == Constants.DEFAULT_ID ? Translator.translate("main.menu") : Game.getGameDetails(Number(newId)).getDisplayName()) + ")",
               profile
             )
             BackendUtils.setTdpProfile(profile)

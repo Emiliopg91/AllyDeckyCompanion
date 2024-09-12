@@ -1,4 +1,3 @@
-import { Translator } from "decky-plugin-framework";
 import { Mode } from "./mode";
 
 declare const plugin: any;
@@ -11,7 +10,6 @@ export class Constants {
     public static PLUGIN_VERSION = plugin.version;
 
     public static DEFAULT_ID = "default";
-    public static DEFAULT_NAME = Translator.translate("main.menu");
 
     public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
     public static CPU_DEFAULT_SMT = true
