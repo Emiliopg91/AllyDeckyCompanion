@@ -12,16 +12,16 @@
         "es": "Permitir subir reloj de CPU. Gran impacto en gasto de batería"
     },
     "fppl.desc": {
-        "en": "Fast power limit",
-        "es": "Límite rápido de potencia"
+        "en": "FPPL",
+        "es": "FPPL"
     },
     "sppl.desc": {
-        "en": "Slow power limit",
-        "es": "Límite lento de potencia"
+        "en": "SPPL",
+        "es": "SPPL"
     },
     "spl.desc": {
-        "en": "Steady power limit",
-        "es": "Limite sostenido de potencia"
+        "en": "SPL",
+        "es": "SPL"
     },
     "performance.mode": {
         "en": "Performance mode",
