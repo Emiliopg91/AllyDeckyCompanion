@@ -23,10 +23,6 @@ This is a (formerly simple) Linux TDP Decky Plugin that wraps ryzenadj. Intended
 
   
 
-- [Compatibility](#compatibility)
-
-  
-
 - [Requirements](#requirements)
 
   
@@ -47,39 +43,7 @@ This is a (formerly simple) Linux TDP Decky Plugin that wraps ryzenadj. Intended
 
   
 
-- [Manual Build](#manual-build)
-
-  
-
 - [Uninstall Instructions](#uninstall-instructions)
-
-  
-
-- [Advanced Configuration](#advanced-configuration)
-
-  
-
-- [Desktop App](#desktop-app)
-
-  
-
-- [Custom Device Settings](#custom-device-settings)
-
-  
-
-- [CPU Boost Controls](#are-there-cpu-boost-controls)
-
-  
-
-- [Troubleshooting](#troubleshooting)
-
-  
-
-- [ROG Ally Troubleshooting](#rog-ally-troubleshooting)
-
-  
-
-- [Ryzenadj Troubleshooting](#ryzenadj-troubleshooting)
 
   
 
