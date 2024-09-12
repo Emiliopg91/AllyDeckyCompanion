@@ -71,8 +71,8 @@
         "en":"Increase battery lifespan setting max charge to 80%",
         "es":"Incrementa la vida útil de batería limitando la carga al 80%"
     },
-    "item.#": {
-        "en": "Item {{id}}",
-        "es": "Elemento {{id}}"
+    "main.menu": {
+        "en": "main menu",
+        "es": "menú principal"
     }
 }
