@@ -93,6 +93,8 @@
 
 - Different profiles when playing on AC or battery
 
+- Support for "secure boot"
+
 - Check for BIOS updates
 
   
