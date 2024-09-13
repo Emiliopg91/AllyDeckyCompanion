@@ -1,5 +1,6 @@
-import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field } from "decky-frontend-lib"
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field, Router } from "decky-frontend-lib"
 import { FC, useEffect, useState } from "react"
+import { AppOverviewExt } from '../utils/models'
 
 import { useProfile } from "../hooks/useProfile";
 import { Logger, Translator } from "decky-plugin-framework";
@@ -36,6 +37,7 @@ export const CpuBlock: FC = () => {
     });
 
   const [id, name] = useProfile()
+  const [iconSrc, setIconSrc] = useState<string | undefined>(undefined)
 
   const profile = Profiles.getProfileForId(id);
 
@@ -58,10 +60,26 @@ export const CpuBlock: FC = () => {
 
   useEffect(() => {
     loadSettings();
+
+    let newIconSrc: string | undefined = undefined;
+    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
+      if (!newIconSrc && app.icon_data && String(app.appid) == String(id)) {
+        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
+      }
+    });
+    setIconSrc(newIconSrc)
   }, [])
 
   useEffect(() => {
     loadSettings();
+
+    let newIconSrc: string | undefined = undefined;
+    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
+      if (!newIconSrc && app.icon_data && String(app.appid) == String(id)) {
+        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
+      }
+    });
+    setIconSrc(newIconSrc)
   }, [id])
 
   const onModeChange = (newVal: number) => {
@@ -122,6 +140,12 @@ export const CpuBlock: FC = () => {
     <PanelSection >
       <PanelSectionRow>
         <Field label={Translator.translate("profile.for")} bottomSeparator="standard">
+          {iconSrc &&
+            <img
+              style={{ maxWidth: 16, maxHeight: 16 }}
+              src={iconSrc}
+            />
+          }
           {name}
         </Field>
       </PanelSectionRow>
