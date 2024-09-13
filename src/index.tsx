@@ -21,11 +21,11 @@ import {
 import { State } from "./utils/state";
 import { Profile, Profiles } from './settings/profiles'
 import { BackendUtils } from "./utils/backend";
-import { SystemSettings } from "./settings/system"; 
+import { SystemSettings } from "./settings/system";
 
-let gameInterval: NodeJS.Timeout | undefined = undefined;
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
+let onGameUnregister: Function | undefined;
 
 export default definePlugin((serverApi: ServerAPI) => {
   (async () => {
@@ -41,8 +41,8 @@ export default definePlugin((serverApi: ServerAPI) => {
 
         Settings.setEntry(Constants.CFG_SCHEMA_PROP, Constants.CFG_SCHEMA_VERS, true)
 
-        const onGameEvent = () => {
-          const newId = Router.MainRunningApp ? Router.MainRunningApp.appid : Constants.DEFAULT_ID;
+        onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
+          const newId = e.bRunning ? String(e.unAppID) : Constants.DEFAULT_ID;
           if (State.RUNNING_GAME_ID !== newId) {
             const profile: Profile = Profiles.getProfileForId(newId, newId == Constants.DEFAULT_ID)
             Logger.info("Applying CPU settings for profile " + newId + " (" + (newId == Constants.DEFAULT_ID ? Translator.translate("main.menu") : Game.getGameDetails(Number(newId)).getDisplayName()) + ")",
@@ -51,8 +51,7 @@ export default definePlugin((serverApi: ServerAPI) => {
             BackendUtils.setTdpProfile(profile)
             State.RUNNING_GAME_ID = newId
           }
-        }
-        gameInterval = setInterval(onGameEvent, 500);
+        })
 
         onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
           Logger.info("Setting CPU profile for suspension")
@@ -77,7 +76,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     content: <MainMenu />,
     icon: <SiAsus />,
     async onDismount() {
-      clearInterval(gameInterval)
+      if (onGameUnregister)
+        onGameUnregister()
       if (onSuspendUnregister)
         onSuspendUnregister()
       if (onResumeUnregister)
