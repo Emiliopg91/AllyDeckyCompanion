@@ -1,23 +1,32 @@
-import { useState, VFC } from "react"
 
 import { CpuBlock } from "../components/cpuBlock";
 import { SystemBlock } from "../components/systemBlock";
 import { PluginBlock } from "../components/pluginBlock";
 import { State } from "../utils/state";
-import { PanelSection, PanelSectionRow } from "decky-frontend-lib";
+import { DropdownItem, PanelSection, PanelSectionRow } from "decky-frontend-lib";
 import { ContributeBlock } from "../components/contributeBlock";
+import { FC, useEffect } from "react";
+import { Translator } from "decky-plugin-framework";
 
-export const MainMenu: VFC = () => {
-  const [cpuCollapsed, setCpuCollapsed] = useState(false);
-  const [systemCollapsed, setSystemCollapsed] = useState(true);
-  const [pluginCollapsed, setPluginCollapsed] = useState(true);
-  const showWarning = !State.IS_ALLY
+export const MainMenu: FC = () => {
+  const css = `
+    .remMargin {
+      margin-bottom: 0px
+    }
+    .remMargin div {
+      margin-bottom: 0px
+    }
+  `
+
+  useEffect(() => {
+    State.CURRENT_TAB = "cpu"
+  }, [])
 
   return (
     <>
-      {showWarning &&
+      {!State.IS_ALLY &&
         <>
-          <PanelSection>
+          <PanelSection c>
             <PanelSectionRow>
               <span></span>
               <br />
@@ -26,24 +35,35 @@ export const MainMenu: VFC = () => {
           </PanelSection>
         </>
       }
-      <CpuBlock collapsed={cpuCollapsed} onCollapse={() => {
-        setSystemCollapsed(true)
-        setPluginCollapsed(true)
-        setCpuCollapsed(!cpuCollapsed)
+      <div>
+        <DropdownItem selectedOption={State.CURRENT_TAB}
+          rgOptions={[
+            {
+              data: "cpu",
+              label: Translator.translate("performance.settings")
+            },
+            {
+              data: "system",
+              label: Translator.translate("system.info")
+            },
+            {
+              data: "plugin",
+              label: Translator.translate("plugin.info")
+            }
+          ]}
+          onChange={(newVal) => { State.CURRENT_TAB = newVal.data }}
+        />
+      </div>
+      {State.CURRENT_TAB === "cpu" &&
+        <CpuBlock />
       }
-      } />
-      <SystemBlock collapsed={systemCollapsed} onCollapse={() => {
-        setPluginCollapsed(true)
-        setCpuCollapsed(true)
-        setSystemCollapsed(!systemCollapsed)
+      {State.CURRENT_TAB === "system" &&
+        <SystemBlock />
+
       }
-      } />
-      <PluginBlock collapsed={pluginCollapsed} onCollapse={() => {
-        setSystemCollapsed(true)
-        setCpuCollapsed(true)
-        setPluginCollapsed(!pluginCollapsed)
+      {State.CURRENT_TAB === "plugin" &&
+        <PluginBlock />
       }
-      } />
       <ContributeBlock />
     </>
   );

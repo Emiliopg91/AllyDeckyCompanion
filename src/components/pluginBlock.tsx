@@ -1,8 +1,7 @@
-import { ButtonItem, Field, PanelSectionRow } from "decky-frontend-lib"
-import { useEffect, useState, VFC } from "react"
+import { ButtonItem, Field, PanelSection, PanelSectionRow } from "decky-frontend-lib"
+import { FC, useEffect, useState, } from "react"
 import { Constants } from "../utils/constants";
 import { BackendUtils } from "../utils/backend";
-import { CollapsibleItem } from "./collapsibleItem";
 import { Toast, Translator } from "decky-plugin-framework";
 
 const getLatestVersionNum = async () => {
@@ -19,7 +18,7 @@ const getLatestVersionNum = async () => {
     return "";
 };
 
-export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ collapsed, onCollapse }) => {
+export const PluginBlock: FC = () => {
     const [latestVersionNum, setLatestVersionNum] = useState("");
     const [isUpdated, setIsUpdated] = useState(true);
     const [isDoingThings, setIsDoingThings] = useState(false);
@@ -34,7 +33,7 @@ export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
 
     return (
         <>
-            <CollapsibleItem title={Translator.translate('plugin.info')} collapsed={collapsed} onCollapse={onCollapse}>
+            <PanelSection>
                 <>
                     <PanelSectionRow>
                         <Field label={Translator.translate("installed.version")} bottomSeparator="none">
@@ -72,7 +71,7 @@ export const PluginBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
                         </>
                     )}
                 </>
-            </CollapsibleItem >
+            </PanelSection >
         </>
     );
 };

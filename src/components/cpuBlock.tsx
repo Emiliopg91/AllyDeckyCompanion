@@ -1,5 +1,5 @@
-import { NotchLabel, PanelSectionRow, SliderField, ToggleField } from "decky-frontend-lib"
-import { useEffect, useState, VFC } from "react"
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field } from "decky-frontend-lib"
+import { FC, useEffect, useState } from "react"
 
 import { useProfile } from "../hooks/useProfile";
 import { Logger, Translator } from "decky-plugin-framework";
@@ -7,7 +7,6 @@ import { Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
-import { CollapsibleItem } from "./collapsibleItem";
 
 
 const saveSettings = debounce((id: string, name: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) => {
@@ -16,7 +15,7 @@ const saveSettings = debounce((id: string, name: string, mode: Number, spl: Numb
   BackendUtils.setTdpProfile(Profiles.getProfileForId(id))
 }, 500)
 
-export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ collapsed, onCollapse }) => {
+export const CpuBlock: FC = () => {
   const modeIndexes: Array<Number> = []
   const modeTags: Array<String> = []
   const notchLabels: NotchLabel[] = [];
@@ -123,13 +122,14 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
   }
 
   return (
-    <CollapsibleItem title={Translator.translate("performance.settings")} collapsed={collapsed} onCollapse={onCollapse}>
+    <PanelSection >
       <PanelSectionRow>
-        <span>{Translator.translate("profile.for", { name })}</span>
+        <Field label={Translator.translate("profile.for")} bottomSeparator="standard">
+          {name}
+        </Field>
       </PanelSectionRow>
       <PanelSectionRow>
         <SliderField
-          label={Translator.translate("performance.mode")}
           value={mode}
           min={0}
           max={modeIndexes.length - 1}
@@ -141,46 +141,56 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
           bottomSeparator={"none"}
           onChange={onModeChange}
         />
-        <SliderField
-          label={Translator.translate("spl.desc")}
-          value={spl}
-          disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
-          showValue
-          step={1}
-          valueSuffix="W"
-          min={5}
-          max={30}
-          validValues="range"
-          bottomSeparator="none"
-          onChange={onSplChange}
-        />
-        <SliderField
-          label={Translator.translate("sppl.desc")}
-          value={sppl}
-          disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
-          showValue
-          step={1}
-          valueSuffix="W"
-          min={5}
-          max={30}
-          validValues="range"
-          bottomSeparator="none"
-          onChange={onSpplChange}
-        />
-        <SliderField
-          label={Translator.translate("fppl.desc")}
-          value={fppl}
-          disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
-          showValue
-          step={1}
-          valueSuffix="W"
-          min={5}
-          max={30}
-          validValues="range"
-          bottomSeparator="none"
-          onChange={onFpplChange}
-        />
       </PanelSectionRow>
+      {mode == 3 &&
+        <>
+          <PanelSectionRow>
+            <SliderField
+              label={Translator.translate("spl.desc")}
+              value={spl}
+              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              showValue
+              step={1}
+              valueSuffix="W"
+              min={5}
+              max={30}
+              validValues="range"
+              bottomSeparator="none"
+              onChange={onSplChange}
+            />
+          </PanelSectionRow>
+          <PanelSectionRow>
+            <SliderField
+              label={Translator.translate("sppl.desc")}
+              value={sppl}
+              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              showValue
+              step={1}
+              valueSuffix="W"
+              min={5}
+              max={30}
+              validValues="range"
+              bottomSeparator="none"
+              onChange={onSpplChange}
+            />
+          </PanelSectionRow>
+          <PanelSectionRow>
+            <SliderField
+              label={Translator.translate("fppl.desc")}
+              value={fppl}
+              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              showValue
+              step={1}
+              valueSuffix="W"
+              min={5}
+              max={30}
+              validValues="range"
+              bottomSeparator="none"
+              onChange={onFpplChange}
+            />
+          </PanelSectionRow>
+        </>
+      }
       <PanelSectionRow>
         <ToggleField
           label="SMT"
@@ -199,6 +209,6 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
           highlightOnFocus
         />
       </PanelSectionRow>
-    </CollapsibleItem>
+    </PanelSection>
   );
 };
