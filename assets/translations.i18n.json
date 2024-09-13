@@ -1,7 +1,7 @@
 {
     "profile.for": {
-        "en": "Profile for {{name}}",
-        "es": "Perfil para {{name}}"
+        "en": "Profile",
+        "es": "Perfil"
     },
     "smt.description": {
         "en": "Enable multithreading. Best disabled for no CPU intensive software",
@@ -72,12 +72,12 @@
         "es": "Incrementa la vida útil de batería limitando la carga al 80%"
     },
     "main.menu": {
-        "en": "main menu",
-        "es": "menú principal"
+        "en": "Main menu",
+        "es": "Menú principal"
     },
     "mode.SILENT": {
         "en": "SILENT",
-        "es": "SILENCIOSO"
+        "es": "SILENCIO"
     },
     "mode.PERFORMANCE": {
         "en": "PERFORMANCE",
@@ -89,7 +89,7 @@
     },
     "mode.CUSTOM": {
         "en": "CUSTOM",
-        "es": "PERSONALIZADO"
+        "es": "CUSTOM"
     },
     "contribute.info": {
         "en": "Contribute",

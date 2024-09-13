@@ -1,10 +1,9 @@
-import { PanelSectionRow, ToggleField } from "decky-frontend-lib"
-import { useState, VFC } from "react"
+import { PanelSection, PanelSectionRow, ToggleField } from "decky-frontend-lib"
+import { FC, useState } from "react"
 import { SystemSettings } from "../settings/system";
-import { CollapsibleItem } from "./collapsibleItem";
 import { Translator } from "decky-plugin-framework";
 
-export const SystemBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ collapsed, onCollapse }) => {
+export const SystemBlock: FC = () => {
   const [limitBattery, setLimitBattery] = useState(SystemSettings.getLimitBattery())
   const onLimitBatteryChange = (newVal: boolean) => {
     SystemSettings.setLimitBattery(newVal);
@@ -14,7 +13,7 @@ export const SystemBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
 
   return (
     <>
-      <CollapsibleItem title={Translator.translate("system.info")} collapsed={collapsed} onCollapse={onCollapse}>
+      <PanelSection>
         <PanelSectionRow>
           <ToggleField
             label={Translator.translate("limit.battery")}
@@ -24,7 +23,7 @@ export const SystemBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = 
             highlightOnFocus
           />
         </PanelSectionRow>
-      </CollapsibleItem>
+      </PanelSection>
     </>
   );
 };
