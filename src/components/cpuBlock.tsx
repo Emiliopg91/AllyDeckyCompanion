@@ -66,16 +66,13 @@ export const CpuBlock: VFC<{ collapsed: boolean, onCollapse: () => void }> = ({ 
   }, [id])
 
   const onModeChange = (newVal: number) => {
-    if (newVal == modeTags.indexOf(Mode[Mode.CUSTOM])) {
-      saveSettings(id, name, newVal, spl, sppl, fppl, cpuBoost, smtEnabled)
-    } else {
-      const tdps = Profiles.getTdpForMode(newVal)
-      saveSettings(id, name, newVal, tdps[0], tdps[1], tdps[2], cpuBoost, smtEnabled)
+    let tdps = Profiles.getTdpForMode(newVal)
 
-      setSpl(tdps[0])
-      setSppl(tdps[1])
-      setFppl(tdps[2])
-    }
+    saveSettings(id, name, newVal, tdps[0], tdps[1], tdps[2], cpuBoost, smtEnabled)
+
+    setSpl(tdps[0])
+    setSppl(tdps[1])
+    setFppl(tdps[2])
     setMode(newVal)
   }
 

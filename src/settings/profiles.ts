@@ -73,6 +73,7 @@ export class Profiles {
                 fppl = Constants.AllySilentFPPL
                 break;
             case Mode.PERFORMANCE:
+            case Mode.CUSTOM:
                 spl = State.IS_ALLY_X ? Constants.AllyXPerformanceSPL : Constants.AllyPerformanceSPL
                 sppl = Constants.AllyPerformanceSPPL
                 fppl = Constants.AllyPerformanceFPPL
