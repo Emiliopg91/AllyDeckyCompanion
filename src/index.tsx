@@ -21,7 +21,7 @@ import {
 import { State } from "./utils/state";
 import { Profile, Profiles } from './settings/profiles'
 import { BackendUtils } from "./utils/backend";
-import { SystemSettings } from "./settings/system";
+import { SystemSettings } from "./settings/system"; 
 
 let gameInterval: NodeJS.Timeout | undefined = undefined;
 let onSuspendUnregister: Function | undefined;
