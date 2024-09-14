@@ -22,15 +22,28 @@ import { State } from "./utils/state";
 import { Profile, Profiles } from './settings/profiles'
 import { BackendUtils } from "./utils/backend";
 import { SystemSettings } from "./settings/system";
+import { debounce } from "lodash";
 
+let onPowerUnregister: Function | undefined;
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
 let onGameUnregister: Function | undefined;
+
+const applyGameProfile = debounce((id: string) => {
+  const profile: Profile = Profiles.getProfileForId(id)
+  Logger.info("Applying CPU settings for profile " + id + " (" + (id == Constants.DEFAULT_ID ? Translator.translate("main.menu") : Game.getGameDetails(Number(id.endsWith("-ac") ? id.substring(0, id.length - 3) : id)).getDisplayName()) + ")",
+    profile
+  )
+  BackendUtils.setTdpProfile(profile)
+}, 500)
 
 export default definePlugin((serverApi: ServerAPI) => {
   (async () => {
     await Framework.initialize(serverApi, Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
     BackendUtils.setServerApi(serverApi)
+
+    Profiles.getDefaultProfile()
+    Profiles.getDefaultACProfile()
 
     BackendUtils.isAlly().then(isAlly => {
       State.IS_ALLY = isAlly
@@ -42,14 +55,28 @@ export default definePlugin((serverApi: ServerAPI) => {
         Settings.setEntry(Constants.CFG_SCHEMA_PROP, Constants.CFG_SCHEMA_VERS, true)
 
         onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
-          const newId = e.bRunning ? String(e.unAppID) : Constants.DEFAULT_ID;
-          if (State.RUNNING_GAME_ID !== newId) {
-            const profile: Profile = Profiles.getProfileForId(newId, newId == Constants.DEFAULT_ID)
-            Logger.info("Applying CPU settings for profile " + newId + " (" + (newId == Constants.DEFAULT_ID ? Translator.translate("main.menu") : Game.getGameDetails(Number(newId)).getDisplayName()) + ")",
-              profile
-            )
-            BackendUtils.setTdpProfile(profile)
-            State.RUNNING_GAME_ID = newId
+          const prevId = State.RUNNING_GAME_ID
+          State.RUNNING_GAME_ID = (e.bRunning ? String(e.unAppID) : Constants.DEFAULT_ID) + (State.ON_BATTERY ? "" : "-ac");
+          if (prevId != State.RUNNING_GAME_ID) {
+            applyGameProfile(State.RUNNING_GAME_ID)
+          }
+        })
+
+        onPowerUnregister = SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
+          if (State.ON_BATTERY != (state.eACState == 1)) {
+            Logger.info("New AC state: " + state.eACState)
+            State.ON_BATTERY = state.eACState == 1
+
+            if (State.ON_BATTERY) {
+              if (State.RUNNING_GAME_ID.endsWith("-ac")) {
+                State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.length - 3)
+              }
+            } else {
+              if (!State.RUNNING_GAME_ID.endsWith("-ac")) {
+                State.RUNNING_GAME_ID = State.RUNNING_GAME_ID + "-ac"
+              }
+            }
+            applyGameProfile(State.RUNNING_GAME_ID)
           }
         })
 
@@ -66,6 +93,8 @@ export default definePlugin((serverApi: ServerAPI) => {
         })
 
         BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
+
+        applyGameProfile(State.RUNNING_GAME_ID)
       })
 
     });
@@ -76,6 +105,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     content: <MainMenu />,
     icon: <SiAsus />,
     async onDismount() {
+      if (onPowerUnregister)
+        onPowerUnregister()
       if (onGameUnregister)
         onGameUnregister()
       if (onSuspendUnregister)

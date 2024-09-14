@@ -26,35 +26,71 @@ export class Profiles {
     }
 
     public static getDefaultProfile(): Profile {
-        return Profiles.getProfileForId(Constants.DEFAULT_ID, true)
+        return Profiles.getProfileForId(Constants.DEFAULT_ID)
+    }
+
+    public static getDefaultACProfile(): Profile {
+        return Profiles.getProfileForId(Constants.DEFAULT_ID+"-ac")
     }
 
     public static existsProfileForId(id: string | number): boolean {
         return Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE) !== null
     }
 
-    public static getProfileForId(inputId: string | number, persist = false): Profile {
+    public static getProfileForId(inputId: string | number): Profile {
         const id = String(inputId)
+        const persist = id == "default" || id == "default-ac"
         if (persist && !Profiles.existsProfileForId(id)) {
             Logger.info("No profile found for " + id + ", creating")
 
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE, String(Constants.TDP_DEFAULT_MODE))), true)
+            if (!id.endsWith("-ac")) {
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE, String(Constants.TDP_DEFAULT_MODE))), true)
 
-            const tdps = this.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
+                const tdps = Profiles.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
 
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL, String(tdps[0]))), true)
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL, String(tdps[1]))), true)
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(Settings.getEntry(Constants.DEFAULT_FPPL, String(tdps[2]))), true)
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(Settings.getEntry(Constants.DEFAULT_CPU_BOOST, String(Constants.CPU_DEFAULT_BOOST))), true)
-            Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(Settings.getEntry(Constants.DEFAULT_CPU_SMT, String(Constants.CPU_DEFAULT_SMT))), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL, String(tdps[0]))), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL, String(tdps[1]))), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(Settings.getEntry(Constants.DEFAULT_FPPL, String(tdps[2]))), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(Settings.getEntry(Constants.DEFAULT_CPU_BOOST, String(Constants.CPU_DEFAULT_BOOST))), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(Settings.getEntry(Constants.DEFAULT_CPU_SMT, String(Constants.CPU_DEFAULT_SMT))), true)
+            } else {
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Mode.TURBO), true)
+
+                const tdps = Profiles.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
+
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(tdps[0]), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(tdps[1]), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(tdps[2]), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(false), true)
+                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(true), true)
+            }
+
         }
 
-        const mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE))))
-        const spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL))))
-        const sppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL))))
-        const fppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(Settings.getEntry(Constants.DEFAULT_FPPL))))
-        const cpuBoost = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(Settings.getEntry(Constants.DEFAULT_CPU_BOOST))) == "true"
-        const smtEnabled = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(Settings.getEntry(Constants.DEFAULT_CPU_SMT))) == "true"
+        let mode: number
+        let spl: number
+        let sppl: number
+        let fppl: number
+        let cpuBoost: boolean
+        let smtEnabled: boolean
+
+        if (!id.endsWith("-ac")) {
+            mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE))))
+            spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL))))
+            sppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL))))
+            fppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(Settings.getEntry(Constants.DEFAULT_FPPL))))
+            cpuBoost = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(Settings.getEntry(Constants.DEFAULT_CPU_BOOST))) == "true"
+            smtEnabled = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(Settings.getEntry(Constants.DEFAULT_CPU_SMT))) == "true"
+
+        } else {
+            const turboProf = Profiles.getTdpForMode(Mode.TURBO)
+            mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Mode.TURBO)))
+            spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(turboProf[0])))
+            sppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(turboProf[1])))
+            fppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(turboProf[2])))
+            cpuBoost = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(false)) == "true"
+            smtEnabled = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(true)) == "true"
+        }
 
         return {
             mode, spl, sppl, fppl, cpuBoost, smtEnabled
