@@ -2,12 +2,15 @@ import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Fi
 import { FC, useEffect, useState } from "react"
 import { AppOverviewExt } from '../utils/models'
 
-import { useProfile } from "../hooks/useProfile";
-import { Logger, Translator } from "decky-plugin-framework";
+import { Game, Logger, Translator } from "decky-plugin-framework";
 import { Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
+import { State } from "../utils/state";
+import { FaBatteryFull, FaSteamSquare } from "react-icons/fa";
+import { PiPlugFill } from "react-icons/pi";
+import { Constants } from "../utils/constants";
 
 
 const saveSettings = debounce((id: string, name: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) => {
@@ -36,7 +39,26 @@ export const CpuBlock: FC = () => {
       notchIdx++;
     });
 
-  const [id, name] = useProfile()
+  const getAppId = (id: string, bat: boolean) => {
+    if (!bat && id.endsWith("-ac")) {
+      return id.substring(0, id.length - 3)
+    }
+    return id;
+  }
+
+  const getAppName = (id: string, bat: boolean) => {
+    const appId = getAppId(id, bat);
+    if (appId == Constants.DEFAULT_ID) {
+      return Translator.translate("main.menu")
+    } else {
+      return Game.getGameDetails(Number(appId)).getDisplayName()
+    }
+  }
+
+  const [bat, setBat] = useState(State.ON_BATTERY);
+  const [id, setId] = useState(State.RUNNING_GAME_ID);
+  const [name, setName] = useState(getAppName(id, bat));
+
   const [iconSrc, setIconSrc] = useState<string | undefined>(undefined)
 
   const profile = Profiles.getProfileForId(id);
@@ -48,38 +70,46 @@ export const CpuBlock: FC = () => {
   const [cpuBoost, setCpuBoost] = useState(profile.cpuBoost)
   const [smtEnabled, setSmt] = useState(profile.smtEnabled)
 
-  const loadSettings = () => {
+  const loadSettings = debounce((id, name) => {
     Logger.info("Loading profile " + id + " (" + name + ")")
     const profile = Profiles.getProfileForId(id);
+    setMode(profile.mode)
     setSpl(profile.spl)
     setSppl(profile.sppl)
     setFppl(profile.fppl)
     setCpuBoost(profile.cpuBoost)
     setSmt(profile.smtEnabled)
+  }, 100)
+
+  const loadIcon = debounce(() => {
+    let newIconSrc: string | undefined = undefined;
+    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
+      if (!newIconSrc && app.icon_data && String(app.appid) == (bat ? id : id.substring(0, id.length - 3))) {
+        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
+      }
+    });
+    setIconSrc(newIconSrc)
+  }, 100)
+
+  const profRefreshFn = () => {
+    setBat(bat => (bat != State.ON_BATTERY) ? State.ON_BATTERY : bat)
+    setId(id => (id != State.RUNNING_GAME_ID) ? State.RUNNING_GAME_ID : id)
+    setName(getAppName(id, bat))
   }
 
   useEffect(() => {
-    loadSettings();
+    loadSettings(id, name);
+    loadIcon()
+    const profRefresh = setInterval(() => profRefreshFn(), 500)
 
-    let newIconSrc: string | undefined = undefined;
-    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
-      if (!newIconSrc && app.icon_data && String(app.appid) == String(id)) {
-        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
-      }
-    });
-    setIconSrc(newIconSrc)
+    return () => {
+      clearInterval(profRefresh)
+    }
   }, [])
 
   useEffect(() => {
-    loadSettings();
-
-    let newIconSrc: string | undefined = undefined;
-    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
-      if (!newIconSrc && app.icon_data && String(app.appid) == String(id)) {
-        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
-      }
-    });
-    setIconSrc(newIconSrc)
+    loadSettings(id, name);
+    loadIcon()
   }, [id])
 
   const onModeChange = (newVal: number) => {
@@ -140,12 +170,25 @@ export const CpuBlock: FC = () => {
     <PanelSection >
       <PanelSectionRow>
         <Field label={Translator.translate("profile.for")} bottomSeparator="standard">
-          {iconSrc &&
-            <img
-              style={{ maxWidth: 16, maxHeight: 16 }}
-              src={iconSrc}
-            />
+          {bat &&
+            <FaBatteryFull />
           }
+          {!bat &&
+            <PiPlugFill />
+          }
+          {(id != "default" && id != "default-ac" && iconSrc) &&
+            <>
+              <span> </span>
+              <img
+                style={{ maxWidth: 16, maxHeight: 16 }}
+                src={iconSrc}
+              />
+            </>
+          }
+          {(id == "default" || id == "default-ac") &&
+            <FaSteamSquare />
+          }
+          <span> </span>
           {name}
         </Field>
       </PanelSectionRow>
