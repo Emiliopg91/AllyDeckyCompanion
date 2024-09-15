@@ -17,11 +17,13 @@ export class Constants {
     public static DEFAULT_ID_AC = Constants.DEFAULT_DEFAULT + Constants.SUFIX_AC
 
     public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
+    public static TDP_AC_DEFAULT_MODE = Mode.TURBO;
     public static CPU_DEFAULT_SMT = true
     public static CPU_DEFAULT_BOOST = false
     public static DEFAULT_BATTERY_LIMIT = false
 
     public static PREFIX_PROFILES = "profiles."
+    public static SUFIX_NAME = ".name"
     public static SUFIX_SPL = ".cpu.tdp.spl"
     public static SUFIX_SPPL = ".cpu.tdp.sppl"
     public static SUFIX_FPPL = ".cpu.tdp.fppl"

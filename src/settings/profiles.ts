@@ -66,33 +66,7 @@ export class Profiles {
 
     public static getProfileForId(inputId: string | number): Profile {
         const id = String(inputId)
-        const persist = (id == Constants.DEFAULT_ID || id == Constants.DEFAULT_ID_AC)
-        if (persist && !Profiles.existsProfileForId(id)) {
-            Logger.info("No profile found for " + id + ", creating")
-
-            if (!id.endsWith(Constants.SUFIX_AC)) {
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE, String(Constants.TDP_DEFAULT_MODE))), true)
-
-                const tdps = Profiles.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
-
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL, String(tdps[0]))), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL, String(tdps[1]))), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(Settings.getEntry(Constants.DEFAULT_FPPL, String(tdps[2]))), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(Settings.getEntry(Constants.DEFAULT_CPU_BOOST, String(Constants.CPU_DEFAULT_BOOST))), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(Settings.getEntry(Constants.DEFAULT_CPU_SMT, String(Constants.CPU_DEFAULT_SMT))), true)
-            } else {
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Mode.TURBO), true)
-
-                const tdps = Profiles.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
-
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(tdps[0]), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(tdps[1]), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(tdps[2]), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(false), true)
-                Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(true), true)
-            }
-
-        }
+        const persist = (id == Constants.DEFAULT_ID || id == Constants.DEFAULT_ID_AC)        
 
         let mode: number
         let spl: number
@@ -100,6 +74,31 @@ export class Profiles {
         let fppl: number
         let cpuBoost: boolean
         let smtEnabled: boolean
+
+        if (persist && !Profiles.existsProfileForId(id)) {
+            Logger.info("No profile found for " + id + ", creating")
+
+            if (!id.endsWith(Constants.SUFIX_AC)) {
+                mode = Constants.TDP_DEFAULT_MODE
+                const tdps = Profiles.getTdpForMode(mode)
+
+                spl = Number(Settings.getEntry(Constants.DEFAULT_SPL, String(tdps[0])))
+                sppl = Number(Settings.getEntry(Constants.DEFAULT_SPPL, String(tdps[1])))
+                fppl = Number(Settings.getEntry(Constants.DEFAULT_FPPL, String(tdps[2])))
+                cpuBoost = Settings.getEntry(Constants.DEFAULT_CPU_BOOST, String(Constants.CPU_DEFAULT_BOOST)) == "true"
+                smtEnabled = Settings.getEntry(Constants.DEFAULT_CPU_SMT, String(Constants.CPU_DEFAULT_SMT)) == "true"
+            } else {
+                mode = Constants.TDP_AC_DEFAULT_MODE
+                const acTdps = Profiles.getTdpForMode(mode)
+
+                spl = acTdps[0]
+                sppl = acTdps[1]
+                fppl = acTdps[2]
+                cpuBoost = Constants.CPU_DEFAULT_BOOST
+                smtEnabled = Constants.CPU_DEFAULT_SMT
+            }
+            Profiles.saveProfileForId(id, mode, spl, sppl, fppl, cpuBoost, smtEnabled)
+        }
 
         if (!id.endsWith(Constants.SUFIX_AC)) {
             mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE))))
@@ -151,6 +150,7 @@ export class Profiles {
     }
 
     public static saveProfileForId(id: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) {
+        Settings.setEntry(Constants.PREFIX_PROFILES + Profiles.getAppId(id) + Constants.SUFIX_NAME, Profiles.getAppName(id), true)
         Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(mode), true)
         Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(spl), true)
         Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(sppl), true)
