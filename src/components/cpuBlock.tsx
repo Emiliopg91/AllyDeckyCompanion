@@ -2,7 +2,7 @@ import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Fi
 import { FC, useEffect, useState } from "react"
 
 import { Logger, Translator } from "decky-plugin-framework";
-import { Profiles } from "../settings/profiles";
+import { Profile, Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
@@ -39,26 +39,13 @@ export const CpuBlock: FC = () => {
     });
 
   const [id, name, icon, bat] = useProfile()
-  const profile = Profiles.getProfileForId(id);
 
-  //const [prof, setProf] = useState<Profile>(Profiles.getProfileForId(id))
-
-  const [mode, setMode] = useState(profile.mode)
-  const [spl, setSpl] = useState(profile.spl)
-  const [sppl, setSppl] = useState(profile.sppl)
-  const [fppl, setFppl] = useState(profile.fppl)
-  const [cpuBoost, setCpuBoost] = useState(profile.cpuBoost)
-  const [smtEnabled, setSmt] = useState(profile.smtEnabled)
+  const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(id))
 
   const loadSettings = debounce((id, name) => {
     Logger.info("Loading profile " + id + " (" + name + ")")
     const profile = Profiles.getProfileForId(id);
-    setMode(profile.mode)
-    setSpl(profile.spl)
-    setSppl(profile.sppl)
-    setFppl(profile.fppl)
-    setCpuBoost(profile.cpuBoost)
-    setSmt(profile.smtEnabled)
+    setProfile(profile)
   }, 100)
 
   useEffect(() => {
@@ -72,55 +59,43 @@ export const CpuBlock: FC = () => {
   const onModeChange = (newVal: number) => {
     let tdps = Profiles.getTdpForMode(newVal)
 
-    saveSettings(id, name, newVal, tdps[0], tdps[1], tdps[2], cpuBoost, smtEnabled)
-
-    setSpl(tdps[0])
-    setSppl(tdps[1])
-    setFppl(tdps[2])
-    setMode(newVal)
+    saveSettings(id, name, newVal, tdps[0], tdps[1], tdps[2], profile.cpuBoost, profile.smtEnabled)
+    setProfile({ ...profile, spl: tdps[0], sppl: tdps[1], fppl: tdps[2], mode: newVal })
   }
 
   const onSplChange = (newVal: number) => {
-    let newSppl = (newVal > sppl) ? newVal : sppl;
-    let newFppl = (newVal > fppl) ? newVal : fppl;
+    let newSppl = (newVal > profile.sppl) ? newVal : profile.sppl;
+    let newFppl = (newVal > profile.fppl) ? newVal : profile.fppl;
 
-    saveSettings(id, name, mode, newVal, newSppl, newFppl, cpuBoost, smtEnabled)
-
-    setSpl(newVal)
-    setSppl(newSppl)
-    setFppl(newFppl)
+    saveSettings(id, name, profile.mode, newVal, newSppl, newFppl, profile.cpuBoost, profile.smtEnabled)
+    setProfile({ ...profile, spl: newVal, sppl: newSppl, fppl: newFppl })
   }
 
   const onSpplChange = (newVal: number) => {
-    if (newVal < spl)
-      newVal = spl;
-    let newFppl = (newVal > fppl) ? newVal : fppl;
+    if (newVal < profile.spl)
+      newVal = profile.spl;
+    let newFppl = (newVal > profile.fppl) ? newVal : profile.fppl;
 
-    saveSettings(id, name, mode, spl, newVal, newFppl, cpuBoost, smtEnabled)
-
-    setSppl(newVal)
-    setFppl(newFppl)
+    saveSettings(id, name, profile.mode, profile.spl, newVal, newFppl, profile.cpuBoost, profile.smtEnabled)
+    setProfile({ ...profile, sppl: newVal, fppl: newFppl })
   }
 
   const onFpplChange = (newVal: number) => {
-    if (newVal < sppl)
-      newVal = sppl;
+    if (newVal < profile.sppl)
+      newVal = profile.sppl;
 
-    saveSettings(id, name, mode, spl, sppl, newVal, cpuBoost, smtEnabled)
-
-    setFppl(newVal)
+    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, newVal, profile.cpuBoost, profile.smtEnabled)
+    setProfile({ ...profile, fppl: newVal })
   }
 
   const onCpuBoostChange = (newVal: boolean) => {
-    saveSettings(id, name, mode, spl, sppl, fppl, newVal, smtEnabled)
-
-    setCpuBoost(newVal)
+    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, profile.fppl, newVal, profile.smtEnabled)
+    setProfile({ ...profile, cpuBoost: newVal })
   }
 
   const onSmtChange = (newVal: boolean) => {
-    saveSettings(id, name, mode, spl, sppl, fppl, cpuBoost, newVal)
-
-    setSmt(newVal)
+    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, profile.fppl, profile.cpuBoost, newVal)
+    setProfile({ ...profile, smtEnabled: newVal })
   }
 
   return (
@@ -151,7 +126,7 @@ export const CpuBlock: FC = () => {
       </PanelSectionRow>
       <PanelSectionRow>
         <SliderField
-          value={mode}
+          value={profile.mode}
           min={0}
           max={modeIndexes.length - 1}
           step={1}
@@ -163,13 +138,13 @@ export const CpuBlock: FC = () => {
           onChange={onModeChange}
         />
       </PanelSectionRow>
-      {mode == 3 &&
+      {profile.mode == 3 &&
         <>
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("spl.desc")}
-              value={spl}
-              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              value={profile.spl}
+              disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
               valueSuffix="W"
@@ -183,8 +158,8 @@ export const CpuBlock: FC = () => {
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("sppl.desc")}
-              value={sppl}
-              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              value={profile.sppl}
+              disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
               valueSuffix="W"
@@ -198,8 +173,8 @@ export const CpuBlock: FC = () => {
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("fppl.desc")}
-              value={fppl}
-              disabled={mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
+              value={profile.fppl}
+              disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
               valueSuffix="W"
@@ -216,7 +191,7 @@ export const CpuBlock: FC = () => {
         <ToggleField
           label="SMT"
           description={Translator.translate('smt.description')}
-          checked={smtEnabled}
+          checked={profile.smtEnabled}
           onChange={onSmtChange}
           highlightOnFocus
         />
@@ -225,7 +200,7 @@ export const CpuBlock: FC = () => {
         <ToggleField
           label="CPU Boost"
           description={Translator.translate("cpu.boost.description")}
-          checked={cpuBoost}
+          checked={profile.cpuBoost}
           onChange={onCpuBoostChange}
           highlightOnFocus
         />
