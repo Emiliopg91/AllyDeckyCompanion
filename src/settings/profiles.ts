@@ -1,5 +1,5 @@
 
-import { Logger, Settings } from "decky-plugin-framework"
+import { Game, Logger, Settings, Translator } from "decky-plugin-framework"
 import { Constants } from '../utils/constants'
 import { Mode } from "../utils/mode"
 import { State } from "../utils/state"
@@ -14,6 +14,19 @@ export interface Profile {
 }
 
 export class Profiles {
+    public static getAppId(id: string): string {
+        return id.substring(0, id.lastIndexOf("."))
+    }
+
+    public static getAppName(id: string): string {
+        const appId = Profiles.getAppId(id);
+        if (appId == Constants.DEFAULT_DEFAULT) {
+            return Translator.translate("main.menu")
+        } else {
+            return Game.getGameDetails(Number(appId)).getDisplayName()
+        }
+    }
+
     public static getFullPowerProfile(): Profile {
         return {
             mode: Mode.TURBO,

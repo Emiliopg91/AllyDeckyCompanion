@@ -1,13 +1,12 @@
-import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field, Router } from "decky-frontend-lib"
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field } from "decky-frontend-lib"
 import { FC, useEffect, useState } from "react"
-import { AppOverviewExt } from '../utils/models'
 
-import { Game, Logger, Translator } from "decky-plugin-framework";
+import { Logger, Translator } from "decky-plugin-framework";
 import { Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
-import { State } from "../utils/state";
+import { useProfile } from "../hooks/useProfile";
 import { FaBatteryFull, FaSteamSquare } from "react-icons/fa";
 import { PiPlugFill } from "react-icons/pi";
 import { Constants } from "../utils/constants";
@@ -39,29 +38,10 @@ export const CpuBlock: FC = () => {
       notchIdx++;
     });
 
-  const getAppId = (id: string, bat: boolean) => {
-    if (!bat && id.endsWith(Constants.SUFIX_AC)) {
-      return id.substring(0, id.lastIndexOf("."))
-    }
-    return id;
-  }
-
-  const getAppName = (id: string, bat: boolean) => {
-    const appId = getAppId(id, bat);
-    if (appId == Constants.DEFAULT_ID) {
-      return Translator.translate("main.menu")
-    } else {
-      return Game.getGameDetails(Number(appId)).getDisplayName()
-    }
-  }
-
-  const [bat, setBat] = useState(State.ON_BATTERY);
-  const [id, setId] = useState(State.RUNNING_GAME_ID);
-  const [name, setName] = useState(getAppName(id, bat));
-
-  const [iconSrc, setIconSrc] = useState<string | undefined>(undefined)
-
+  const [id, name, icon, bat] = useProfile()
   const profile = Profiles.getProfileForId(id);
+
+  //const [prof, setProf] = useState<Profile>(Profiles.getProfileForId(id))
 
   const [mode, setMode] = useState(profile.mode)
   const [spl, setSpl] = useState(profile.spl)
@@ -81,35 +61,12 @@ export const CpuBlock: FC = () => {
     setSmt(profile.smtEnabled)
   }, 100)
 
-  const loadIcon = debounce(() => {
-    let newIconSrc: string | undefined = undefined;
-    (Router.RunningApps as AppOverviewExt[]).filter((app) => {
-      if (!newIconSrc && app.icon_data && String(app.appid) == (bat ? id : id.substring(0, id.lastIndexOf('.')))) {
-        newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
-      }
-    });
-    setIconSrc(newIconSrc)
-  }, 100)
-
-  const profRefreshFn = () => {
-    setBat(bat => (bat != State.ON_BATTERY) ? State.ON_BATTERY : bat)
-    setId(id => (id != State.RUNNING_GAME_ID) ? State.RUNNING_GAME_ID : id)
-    setName(getAppName(id, bat))
-  }
-
   useEffect(() => {
     loadSettings(id, name);
-    loadIcon()
-    const profRefresh = setInterval(() => profRefreshFn(), 500)
-
-    return () => {
-      clearInterval(profRefresh)
-    }
   }, [])
 
   useEffect(() => {
     loadSettings(id, name);
-    loadIcon()
   }, [id])
 
   const onModeChange = (newVal: number) => {
@@ -176,12 +133,12 @@ export const CpuBlock: FC = () => {
           {!bat &&
             <PiPlugFill />
           }
-          {(id != Constants.DEFAULT_ID && id != Constants.DEFAULT_ID_AC && iconSrc) &&
+          {(id != Constants.DEFAULT_ID && id != Constants.DEFAULT_ID_AC && icon) &&
             <>
               <span> </span>
               <img
                 style={{ maxWidth: 16, maxHeight: 16 }}
-                src={iconSrc}
+                src={icon}
               />
             </>
           }
