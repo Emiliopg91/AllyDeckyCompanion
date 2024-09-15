@@ -31,7 +31,7 @@ let onGameUnregister: Function | undefined;
 
 const applyGameProfile = debounce((id: string) => {
   const profile: Profile = Profiles.getProfileForId(id)
-  Logger.info("Applying CPU settings for profile " + id + " (" + (id == Constants.DEFAULT_ID ? Translator.translate("main.menu") : Game.getGameDetails(Number(id.endsWith("-ac") ? id.substring(0, id.length - 3) : id)).getDisplayName()) + ")",
+  Logger.info("Applying CPU settings for profile " + id,
     profile
   )
   BackendUtils.setTdpProfile(profile)
@@ -56,7 +56,9 @@ export default definePlugin((serverApi: ServerAPI) => {
 
         onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
           const prevId = State.RUNNING_GAME_ID
-          State.RUNNING_GAME_ID = (e.bRunning ? String(e.unAppID) : Constants.DEFAULT_ID) + (State.ON_BATTERY ? "" : "-ac");
+          State.RUNNING_GAME_ID = (e.bRunning 
+            ? String(e.unAppID) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC) 
+            : (State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC));
           if (prevId != State.RUNNING_GAME_ID) {
             applyGameProfile(State.RUNNING_GAME_ID)
           }
@@ -67,15 +69,7 @@ export default definePlugin((serverApi: ServerAPI) => {
             Logger.info("New AC state: " + state.eACState)
             State.ON_BATTERY = state.eACState == 1
 
-            if (State.ON_BATTERY) {
-              if (State.RUNNING_GAME_ID.endsWith("-ac")) {
-                State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.length - 3)
-              }
-            } else {
-              if (!State.RUNNING_GAME_ID.endsWith("-ac")) {
-                State.RUNNING_GAME_ID = State.RUNNING_GAME_ID + "-ac"
-              }
-            }
+            State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.lastIndexOf(".")) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
             applyGameProfile(State.RUNNING_GAME_ID)
           }
         })

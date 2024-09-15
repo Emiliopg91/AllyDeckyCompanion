@@ -9,7 +9,11 @@ export class Constants {
     public static PLUGIN_NAME = plugin.name;
     public static PLUGIN_VERSION = plugin.version;
 
-    public static DEFAULT_ID = "default";
+    public static SUFIX_AC = ".acpower"
+    public static SUFIX_BAT = ".battery"
+
+    public static DEFAULT_ID = "default" + Constants.SUFIX_BAT
+    public static DEFAULT_ID_AC = "default" + Constants.SUFIX_AC
 
     public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
     public static CPU_DEFAULT_SMT = true

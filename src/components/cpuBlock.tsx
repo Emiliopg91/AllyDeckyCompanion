@@ -40,8 +40,8 @@ export const CpuBlock: FC = () => {
     });
 
   const getAppId = (id: string, bat: boolean) => {
-    if (!bat && id.endsWith("-ac")) {
-      return id.substring(0, id.length - 3)
+    if (!bat && id.endsWith(Constants.SUFIX_AC)) {
+      return id.substring(0, id.lastIndexOf("."))
     }
     return id;
   }
@@ -84,7 +84,7 @@ export const CpuBlock: FC = () => {
   const loadIcon = debounce(() => {
     let newIconSrc: string | undefined = undefined;
     (Router.RunningApps as AppOverviewExt[]).filter((app) => {
-      if (!newIconSrc && app.icon_data && String(app.appid) == (bat ? id : id.substring(0, id.length - 3))) {
+      if (!newIconSrc && app.icon_data && String(app.appid) == (bat ? id : id.substring(0, id.lastIndexOf('.')))) {
         newIconSrc = "data:image/" + app.icon_data_format + ";base64," + app.icon_data
       }
     });
@@ -176,7 +176,7 @@ export const CpuBlock: FC = () => {
           {!bat &&
             <PiPlugFill />
           }
-          {(id != "default" && id != "default-ac" && iconSrc) &&
+          {(id != Constants.DEFAULT_ID && id != Constants.DEFAULT_ID_AC && iconSrc) &&
             <>
               <span> </span>
               <img
@@ -185,7 +185,7 @@ export const CpuBlock: FC = () => {
               />
             </>
           }
-          {(id == "default" || id == "default-ac") &&
+          {(id == Constants.DEFAULT_ID || id == Constants.DEFAULT_ID_AC) &&
             <FaSteamSquare />
           }
           <span> </span>

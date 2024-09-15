@@ -30,7 +30,7 @@ export class Profiles {
     }
 
     public static getDefaultACProfile(): Profile {
-        return Profiles.getProfileForId(Constants.DEFAULT_ID+"-ac")
+        return Profiles.getProfileForId(Constants.DEFAULT_ID_AC)
     }
 
     public static existsProfileForId(id: string | number): boolean {
@@ -39,11 +39,11 @@ export class Profiles {
 
     public static getProfileForId(inputId: string | number): Profile {
         const id = String(inputId)
-        const persist = id == "default" || id == "default-ac"
+        const persist = (id == Constants.DEFAULT_ID || id == Constants.DEFAULT_ID_AC)
         if (persist && !Profiles.existsProfileForId(id)) {
             Logger.info("No profile found for " + id + ", creating")
 
-            if (!id.endsWith("-ac")) {
+            if (!id.endsWith(Constants.SUFIX_AC)) {
                 Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE, String(Constants.TDP_DEFAULT_MODE))), true)
 
                 const tdps = Profiles.getTdpForMode(Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)))
@@ -74,7 +74,7 @@ export class Profiles {
         let cpuBoost: boolean
         let smtEnabled: boolean
 
-        if (!id.endsWith("-ac")) {
+        if (!id.endsWith(Constants.SUFIX_AC)) {
             mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(Settings.getEntry(Constants.DEFAULT_MODE))))
             spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(Settings.getEntry(Constants.DEFAULT_SPL))))
             sppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(Settings.getEntry(Constants.DEFAULT_SPPL))))
