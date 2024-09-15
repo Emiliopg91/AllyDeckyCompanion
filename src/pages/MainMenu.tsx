@@ -1,6 +1,6 @@
 
 import { CpuBlock } from "../components/cpuBlock";
-import { SystemBlock } from "../components/systemBlock";
+import { SystemBlock } from "../components/settingsBlock";
 import { PluginBlock } from "../components/pluginBlock";
 import { State } from "../utils/state";
 import { DropdownItem, PanelSection, PanelSectionRow } from "decky-frontend-lib";
@@ -9,15 +9,6 @@ import { FC, useEffect } from "react";
 import { Translator } from "decky-plugin-framework";
 
 export const MainMenu: FC = () => {
-  const css = `
-    .remMargin {
-      margin-bottom: 0px
-    }
-    .remMargin div {
-      margin-bottom: 0px
-    }
-  `
-
   useEffect(() => {
     State.CURRENT_TAB = "cpu"
   }, [])
@@ -26,7 +17,7 @@ export const MainMenu: FC = () => {
     <>
       {!State.IS_ALLY &&
         <>
-          <PanelSection c>
+          <PanelSection>
             <PanelSectionRow>
               <span></span>
               <br />
@@ -44,7 +35,7 @@ export const MainMenu: FC = () => {
             },
             {
               data: "system",
-              label: Translator.translate("system.info")
+              label: Translator.translate("settings.info")
             },
             {
               data: "plugin",

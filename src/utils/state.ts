@@ -9,4 +9,5 @@ export class State {
     public static IS_ALLY = false
     public static IS_ALLY_X = false
     public static CURRENT_TAB = "cpu";
+    public static PROFILE_PER_GAME = false
 }

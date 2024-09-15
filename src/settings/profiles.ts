@@ -3,6 +3,8 @@ import { Game, Logger, Settings, Translator } from "decky-plugin-framework"
 import { Constants } from '../utils/constants'
 import { Mode } from "../utils/mode"
 import { State } from "../utils/state"
+import { debounce } from "lodash"
+import { BackendUtils } from "../utils/backend"
 
 export interface Profile {
     mode: number
@@ -36,6 +38,18 @@ export class Profiles {
             cpuBoost: true,
             smtEnabled: true
         }
+    }
+
+    private static debouncedApplyGameProfile = debounce((id: string) => {
+        const profile: Profile = Profiles.getProfileForId(id)
+        Logger.info("Applying CPU settings for profile " + id,
+            profile
+        )
+        BackendUtils.setTdpProfile(profile)
+    }, 500)
+
+    public static applyGameProfile(id: string) {
+        Profiles.debouncedApplyGameProfile(id)
     }
 
     public static getDefaultProfile(): Profile {

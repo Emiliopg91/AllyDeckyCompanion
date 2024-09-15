@@ -35,7 +35,10 @@ export class Constants {
     public static DEFAULT_FPPL = Constants.PREFIX_PROFILES + Constants.DEFAULT_ID + Constants.SUFIX_FPPL
     public static DEFAULT_CPU_BOOST = Constants.PREFIX_PROFILES + Constants.DEFAULT_ID + Constants.SUFIX_CPU_BOOST
     public static DEFAULT_CPU_SMT = Constants.PREFIX_PROFILES + Constants.DEFAULT_ID + Constants.SUFIX_CPU_SMT
-    public static BATTERY_LIMIT = "system.limit_battery"
+
+    public static PREFIX_SETTINGS = "settings."
+    public static BATTERY_LIMIT = Constants.PREFIX_SETTINGS + "limit_battery"
+    public static PROFILE_PER_GAME = Constants.PREFIX_SETTINGS + "profile_per_game"
 
     public static PROFILE_SILENT = "silent"
     public static PROFILE_PERFORMANCE = "performance"

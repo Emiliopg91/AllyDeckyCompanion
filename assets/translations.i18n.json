@@ -59,9 +59,9 @@
         "en": "Update to {{version}}",
         "es": "Actualizar a {{version}}"
     },
-    "system.info": {
-        "en": "System",
-        "es": "Sistema"
+    "settings.info": {
+        "en": "Settings",
+        "es": "Configuración"
     },
     "limit.battery": {
         "en": "Limit battery charge",
@@ -72,8 +72,8 @@
         "es": "Incrementa la vida útil de batería limitando la carga al 80%"
     },
     "main.menu": {
-        "en": "Main menu",
-        "es": "Menú principal"
+        "en": "SteamOS",
+        "es": "SteamOS"
     },
     "mode.SILENT": {
         "en": "SILENT",
@@ -102,5 +102,25 @@
     "report.a.bug": {
         "en": "Report bug",
         "es": "Reportar error"
+    },
+    "profile.per.game.ask": {
+        "en": "Enable per-game performance profile?",
+        "es": "¿Habilitar perfil de rendimiento por juego?"
+    },
+    "enable": {
+        "en": "Enable",
+        "es": "Habilitar"
+    },
+    "disable": {
+        "en": "Disable",
+        "es": "Deshabilitar"
+    },
+    "profile.per.game": {
+        "en": "Performance profile per-game",
+        "es": "Perfil de rendimiento por juego"
+    },
+    "profile.per.game.desc": {
+        "en": "Allow different performance profiles per game or use a global profile",
+        "es": "Permitir diferentes perfiles de rendimiento por juego o utilizar un perfil global"
     }
 }
