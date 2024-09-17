@@ -134,9 +134,15 @@ export class Profiles {
             Object.keys(cfg.tdpProfiles).forEach((srcId) => {
                 const id = srcId.replace("-ac-power", "")
                 const ac = srcId.includes("-ac-power")
-                const tdp = cfg.tdpProfiles[id].tdp
                 const smt = cfg.tdpProfiles[id].smt
                 const cpuBoost = cfg.tdpProfiles[id].cpuBoost
+                let tdp = cfg.tdpProfiles[id].tdp
+                if (tdp < 5) {
+                    tdp = 5
+                } else if (tdp > Constants.AllyTurboFPPL) {
+                    tdp = Constants.AllyTurboFPPL
+                }
+
 
                 const localId = id + (ac ? Constants.SUFIX_AC : Constants.SUFIX_BAT)
                 if (!Profiles.existsProfileForId(localId)) {

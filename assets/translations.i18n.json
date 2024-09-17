@@ -150,5 +150,9 @@
     "incompatible.device": {
         "en": "Incompatible device",
         "es": "Dispositivo incompatible"
+    },
+    "restart.to.apply": {
+        "en": "Restart to apply changes",
+        "es": "Reiniciar para aplicar cambios"
     }
 }

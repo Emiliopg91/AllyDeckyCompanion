@@ -16,6 +16,7 @@ import {
   Framework,
   Logger,
   Settings,
+  Toast,
   Translator,
 } from "decky-plugin-framework";
 import { State } from "./utils/state";
@@ -30,7 +31,7 @@ let onGameUnregister: Function | undefined;
 
 const checkProfilePerGame = () => {
   return new Promise<void>((resolve) => {
-    if (!Settings.getEntry(Constants.PROFILE_PER_GAME) && !State.SDTDP_ENABLED) {
+    if (!Settings.getEntry(Constants.PROFILE_PER_GAME)) {
       showModal(<ConfirmModal
         strTitle={Constants.PLUGIN_NAME}
         strDescription={Translator.translate("profile.per.game.ask")}
@@ -39,11 +40,13 @@ const checkProfilePerGame = () => {
         onCancel={() => {
           Settings.setEntry(Constants.PROFILE_PER_GAME, "false", true)
           State.PROFILE_PER_GAME = false
+          Logger.info("Disabled profile per-game")
           resolve()
         }}
         onOK={() => {
           Settings.setEntry(Constants.PROFILE_PER_GAME, "true", true)
           State.PROFILE_PER_GAME = true
+          Logger.info("Enabled profile per-game")
           resolve()
         }}
       />)
@@ -65,6 +68,8 @@ const checkSdtdp = () => {
           strOKButtonText={Translator.translate("disable")}
           onCancel={() => {
             State.SDTDP_ENABLED = true
+            Logger.info("SimpleDeckyTDP not disabled")
+            resolve()
           }}
           onOK={() => {
             Logger.info("Disabling SimpleDeckyTDP")
@@ -96,11 +101,12 @@ export default definePlugin((serverApi: ServerAPI) => {
         BackendUtils.isAlly().then(isAlly => {
           State.IS_ALLY = isAlly
 
-          State.ONLY_GUI = !isAlly || State.SDTDP_ENABLED
+          State.ONLY_GUI = !State.IS_ALLY || State.SDTDP_ENABLED
 
           BackendUtils.isAllyX().then(isX => {
             State.IS_ALLY_X = isX
             Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
+            Logger.info("Mode ONLY_GUI " + (State.ONLY_GUI ? "en" : "dis") + "abled")
 
             BackendUtils.isSdtdpPresent().then((res) => {
               Logger.info("SDTDP " + ((res) ? "" : "no ") + "present")

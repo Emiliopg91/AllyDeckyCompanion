@@ -118,5 +118,5 @@ class Plugin:
         dst = decky_plugin.DECKY_PLUGIN_DIR+"/SimpleDeckyTDP"
         shutil.move(src, dst)
         decky_plugin.logger.info(f"Moved '{src}' to '{dst}'")
-        decky_plugin.logger.info("Restaring Decky Plugin Loader")
-        subprocess.run(["systemctl", "reboot"], check=True)
+        decky_plugin.logger.info("Restaring device")
+        subprocess.run(["reboot", "--force"], check=True)
