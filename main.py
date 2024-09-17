@@ -52,9 +52,9 @@ class Plugin:
         plugin_config.migrate()
 
 # BATTERY 
-    async def set_charge_limit(self, enabled: bool):
-        decky_plugin.logger.debug(f"Executing: set_charge_limit({enabled})")
-        middleware.set_charge_limit(enabled)
+    async def set_charge_limit(self, limit: int):
+        decky_plugin.logger.debug(f"Executing: set_charge_limit({limit})")
+        middleware.set_charge_limit(limit)
 
 # TDP 
     async def set_platform_profile(self, prof: str):
