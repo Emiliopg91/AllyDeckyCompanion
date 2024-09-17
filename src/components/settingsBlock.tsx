@@ -57,7 +57,9 @@ export const SystemBlock: FC = () => {
               value={limitBattery}
               min={0}
               max={batLimitIndexes.length - 1}
-              step={1}
+              step={1} 
+              label={Translator.translate("limit.battery")}
+              description={Translator.translate("limit.battery.desc")}
               notchCount={batLimitTags.length}
               notchLabels={batLimitNotchLabels}
               notchTicksVisible={true}
