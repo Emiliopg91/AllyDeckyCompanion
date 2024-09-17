@@ -6,8 +6,11 @@ import os
 import decky_plugin
 import plugin_config
 import logger_utils
+import sdtdp
 import middleware
 import plugin_update
+import shutil
+import subprocess
 from time import sleep
 
 class Plugin:
@@ -90,8 +93,30 @@ class Plugin:
         return middleware.is_ally()
 
     async def ota_update(self):
+        decky_plugin.logger.debug("Executing: ota_update()")
         # trigger ota update
         try:
             plugin_update.ota_update()
         except Exception as e:
             logging.error(e)
+
+    async def get_sdtdp_cfg(self):
+        decky_plugin.logger.debug("Executing: get_sdtdp_cfg()")
+        return sdtdp.get_config()
+
+    async def is_sdtdp_cfg_present(self):
+        decky_plugin.logger.debug("Executing: is_sdtdp_cfg_present()")
+        return sdtdp.is_config_present()
+
+    async def is_sdtdp_enabled(self):
+        decky_plugin.logger.debug("Executing: is_sdtdp_enabled()")
+        return sdtdp.is_enabled()
+    
+    async def disable_sdtdp(self):
+        decky_plugin.logger.debug("Executing: disable_sdtdp()")
+        src = sdtdp.plugin_dir
+        dst = decky_plugin.DECKY_PLUGIN_DIR+"/SimpleDeckyTDP"
+        shutil.move(src, dst)
+        decky_plugin.logger.info(f"Moved '{src}' to '{dst}'")
+        decky_plugin.logger.info("Restaring Decky Plugin Loader")
+        subprocess.run(["systemctl", "reboot"], check=True)

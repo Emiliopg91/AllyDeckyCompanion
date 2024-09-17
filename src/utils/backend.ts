@@ -1,9 +1,9 @@
 import { Backend, Logger } from "decky-plugin-framework"
-import { Profile } from "../settings/profiles";
 import { Constants } from "./constants";
 import { debounce } from "lodash";
 import { ServerAPI } from "decky-frontend-lib";
 import { State } from "./state";
+import { Profile, SdtdpSettings } from "./models";
 
 /**
  * The Backend class provides access to plugin Python backend methods
@@ -20,6 +20,7 @@ export class BackendUtils {
 
     public static setServerApi(serverApi: ServerAPI) {
         BackendUtils.SERVER_API = serverApi
+        BackendUtils.SERVER_API.routerHook
     }
 
     public static getServerApi(): ServerAPI {
@@ -72,10 +73,26 @@ export class BackendUtils {
 
     public static async setBatteryLimit(limit: boolean): Promise<void> {
         if (State.IS_ALLY)
-        Backend.backend_call<{ enabled: Boolean }, number>("set_charge_limit", { enabled: limit });
+            Backend.backend_call<{ enabled: Boolean }, number>("set_charge_limit", { enabled: limit });
     }
 
     public static async otaUpdate(): Promise<void> {
         Backend.backend_call<{}, number>("ota_update", {});
+    }
+
+    public static async isSdtdpEnabled(): Promise<boolean> {
+        return Backend.backend_call<{}, boolean>("is_sdtdp_enabled", {});
+    }
+
+    public static async isSdtdpPresent(): Promise<boolean> {
+        return Backend.backend_call<{}, boolean>("is_sdtdp_cfg_present", {});
+    }
+
+    public static async getSdtdpCfg(): Promise<SdtdpSettings> {
+        return Backend.backend_call<{}, SdtdpSettings>("get_sdtdp_cfg", {});
+    }
+
+    public static async disableSDTDP(): Promise<void> {
+        return Backend.backend_call<{}, void>("disable_sdtdp", {})
     }
 }

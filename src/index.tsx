@@ -30,7 +30,7 @@ let onGameUnregister: Function | undefined;
 
 const checkProfilePerGame = () => {
   return new Promise<void>((resolve) => {
-    if (!Settings.getEntry(Constants.PROFILE_PER_GAME)) {
+    if (!Settings.getEntry(Constants.PROFILE_PER_GAME) && !State.SDTDP_ENABLED) {
       showModal(<ConfirmModal
         strTitle={Constants.PLUGIN_NAME}
         strDescription={Translator.translate("profile.per.game.ask")}
@@ -54,6 +54,30 @@ const checkProfilePerGame = () => {
   })
 }
 
+const checkSdtdp = () => {
+  return new Promise<void>((resolve) => {
+    BackendUtils.isSdtdpEnabled().then(res => {
+      if (res) {
+        showModal(<ConfirmModal
+          strTitle={Constants.PLUGIN_NAME}
+          strDescription={Translator.translate("disable.sdtdp.ask")}
+          strCancelButtonText={Translator.translate("enable")}
+          strOKButtonText={Translator.translate("disable")}
+          onCancel={() => {
+            State.SDTDP_ENABLED = true
+          }}
+          onOK={() => {
+            Logger.info("Disabling SimpleDeckyTDP")
+            BackendUtils.disableSDTDP()
+          }}
+        />)
+      } else {
+        resolve()
+      }
+    });
+  })
+}
+
 export default definePlugin((serverApi: ServerAPI) => {
   (async () => {
     await Framework.initialize(serverApi, Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
@@ -62,57 +86,66 @@ export default definePlugin((serverApi: ServerAPI) => {
     Settings.setEntry(Constants.CFG_SCHEMA_PROP, Constants.CFG_SCHEMA_VERS, true)
     BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
 
-    checkProfilePerGame().then(() => {
-      Logger.info("Profile per-game " + (State.PROFILE_PER_GAME ? "en" : "dis") + "abled")
+    checkSdtdp().then(() => {
+      checkProfilePerGame().then(() => {
+        Logger.info("Profile per-game " + (State.PROFILE_PER_GAME ? "en" : "dis") + "abled")
 
-      Profiles.getDefaultProfile()
-      Profiles.getDefaultACProfile()
+        Profiles.getDefaultProfile()
+        Profiles.getDefaultACProfile()
 
-      BackendUtils.isAlly().then(isAlly => {
-        State.IS_ALLY = isAlly
+        BackendUtils.isAlly().then(isAlly => {
+          State.IS_ALLY = isAlly
 
-        BackendUtils.isAllyX().then(isX => {
-          State.IS_ALLY_X = isX
-          Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
+          State.ONLY_GUI = !isAlly || State.SDTDP_ENABLED
 
-          onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
-            if (State.PROFILE_PER_GAME) {
-              const prevId = State.RUNNING_GAME_ID
-              State.RUNNING_GAME_ID = (e.bRunning
-                ? String(e.unAppID) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-                : (State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC));
-              if (prevId != State.RUNNING_GAME_ID) {
+          BackendUtils.isAllyX().then(isX => {
+            State.IS_ALLY_X = isX
+            Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
+
+            BackendUtils.isSdtdpPresent().then((res) => {
+              Logger.info("SDTDP " + ((res) ? "" : "no ") + "present")
+              State.SDTDP_SETTINGS_PRESENT = res
+            })
+
+            onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
+              if (State.PROFILE_PER_GAME) {
+                const prevId = State.RUNNING_GAME_ID
+                State.RUNNING_GAME_ID = (e.bRunning
+                  ? String(e.unAppID) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
+                  : (State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC));
+                if (prevId != State.RUNNING_GAME_ID) {
+                  Profiles.applyGameProfile(State.RUNNING_GAME_ID)
+                }
+              }
+            })
+
+            onPowerUnregister = SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
+              if (State.ON_BATTERY != (state.eACState == 1)) {
+                Logger.info("New AC state: " + state.eACState)
+                State.ON_BATTERY = state.eACState == 1
+
+                State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.lastIndexOf(".")) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
                 Profiles.applyGameProfile(State.RUNNING_GAME_ID)
               }
-            }
-          })
-
-          onPowerUnregister = SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
-            if (State.ON_BATTERY != (state.eACState == 1)) {
-              Logger.info("New AC state: " + state.eACState)
-              State.ON_BATTERY = state.eACState == 1
-
-              State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.lastIndexOf(".")) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-              Profiles.applyGameProfile(State.RUNNING_GAME_ID)
-            }
-          })
-
-          onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
-            Logger.info("Setting CPU profile for suspension")
-            BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
-          })
-
-          onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
-            Logger.info("Waiting 10 seconds for restoring CPU profile")
-            sleep(10000).then(() => {
-              BackendUtils.setTdpProfile(Profiles.getProfileForId(State.RUNNING_GAME_ID))
             })
+
+            onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
+              Logger.info("Setting CPU profile for suspension")
+              BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
+            })
+
+            onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
+              Logger.info("Waiting 10 seconds for restoring CPU profile")
+              sleep(10000).then(() => {
+                BackendUtils.setTdpProfile(Profiles.getProfileForId(State.RUNNING_GAME_ID))
+              })
+            })
+
+            Profiles.applyGameProfile(State.RUNNING_GAME_ID)
           })
 
-          Profiles.applyGameProfile(State.RUNNING_GAME_ID)
-        })
-
-      });
+        });
+      })
     })
   })()
 

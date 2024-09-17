@@ -23,7 +23,7 @@ export function useProfile(): [string, string, string | undefined, boolean] {
     const [iconSrc, setIconSrc] = useState<string | undefined>(loadIcon())
 
     const profRefreshFn = () => {
-        setBat(bat => {
+        setBat(() => {
             return State.ON_BATTERY
         })
         setId(id => {

@@ -10,3 +10,23 @@ export interface AppOverviewExt extends AppOverview {
     icon_hash: string; // base, url hash to fetch the icon for steam games (e.g.: "/assets/" + appid + "_icon.jpg?v=" + icon_hash)
     m_gameid: string; // base, id for non-steam games
 }
+
+
+export interface Profile {
+    mode: number
+    spl: number
+    sppl: number
+    fppl: number
+    cpuBoost: boolean
+    smtEnabled: boolean
+}
+
+export interface SdtdpSettingsTdpProfile {
+    tdp: number
+    cpuBoost: boolean
+    smt: boolean
+}
+
+export interface SdtdpSettings {
+    tdpProfiles: Record<string, SdtdpSettingsTdpProfile>
+}

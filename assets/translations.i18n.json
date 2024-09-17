@@ -122,5 +122,33 @@
     "profile.per.game.desc": {
         "en": "Allow different performance profiles per game or use a global profile",
         "es": "Permitir diferentes perfiles de rendimiento por juego o utilizar un perfil global"
+    },
+    "import.sdtdp.settings": {
+        "en": "Import SDTDP settings",
+        "es": "Importar configuración de SDTDP"
+    },
+    "import.sdtdp.settings.in.progress": {
+        "en": "Import in progress",
+        "es": "Importación en proceso"
+    },
+    "import.sdtdp.settings.finished": {
+        "en": "Import finished",
+        "es": "Importación finalizada"
+    },
+    "disable.sdtdp.ask": {
+        "en": "SimpleDeckyTDP plugin has been detected. To ensure system stability, we recommend disabling it. If you do not disable it, AllyDeckyCompanion will not apply performance profiles.",
+        "es": "Se ha detectado el plugin SimpleDeckyTDP. Para garantizar la estabilidad del sistema, recomendamos deshabilitarlo. De no deshabilitarlo, AllyDeckyCompanion no aplicará los perfiles de rendimiento."
+    },
+    "no.profiles.applied": {
+        "en": "No performance profile will be aplied. Reasons:",
+        "es": "No se aplicarán los perfiles de rendimiento. Razones:"
+    },
+    "sdtdp.enabled": {
+        "en": "SimpleDeckyTDP enabled",
+        "es": "SimpleDeckyTDP activo"
+    },
+    "incompatible.device": {
+        "en": "Incompatible device",
+        "es": "Dispositivo incompatible"
     }
 }

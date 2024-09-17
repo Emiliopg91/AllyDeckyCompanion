@@ -1,14 +1,16 @@
-import { PanelSection, PanelSectionRow, Router, ToggleField } from "decky-frontend-lib"
+import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "decky-frontend-lib"
 import { FC, useState } from "react"
 import { SystemSettings } from "../settings/system";
-import { Translator } from "decky-plugin-framework";
+import { Toast, Translator } from "decky-plugin-framework";
 import { State } from "../utils/state";
 import { Constants } from "../utils/constants";
 import { Profiles } from "../settings/profiles";
+import { BackendUtils } from "../utils/backend";
 
 export const SystemBlock: FC = () => {
   const [limitBattery, setLimitBattery] = useState(SystemSettings.getLimitBattery())
   const [profilePerGame, setProfilePerGame] = useState(State.PROFILE_PER_GAME)
+  const [isDoingThings, setIsDoingThings] = useState(false);
 
   const onLimitBatteryChange = (newVal: boolean) => {
     SystemSettings.setLimitBattery(newVal);
@@ -51,6 +53,29 @@ export const SystemBlock: FC = () => {
             highlightOnFocus
           />
         </PanelSectionRow>
+        {State.SDTDP_SETTINGS_PRESENT &&
+          <PanelSectionRow>
+            <ButtonItem
+              onClick={() => {
+                Toast.toast(Translator.translate("import.sdtdp.settings.in.progress"))
+                setIsDoingThings(true)
+                Profiles.importFromSDTDP().then(()=>{
+                  setIsDoingThings(false)
+                  Toast.toast(Translator.translate("import.sdtdp.settings.finished"))
+                })
+              }}
+              disabled={isDoingThings}
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {Translator.translate("import.sdtdp.settings")}
+            </ButtonItem>
+          </PanelSectionRow>
+        }
       </PanelSection>
     </>
   );

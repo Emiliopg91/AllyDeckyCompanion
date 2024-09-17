@@ -12,6 +12,9 @@ dependencies:
     version: 0.3.4
 
 devDependencies:
+  '@decky/ui':
+    specifier: ^4.7.1
+    version: 4.7.1
   '@rollup/plugin-commonjs':
     specifier: ^21.1.0
     version: 21.1.0(rollup@2.79.1)
@@ -59,6 +62,10 @@ devDependencies:
     version: 4.9.5
 
 packages:
+
+  /@decky/ui@4.7.1:
+    resolution: {integrity: sha512-yJwBgW+J2cMDfMkmcDFtzsubhUjekFZAtCnP55QEJ/1UKGR7sLNOvDLFYi1h5PI0K4L1XYcAMKHwbYFFTzcDTA==}
+    dev: true
 
   /@jridgewell/gen-mapping@0.3.3:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
