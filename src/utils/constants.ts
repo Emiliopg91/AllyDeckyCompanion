@@ -3,7 +3,7 @@ import { Mode } from "./mode";
 declare const plugin: any;
 
 export class Constants {
-    public static CFG_SCHEMA_VERS = "1";
+    public static CFG_SCHEMA_VERS = 2;
     public static CFG_SCHEMA_PROP = "schema";
 
     public static PLUGIN_NAME = plugin.name;
@@ -20,7 +20,7 @@ export class Constants {
     public static TDP_AC_DEFAULT_MODE = Mode.TURBO;
     public static CPU_DEFAULT_SMT = true
     public static CPU_DEFAULT_BOOST = false
-    public static DEFAULT_BATTERY_LIMIT = false
+    public static DEFAULT_BATTERY_LIMIT = 100
 
     public static PREFIX_PROFILES = "profiles."
     public static SUFIX_NAME = ".name"

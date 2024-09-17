@@ -2,7 +2,7 @@ import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Fi
 import { FC, useEffect, useState } from "react"
 
 import { Logger, Translator } from "decky-plugin-framework";
-import { Profile, Profiles } from "../settings/profiles";
+import { Profiles } from "../settings/profiles";
 import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
@@ -10,6 +10,7 @@ import { useProfile } from "../hooks/useProfile";
 import { FaBatteryFull, FaSteamSquare } from "react-icons/fa";
 import { PiPlugFill } from "react-icons/pi";
 import { Constants } from "../utils/constants";
+import { Profile } from "../utils/models";
 
 
 const saveSettings = debounce((id: string, name: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) => {

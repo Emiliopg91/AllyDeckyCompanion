@@ -16,7 +16,6 @@ import {
   Framework,
   Logger,
   Settings,
-  Toast,
   Translator,
 } from "decky-plugin-framework";
 import { State } from "./utils/state";
@@ -83,13 +82,30 @@ const checkSdtdp = () => {
   })
 }
 
+const migrateSchema = () => {
+  Logger.info("Migrating settings file schema to v" + Constants.CFG_SCHEMA_VERS)
+
+  const batLimit = String(Settings.getEntry(Constants.BATTERY_LIMIT, String(Constants.DEFAULT_BATTERY_LIMIT)))
+  if (batLimit == "true") {
+    Settings.setEntry(Constants.BATTERY_LIMIT, String(80), true)
+  } else if (batLimit == "false") {
+    Settings.setEntry(Constants.BATTERY_LIMIT, String(100), true)
+  }
+
+  Logger.info("Migration finished")
+}
+
 export default definePlugin((serverApi: ServerAPI) => {
   (async () => {
     await Framework.initialize(serverApi, Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
     BackendUtils.setServerApi(serverApi)
 
-    Settings.setEntry(Constants.CFG_SCHEMA_PROP, Constants.CFG_SCHEMA_VERS, true)
-    BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
+    const prevSchemaVers = Settings.getEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS))
+    Settings.setEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS), true)
+
+    if (Number(String(prevSchemaVers)) < Constants.CFG_SCHEMA_VERS) {
+      migrateSchema()
+    }
 
     checkSdtdp().then(() => {
       checkProfilePerGame().then(() => {
@@ -104,6 +120,8 @@ export default definePlugin((serverApi: ServerAPI) => {
           State.ONLY_GUI = !State.IS_ALLY || State.SDTDP_ENABLED
 
           BackendUtils.isAllyX().then(isX => {
+            BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
+            
             State.IS_ALLY_X = isX
             Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
             Logger.info("Mode ONLY_GUI " + (State.ONLY_GUI ? "en" : "dis") + "abled")

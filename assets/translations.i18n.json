@@ -68,8 +68,8 @@
         "es": "Limitar carga de batería"
     },
     "limit.battery.desc": {
-        "en": "Increase battery lifespan setting max charge to 80%",
-        "es": "Incrementa la vida útil de batería limitando la carga al 80%"
+        "en": "Increase battery lifespan setting max charge",
+        "es": "Incrementa la vida útil de batería limitando la carga"
     },
     "main.menu": {
         "en": "SteamOS",
@@ -124,8 +124,8 @@
         "es": "Permitir diferentes perfiles de rendimiento por juego o utilizar un perfil global"
     },
     "import.sdtdp.settings": {
-        "en": "Import SDTDP settings",
-        "es": "Importar configuración de SDTDP"
+        "en": "Import SimpleDeckyTDP performance profiles",
+        "es": "Importar perfiles de rendimiento de SimpleDeckyTDP"
     },
     "import.sdtdp.settings.in.progress": {
         "en": "Import in progress",

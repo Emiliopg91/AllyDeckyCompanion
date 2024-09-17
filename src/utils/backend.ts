@@ -58,7 +58,6 @@ export class BackendUtils {
         } else if (profile.spl <= Constants.AllyPerformanceSPL) {
             epp = 'balanced'
         }
-        Logger.info("Setting EPP mode '" + epp + "' for TDP ", profile)
 
         Backend.backend_call<{ prof: String }, number>("set_platform_profile", { prof: epp });
         Backend.backend_call<{ spl: number, sppl: number, fppl: number }, number>("set_tdp", { spl: profile.spl, sppl: profile.sppl, fppl: profile.fppl });
@@ -71,9 +70,11 @@ export class BackendUtils {
             BackendUtils.debouncedSetTdpProfile(profile)
     }
 
-    public static async setBatteryLimit(limit: boolean): Promise<void> {
-        if (State.IS_ALLY)
-            Backend.backend_call<{ enabled: Boolean }, number>("set_charge_limit", { enabled: limit });
+    public static async setBatteryLimit(limit: number): Promise<void> {
+        if (State.IS_ALLY) {
+            Logger.info("Setting battery limit to " + limit + "%")
+            Backend.backend_call<{ limit: number }, number>("set_charge_limit", { limit });
+        }
     }
 
     public static async otaUpdate(): Promise<void> {

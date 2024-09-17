@@ -5,10 +5,10 @@ import { State } from '../utils/state'
 
 export class SystemSettings {
     public static getLimitBattery() {
-        return Settings.getEntry(Constants.BATTERY_LIMIT, String(Constants.DEFAULT_BATTERY_LIMIT)) == "true"
+        return Number(Settings.getEntry(Constants.BATTERY_LIMIT, String(Constants.DEFAULT_BATTERY_LIMIT)))
     }
 
-    public static setLimitBattery(limit: boolean) {
+    public static setLimitBattery(limit: number) {
         Settings.setEntry(Constants.BATTERY_LIMIT, String(limit), true)
         BackendUtils.setBatteryLimit(limit)
     }
