@@ -1,4 +1,4 @@
-import { SiAsus } from "react-icons/si";
+import { RogIcon } from "./components/rogIcon";
 import { MainMenu } from "./pages/MainMenu"
 import { Constants } from "./utils/constants";
 
@@ -170,7 +170,7 @@ export default definePlugin(() => {
     name: Constants.PLUGIN_NAME,
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
     content: <MainMenu />,
-    icon: <SiAsus />,
+    icon: <RogIcon />,
     async onDismount() {
       if (onPowerUnregister)
         onPowerUnregister()
