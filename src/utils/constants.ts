@@ -1,6 +1,5 @@
 import { Mode } from "./mode";
-
-declare const plugin: any;
+import plugin from "../../plugin.json"
 
 export class Constants {
     public static CFG_SCHEMA_VERS = 2;

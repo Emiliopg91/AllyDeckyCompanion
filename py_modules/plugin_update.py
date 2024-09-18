@@ -1,6 +1,6 @@
 import os
 import stat
-import decky_plugin
+import decky
 import subprocess
 import urllib.request
 import json
@@ -37,20 +37,20 @@ def ota_update():
   downloaded_filepath = download_latest_build()
 
   if os.path.exists(downloaded_filepath):
-    plugin_dir = f'{decky_plugin.DECKY_USER_HOME}/homebrew/plugins/AllyDeckyCompanion'
+    plugin_dir = f'{decky.DECKY_USER_HOME}/homebrew/plugins/AllyDeckyCompanion'
 
     try:
       recursive_chmod(plugin_dir, stat.S_IWUSR)
 
       shutil.rmtree(plugin_dir)
     except Exception as e:
-      decky_plugin.logger.error(f'ota error during removal of old plugin {e}')
+      decky.logger.error(f'ota error during removal of old plugin {e}')
 
     try:
-      shutil.unpack_archive(downloaded_filepath, f'{decky_plugin.DECKY_USER_HOME}/homebrew/plugins')
+      shutil.unpack_archive(downloaded_filepath, f'{decky.DECKY_USER_HOME}/homebrew/plugins')
       os.remove(downloaded_filepath)
     except Exception as e:
-      decky_plugin.logger.error(f'error during install {e}')
+      decky.logger.error(f'error during install {e}')
 
     cmd = f'echo "systemctl restart plugin_loader.service" | sh'
 

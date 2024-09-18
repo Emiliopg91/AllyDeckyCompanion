@@ -1,10 +1,11 @@
 {
   "name": "AllyDeckyCompanion",
   "author": "Emiliopg91",
-  "flags": ["root"],
+  "flags": ["root", "_root"],
+  "api_version": 1,
   "publish": {
-    "tags": ["template"],
-    "description": "Template for Decky plugins.",
-    "image": "https://opengraph.githubassets.com/1/Emiliopg91/Decky-Plugin-Template"
+    "tags": ["template", "root"],
+    "description": "Decky example plugin.",
+    "image": "https://opengraph.githubassets.com/1/SteamDeckHomebrew/PluginLoader"
   }
 }

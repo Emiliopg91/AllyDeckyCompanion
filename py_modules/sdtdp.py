@@ -1,11 +1,11 @@
 import os
-import decky_plugin
+import decky
 import json
 
 # Plugin directories and files
 
-plugin_dir = decky_plugin.DECKY_PLUGIN_DIR + "/../SimpleDeckyTDP"
-cfg_property_file = decky_plugin.DECKY_PLUGIN_SETTINGS_DIR + "/../SimpleDeckyTDP/settings.json"
+plugin_dir = decky.DECKY_PLUGIN_DIR + "/../SimpleDeckyTDP"
+cfg_property_file = decky.DECKY_PLUGIN_SETTINGS_DIR + "/../SimpleDeckyTDP/settings.json"
 
 def get_config(): 
     with open(cfg_property_file, "r") as jsonFile:
