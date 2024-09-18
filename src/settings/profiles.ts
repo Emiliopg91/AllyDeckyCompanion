@@ -3,7 +3,7 @@ import { Game, Logger, Settings, Translator } from "decky-plugin-framework"
 import { Constants } from '../utils/constants'
 import { Mode } from "../utils/mode"
 import { State } from "../utils/state"
-import { debounce, isNaN } from "lodash"
+import { debounce } from "lodash"
 import { BackendUtils } from "../utils/backend"
 import { Profile } from "../utils/models"
 
@@ -12,9 +12,9 @@ export class Profiles {
     public static summary() {
         let maxProfLen = 11
 
-        const header1 = " ---------------------------------------------------" + ("".padStart(maxProfLen, "-"));
-        const header2 = " |  POWER  |      MODE    | SPL | SPPL | FPPL |  SMT  | BOOST |";
-        const separator = "------------------------------------------------------" + ("".padStart(maxProfLen, "-"))
+        const header1 = " --------------------------------------------------" + ("".padStart(maxProfLen, "-"));
+        const header2 = " |  POWER  |     MODE    | SPL | SPPL | FPPL |  SMT  | BOOST |";
+        const separator = "-----------------------------------------------------" + ("".padStart(maxProfLen, "-"))
 
         const profiles = Settings.getConfigurationStructured()["profiles"]
         Logger.info("Loaded profiles for " + Object.keys(profiles).length + " games: ")
@@ -36,7 +36,7 @@ export class Profiles {
                     let line = "| "
                     line += (isFirst ? ((profiles[appId]["name"] + " (" + appId + ")").padStart(maxNameLen)) : "".padStart(maxNameLen)) + " | ";
                     line += pwr.toUpperCase() + " | "
-                    line += " " + Mode[Number(profile["mode"])].padStart(maxProfLen) + " | "
+                    line += Mode[Number(profile["mode"])].padStart(maxProfLen) + " | "
                     line += (profile["cpu"]["tdp"]["spl"] as String).padStart(3) + " | "
                     line += (profile["cpu"]["tdp"]["sppl"] as String).padStart(3) + "  | "
                     line += (profile["cpu"]["tdp"]["fppl"] as String).padStart(3) + "  | "
