@@ -1,12 +1,13 @@
 import { Mode } from "./mode";
 import plugin from "../../plugin.json"
+import pckage from "../../package.json"
 
 export class Constants {
     public static CFG_SCHEMA_VERS = 2;
     public static CFG_SCHEMA_PROP = "schema";
 
     public static PLUGIN_NAME = plugin.name;
-    public static PLUGIN_VERSION = plugin.version;
+    public static PLUGIN_VERSION = pckage.version;
 
     public static SUFIX_AC = ".acpower"
     public static SUFIX_BAT = ".battery"

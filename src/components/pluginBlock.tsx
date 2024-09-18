@@ -2,21 +2,24 @@ import { ButtonItem, Field, PanelSection, PanelSectionRow } from "@decky/ui"
 import { FC, useEffect, useState, } from "react"
 import { Constants } from "../utils/constants";
 import { BackendUtils } from "../utils/backend";
-import { Toast, Translator } from "decky-plugin-framework";
-import { fetchNoCors } from "@decky/api";
+import { Logger, Toast, Translator } from "decky-plugin-framework";
 
 const getLatestVersionNum = async () => {
-    const result = await fetchNoCors(
-        "https://raw.githubusercontent.com/Emiliopg91/AllyDeckyCompanion/main/package.json",
-        { method: "GET" }
-    );
+    try {
+        const result = await fetch(
+            "https://raw.githubusercontent.com/Emiliopg91/AllyDeckyCompanion/main/package.json",
+            { method: "GET" }
+        );
 
-    //@ts-ignore
-    const body = result.body as string;
-    if (body && typeof body === "string") {
-        return JSON.parse(body)["version"];
+        if (result.ok) {
+            return (await result.json())["version"]
+        } else {
+            return "";
+        }
+    } catch (e) {
+        Logger.error("Error fetching latest version", e)
+        return ""
     }
-    return "";
 };
 
 export const PluginBlock: FC = () => {
