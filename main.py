@@ -31,7 +31,6 @@ class Plugin:
 # Logger
 
     async def log(self, level: str, msg: str) -> int:
-        decky.logger.debug("Executing: log()")
         return logger_utils.log(level, msg)
 
     async def get_plugin_log(self) -> str:

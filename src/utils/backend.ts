@@ -47,10 +47,12 @@ export class BackendUtils {
             epp = 'balanced'
         }
 
-        Backend.backend_call<[ prof: String ], number>("set_platform_profile",  epp);
-        Backend.backend_call<[ spl: number, sppl: number, fppl: number ], number>("set_tdp", profile.spl, profile.sppl, profile.fppl );
-        Backend.backend_call<[ enabled: Boolean ], number>("set_smt", profile.smtEnabled );
-        Backend.backend_call<[ enabled: Boolean ], number>("set_cpu_boost", profile.cpuBoost );
+        Logger.info("Setting CPU performance to '" + epp + "':", profile)
+
+        Backend.backend_call<[prof: String], number>("set_platform_profile", epp);
+        Backend.backend_call<[spl: number, sppl: number, fppl: number], number>("set_tdp", profile.spl, profile.sppl, profile.fppl);
+        Backend.backend_call<[enabled: Boolean], number>("set_smt", profile.smtEnabled);
+        Backend.backend_call<[enabled: Boolean], number>("set_cpu_boost", profile.cpuBoost);
     }, 500)
 
     public static async setTdpProfile(profile: Profile): Promise<void> {
@@ -61,7 +63,7 @@ export class BackendUtils {
     public static async setBatteryLimit(limit: number): Promise<void> {
         if (State.IS_ALLY) {
             Logger.info("Setting battery limit to " + limit + "%")
-            Backend.backend_call<[ limit: number ], number>("set_charge_limit", limit );
+            Backend.backend_call<[limit: number], number>("set_charge_limit", limit);
         }
     }
 

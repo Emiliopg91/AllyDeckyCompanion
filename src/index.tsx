@@ -17,10 +17,10 @@ import { SystemSettings } from "./settings/system";
 import { ConfirmModal, showModal, sleep, staticClasses } from "@decky/ui";
 import { definePlugin } from "@decky/api";
 
-let onPowerUnregister: Function | undefined;
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
 let onGameUnregister: Function | undefined;
+let onShutdownUnregister: Function | undefined;
 
 const checkProfilePerGame = () => {
   return new Promise<void>((resolve) => {
@@ -92,6 +92,7 @@ const migrateSchema = () => {
 export default definePlugin(() => {
   (async () => {
     await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
+    Profiles.summary()
 
     const prevSchemaVers = Settings.getEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS))
     Settings.setEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS), true)
@@ -134,9 +135,9 @@ export default definePlugin(() => {
                   Profiles.applyGameProfile(State.RUNNING_GAME_ID)
                 }
               }
-            })
+            }).unregister
 
-            onPowerUnregister = SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
+            SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
               if (State.ON_BATTERY != (state.eACState == 1)) {
                 Logger.info("New AC state: " + state.eACState)
                 State.ON_BATTERY = state.eACState == 1
@@ -149,14 +150,19 @@ export default definePlugin(() => {
             onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
               Logger.info("Setting CPU profile for suspension")
               BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
-            })
+            }).unregister
 
             onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
               Logger.info("Waiting 10 seconds for restoring CPU profile")
               sleep(10000).then(() => {
                 BackendUtils.setTdpProfile(Profiles.getProfileForId(State.RUNNING_GAME_ID))
               })
-            })
+            }).unregister
+
+            onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
+              Logger.info("Setting CPU profile for shutdown/restart")
+              BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
+            }).unregister
 
             Profiles.applyGameProfile(State.RUNNING_GAME_ID)
           })
@@ -171,16 +177,17 @@ export default definePlugin(() => {
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
     content: <MainMenu />,
     icon: <RogIcon />,
-    async onDismount() {
-      if (onPowerUnregister)
-        onPowerUnregister()
+    onDismount() {
       if (onGameUnregister)
         onGameUnregister()
       if (onSuspendUnregister)
         onSuspendUnregister()
       if (onResumeUnregister)
         onResumeUnregister()
-      await Framework.shutdown()
+      if (onShutdownUnregister)
+        onShutdownUnregister()
+
+      Framework.shutdown()
     }
   };
 });

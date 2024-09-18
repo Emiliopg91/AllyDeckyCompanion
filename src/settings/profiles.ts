@@ -3,11 +3,53 @@ import { Game, Logger, Settings, Translator } from "decky-plugin-framework"
 import { Constants } from '../utils/constants'
 import { Mode } from "../utils/mode"
 import { State } from "../utils/state"
-import { debounce } from "lodash"
+import { debounce, isNaN } from "lodash"
 import { BackendUtils } from "../utils/backend"
 import { Profile } from "../utils/models"
 
 export class Profiles {
+
+    public static summary() {
+        let maxProfLen = 11
+
+        const header1 = " ---------------------------------------------------" + ("".padStart(maxProfLen, "-"));
+        const header2 = " |  POWER  |      MODE    | SPL | SPPL | FPPL |  SMT  | BOOST |";
+        const separator = "------------------------------------------------------" + ("".padStart(maxProfLen, "-"))
+
+        const profiles = Settings.getConfigurationStructured()["profiles"]
+        Logger.info("Loaded profiles for " + Object.keys(profiles).length + " games: ")
+
+        let maxNameLen = 0
+        Object.keys(profiles).forEach((appId) => {
+            const len = (profiles[appId]["name"] as String).length + appId.length + 3
+            maxNameLen = Math.max(len, maxNameLen)
+        })
+
+        Logger.info((header1.padStart(header1.length + maxNameLen + 2)))
+        Logger.info((header2.padStart(header2.length + maxNameLen + 2)))
+        Object.keys(profiles).forEach((appId) => {
+            Logger.info(separator.padStart(separator.length + maxNameLen, "-"))
+            let isFirst = true
+            Object.keys(profiles[appId]).forEach((pwr) => {
+                if (pwr != "name") {
+                    const profile = profiles[appId][pwr]
+                    let line = "| "
+                    line += (isFirst ? ((profiles[appId]["name"] + " (" + appId + ")").padStart(maxNameLen)) : "".padStart(maxNameLen)) + " | ";
+                    line += pwr.toUpperCase() + " | "
+                    line += " " + Mode[Number(profile["mode"])].padStart(maxProfLen) + " | "
+                    line += (profile["cpu"]["tdp"]["spl"] as String).padStart(3) + " | "
+                    line += (profile["cpu"]["tdp"]["sppl"] as String).padStart(3) + "  | "
+                    line += (profile["cpu"]["tdp"]["fppl"] as String).padStart(3) + "  | "
+                    line += (profile["cpu"]["smt"] as String).padStart(5) + " | "
+                    line += (profile["cpu"]["boost"] as String).padStart(5) + " | "
+                    Logger.info(line)
+                    isFirst = false
+                }
+            })
+        })
+        Logger.info(separator.padStart(separator.length + maxNameLen, "-"))
+    }
+
     public static getAppId(id: string): string {
         return id.substring(0, id.lastIndexOf("."))
     }
@@ -27,16 +69,14 @@ export class Profiles {
             spl: Constants.AllyTurboFPPL,
             sppl: Constants.AllyTurboFPPL,
             fppl: Constants.AllyTurboFPPL,
-            cpuBoost: true,
+            cpuBoost: false,
             smtEnabled: true
         }
     }
 
     private static debouncedApplyGameProfile = debounce((id: string) => {
         const profile: Profile = Profiles.getProfileForId(id)
-        Logger.info("Applying CPU settings for profile " + id,
-            profile
-        )
+        Logger.info("Applying profile " + id)
         BackendUtils.setTdpProfile(profile)
     }, 500)
 
