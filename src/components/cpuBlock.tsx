@@ -1,4 +1,4 @@
-import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field } from "decky-frontend-lib"
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField, Field } from "@decky/ui"
 import { FC, useEffect, useState } from "react"
 
 import { Logger, Translator } from "decky-plugin-framework";

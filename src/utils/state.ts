@@ -1,4 +1,4 @@
-import { Router } from "decky-frontend-lib";
+import { Router } from "@decky/ui";
 import { Constants } from "./constants";
 
 export class State {

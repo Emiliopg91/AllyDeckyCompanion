@@ -1,4 +1,4 @@
-import decky_plugin
+import decky
 import re
 import os
 from time import sleep
@@ -18,7 +18,7 @@ RYZENADJ_PATH = shutil.which('ryzenadj')
 
 def set_charge_limit(lim: int):
     try:
-        decky_plugin.logger.debug(f"Setting charge limit to {lim}%  by writing to {BAT_LIM_FN}")
+        decky.logger.debug(f"Setting charge limit to {lim}%  by writing to {BAT_LIM_FN}")
         with open(BAT_LIM_FN, "w") as f:
             f.write(str(lim))
             f.close()
@@ -26,7 +26,7 @@ def set_charge_limit(lim: int):
         logging.error(e)
 
 def set_platform_profile(prof: str):
-    decky_plugin.logger.debug(f"Setting platform profile to '{prof}' by writing to {EPP_FN}")
+    decky.logger.debug(f"Setting platform profile to '{prof}' by writing to {EPP_FN}")
     with open(EPP_FN, "w") as f:
         f.write(prof)
 
@@ -39,12 +39,12 @@ def ryzenadj(spl: int, sppl: int, fppl: int):
             '--slow-limit', str(sppl*1000),
             '--fast-limit', str(fppl*1000)
         ]
-        decky_plugin.logger.debug("Running '" + (" ".join(commands)) + "'")
+        decky.logger.debug("Running '" + (" ".join(commands)) + "'")
         results = subprocess.call(commands)
-        decky_plugin.logger.debug("Exit code '" + result + "'")
+        decky.logger.debug("Exit code '" + result + "'")
 
 def set_tdp(pretty: str, fn: str, val: int):
-    decky_plugin.logger.debug(f"Setting tdp value '{pretty}' to {val} by writing to {fn}")
+    decky.logger.debug(f"Setting tdp value '{pretty}' to {val} by writing to {fn}")
     with open(fn, "w") as f:
         f.write(f"{val}\n")
     return True
@@ -91,7 +91,7 @@ def set_cpb_boost(enabled):
 
 def set_cpu_boost(enabled = True):
     try:
-        decky_plugin.logger.debug(f"Setting CPU Boost to {enabled} by writing to '/sys/devices/system/cpu/cpufreq/policy*/boost'")
+        decky.logger.debug(f"Setting CPU Boost to {enabled} by writing to '/sys/devices/system/cpu/cpufreq/policy*/boost'")
         set_cpb_boost(enabled)
     except Exception as e:
         logging.error(e)
@@ -99,7 +99,7 @@ def set_cpu_boost(enabled = True):
 def set_smt(enabled = True):
     try:
         val = "on" if enabled else "off"
-        decky_plugin.logger.debug(f"Setting SMT to {val} by writing to {AMD_SMT_PATH}")
+        decky.logger.debug(f"Setting SMT to {val} by writing to {AMD_SMT_PATH}")
         with open(AMD_SMT_PATH, 'w') as file:
             file.write(val)
             file.close()

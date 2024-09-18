@@ -1,11 +1,3 @@
-import {
-  ConfirmModal,
-  definePlugin,
-  ServerAPI,
-  showModal,
-  sleep,
-  staticClasses,
-} from "decky-frontend-lib";
 import { SiAsus } from "react-icons/si";
 import { MainMenu } from "./pages/MainMenu"
 import { Constants } from "./utils/constants";
@@ -22,6 +14,8 @@ import { State } from "./utils/state";
 import { Profiles } from './settings/profiles'
 import { BackendUtils } from "./utils/backend";
 import { SystemSettings } from "./settings/system";
+import { ConfirmModal, showModal, sleep, staticClasses } from "@decky/ui";
+import { definePlugin } from "@decky/api";
 
 let onPowerUnregister: Function | undefined;
 let onSuspendUnregister: Function | undefined;
@@ -95,10 +89,9 @@ const migrateSchema = () => {
   Logger.info("Migration finished")
 }
 
-export default definePlugin((serverApi: ServerAPI) => {
+export default definePlugin(() => {
   (async () => {
-    await Framework.initialize(serverApi, Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
-    BackendUtils.setServerApi(serverApi)
+    await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations)
 
     const prevSchemaVers = Settings.getEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS))
     Settings.setEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS), true)
@@ -121,7 +114,7 @@ export default definePlugin((serverApi: ServerAPI) => {
 
           BackendUtils.isAllyX().then(isX => {
             BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
-            
+
             State.IS_ALLY_X = isX
             Logger.info("Product: " + (isAlly ? ("ASUS ROG Ally " + (isX ? "X" : "")) : "Unknown"))
             Logger.info("Mode ONLY_GUI " + (State.ONLY_GUI ? "en" : "dis") + "abled")
@@ -174,6 +167,7 @@ export default definePlugin((serverApi: ServerAPI) => {
   })()
 
   return {
+    name: Constants.PLUGIN_NAME,
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
     content: <MainMenu />,
     icon: <SiAsus />,

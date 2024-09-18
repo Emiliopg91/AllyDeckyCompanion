@@ -1,4 +1,4 @@
-import { ButtonItem, NotchLabel, PanelSection, PanelSectionRow, Router, SliderField, ToggleField } from "decky-frontend-lib"
+import { ButtonItem, NotchLabel, PanelSection, PanelSectionRow, Router, SliderField, ToggleField } from "@decky/ui"
 import { FC, useState } from "react"
 import { SystemSettings } from "../settings/system";
 import { Toast, Translator } from "decky-plugin-framework";

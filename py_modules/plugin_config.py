@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
-import decky_plugin
+import decky
 import json
 
 # Plugin directories and files
-plugin_dir = Path(decky_plugin.DECKY_PLUGIN_DIR)
-config_dir = Path(decky_plugin.DECKY_PLUGIN_SETTINGS_DIR)
+plugin_dir = Path(decky.DECKY_PLUGIN_DIR)
+config_dir = Path(decky.DECKY_PLUGIN_SETTINGS_DIR)
 
 cfg_property_file = config_dir / "plugin.json"
 

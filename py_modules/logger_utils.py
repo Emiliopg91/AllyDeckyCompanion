@@ -1,4 +1,4 @@
-import decky_plugin
+import decky
 import plugin_config
 import logging
 
@@ -16,13 +16,13 @@ def log(level: str, msg: str) -> int:
     """
     match level.strip().lower():
         case "debug":
-            decky_plugin.logger.debug(msg)
+            decky.logger.debug(msg)
         case "info":
-            decky_plugin.logger.info(msg)
+            decky.logger.info(msg)
         case "warn":
-            decky_plugin.logger.warn(msg)
+            decky.logger.warn(msg)
         case "error":
-            decky_plugin.logger.error(msg)
+            decky.logger.error(msg)
 
 def get_plugin_log() -> str:
     """
@@ -32,7 +32,7 @@ def get_plugin_log() -> str:
     str: The plugin log.
     """
     log: str = ""
-    for line in reversed(list(open(decky_plugin.DECKY_PLUGIN_LOG))):
+    for line in reversed(list(open(decky.DECKY_LOG))):
         log = line + '\n' + log  
         if "Logger initialized at level" in line.strip():
             break
@@ -44,6 +44,6 @@ def configure_logger():
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     logger_level=plugin_config.get_config_item("log_level", "INFO")
-    decky_plugin.logger.setLevel(logger_level)
-    for h in decky_plugin.logger.handlers:
+    decky.logger.setLevel(logger_level)
+    for h in decky.logger.handlers:
         h.setFormatter(formatter)

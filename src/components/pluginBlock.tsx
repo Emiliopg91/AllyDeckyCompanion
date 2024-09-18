@@ -1,11 +1,12 @@
-import { ButtonItem, Field, PanelSection, PanelSectionRow } from "decky-frontend-lib"
+import { ButtonItem, Field, PanelSection, PanelSectionRow } from "@decky/ui"
 import { FC, useEffect, useState, } from "react"
 import { Constants } from "../utils/constants";
 import { BackendUtils } from "../utils/backend";
 import { Toast, Translator } from "decky-plugin-framework";
+import { fetchNoCors } from "@decky/api";
 
 const getLatestVersionNum = async () => {
-    const { result } = await BackendUtils.getServerApi().fetchNoCors(
+    const result = await fetchNoCors(
         "https://raw.githubusercontent.com/Emiliopg91/AllyDeckyCompanion/main/package.json",
         { method: "GET" }
     );
