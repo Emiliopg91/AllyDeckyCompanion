@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { State } from '../utils/state'
-import { Router } from "decky-frontend-lib";
 import { AppOverviewExt } from "../utils/models";
 import { Profiles } from "../settings/profiles";
+import { Router } from "@decky/ui";
 
 export function useProfile(): [string, string, string | undefined, boolean] {
 

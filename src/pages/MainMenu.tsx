@@ -3,7 +3,7 @@ import { CpuBlock } from "../components/cpuBlock";
 import { SystemBlock } from "../components/settingsBlock";
 import { PluginBlock } from "../components/pluginBlock";
 import { State } from "../utils/state";
-import { DropdownItem, PanelSection, PanelSectionRow } from "decky-frontend-lib";
+import { DropdownItem, PanelSection, PanelSectionRow } from "@decky/ui";
 import { ContributeBlock } from "../components/contributeBlock";
 import { FC, useEffect } from "react";
 import { Translator } from "decky-plugin-framework";

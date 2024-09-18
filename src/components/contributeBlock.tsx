@@ -1,8 +1,8 @@
-import { DialogButton, Navigation, PanelSection, PanelSectionRow } from "decky-frontend-lib"
 import { FC } from "react"
 import { Translator } from "decky-plugin-framework";
 import { SiKofi } from "react-icons/si";
 import { FaBug } from "react-icons/fa";
+import { DialogButton, Navigation, PanelSection, PanelSectionRow } from "@decky/ui";
 
 export const ContributeBlock: FC = () => {
 
