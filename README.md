@@ -84,6 +84,9 @@
 - [X] Battery charge limit to 80% to expand battery lifespan
 
 
+- [X] Check if SimpleDeckyTDP is enabled. Now you can disable it and import it's configuration
+
+
 - [ ] Support for "secure boot"
 
 
