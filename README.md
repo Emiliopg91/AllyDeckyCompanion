@@ -58,12 +58,7 @@
   
 
   
-
-- [X] Per game TDP Profiles (and optional separate AC Power Profiles)
-
-  
-
-- [X] Different profiles when playing on AC or battery
+- [X]  Per-game performance profiles profiles when playing on AC or battery
   
 
 - [X] Custom TDP limit by settings SPL, SPPL and FPPL
