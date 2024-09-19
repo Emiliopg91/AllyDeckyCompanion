@@ -84,10 +84,10 @@
 - [X] Battery charge limit to 80% to expand battery lifespan
 
 
-- [] Support for "secure boot"
+- [ ] Support for "secure boot"
 
 
-- [] Check for BIOS updates
+- [ ] Check for BIOS updates
 
   
 
