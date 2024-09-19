@@ -16,10 +16,6 @@
 
   
 
-- [Incoming features](#incoming-features)
-
-  
-
 - [Requirements](#requirements)
 
   
