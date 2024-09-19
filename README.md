@@ -63,39 +63,35 @@
 
   
 
-- Per game TDP Profiles (and optional separate AC Power Profiles)
+- [X] Per game TDP Profiles (and optional separate AC Power Profiles)
 
   
 
-- Custom TDP limit by settings SPL, SPPL and FPPL
+- [X] Different profiles when playing on AC or battery
+  
+
+- [X] Custom TDP limit by settings SPL, SPPL and FPPL
+  
+
+- [X] SMT control
 
   
 
-- SMT control
+- [X] CPU Boost control
 
   
 
-- CPU Boost control
+- [X] CPU and TDP boost on suspend-resume events
 
   
 
-- CPU and TDP boost on suspend-resume events
+- [X] Battery charge limit to 80% to expand battery lifespan
 
-  
 
-- Battery charge limit to 80% to expand battery lifespan
+- [] Support for "secure boot"
 
-  
 
-  
-
-## Incoming features
-
-- Different profiles when playing on AC or battery
-
-- Support for "secure boot"
-
-- Check for BIOS updates
+- [] Check for BIOS updates
 
   
 
