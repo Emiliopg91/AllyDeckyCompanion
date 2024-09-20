@@ -82,10 +82,10 @@
 - [X] Check if SimpleDeckyTDP is enabled. Now you can disable it and import it's configuration
 
 
-- [ ] Support for "secure boot"
+- [X] Support for "secure boot"
 
 
-- [ ] Check for BIOS updates
+- [X] Check for BIOS updates
 
   
 
