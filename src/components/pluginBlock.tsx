@@ -2,7 +2,8 @@ import { ButtonItem, Field, PanelSection, PanelSectionRow } from "@decky/ui"
 import { FC, useEffect, useState, } from "react"
 import { Constants } from "../utils/constants";
 import { BackendUtils } from "../utils/backend";
-import { Logger, Toast, Translator } from "decky-plugin-framework";
+import { Logger, Translator } from "decky-plugin-framework";
+import { Toast } from "../utils/toast";
 
 const getLatestVersionNum = async () => {
     try {

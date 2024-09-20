@@ -176,7 +176,7 @@ export default definePlugin(() => {
     name: Constants.PLUGIN_NAME,
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
     content: <MainMenu />,
-    icon: <RogIcon />,
+    icon: <RogIcon width={20} height={20} />,
     onDismount() {
       if (onGameUnregister)
         onGameUnregister()

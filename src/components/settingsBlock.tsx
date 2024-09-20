@@ -1,7 +1,8 @@
 import { ButtonItem, NotchLabel, PanelSection, PanelSectionRow, Router, SliderField, ToggleField } from "@decky/ui"
 import { FC, useState } from "react"
 import { SystemSettings } from "../settings/system";
-import { Toast, Translator } from "decky-plugin-framework";
+import { Translator } from "decky-plugin-framework";
+import { Toast } from "../utils/toast";
 import { State } from "../utils/state";
 import { Constants } from "../utils/constants";
 import { Profiles } from "../settings/profiles";
