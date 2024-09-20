@@ -6,6 +6,7 @@ import { State } from "../utils/state"
 import { debounce } from "lodash"
 import { BackendUtils } from "../utils/backend"
 import { Profile } from "../utils/models"
+import { SpreadSheet, SpreadSheetCell } from "../utils/spreadsheet"
 
 export class Profiles {
 
@@ -13,18 +14,12 @@ export class Profiles {
 
         const profiles = Settings.getConfigurationStructured()["profiles"]
 
-        let maxNameLen = 0
-        let maxProfLen = 0
         let profCount = 0;
         let sortedAppIds: Array<{ appId: string, name: string }> = []
         Object.keys(profiles).forEach((appId) => {
-            const len = (profiles[appId].name as String).length + appId.length + 3
-            maxNameLen = Math.max(len, maxNameLen)
             sortedAppIds.push({ appId, name: profiles[appId].name })
-
             Object.keys(profiles[appId]).forEach((pwr) => {
                 if (pwr != "name") {
-                    maxProfLen = Math.max(Mode[Number(profiles[appId][pwr].mode)].length, maxProfLen)
                     profCount++
                 }
             })
@@ -42,36 +37,49 @@ export class Profiles {
                 return 0;
         });
 
+        Logger.info("")
         Logger.info("Loaded profiles " + profCount + " for " + Object.keys(profiles).length + " games: ")
 
-        const header1 = " --------------------------------------------------" + ("".padStart(maxProfLen, "-"));
-        const header2 = " |  POWER  | " + ("MODE".padStart(((maxProfLen + 4) / 2) + (maxProfLen % 2))).padEnd(maxProfLen) + " | SPL | SPPL | FPPL |  SMT  | BOOST |";
-        const separator = "-----------------------------------------------------" + ("".padStart(maxProfLen, "-"))
+        const headers: Array<SpreadSheetCell> = []
+        headers.push({ data: "NAME", align: "center" })
+        headers.push({ data: "APPID", align: "center" })
+        headers.push({ data: "POWER", align: "center" })
+        headers.push({ data: "MODE", align: "center" })
+        headers.push({ data: "SPL*", align: "center" })
+        headers.push({ data: "SPPL*", align: "center" })
+        headers.push({ data: "FPPL*", align: "center" })
+        headers.push({ data: "SMT*", align: "center" })
+        headers.push({ data: "BOOST*", align: "center" })
 
-        Logger.info((header1.padStart(header1.length + maxNameLen + 2)))
-        Logger.info((header2.padStart(header2.length + maxNameLen + 2)))
+        const body: Array<Array<SpreadSheetCell>> = []
         sortedAppIds.forEach((entry) => {
-            Logger.info(separator.padStart(separator.length + maxNameLen, "-"))
             let isFirst = true
             Object.keys(profiles[entry.appId]).forEach((pwr) => {
                 if (pwr != "name") {
                     const profile = profiles[entry.appId][pwr]
-                    let line = "| "
-                    line += (isFirst ? ((profiles[entry.appId].name + " (" + entry.appId + ")").padStart(maxNameLen)) : "".padStart(maxNameLen)) + " | ";
-                    line += pwr.toUpperCase() + " | "
-                    line += Mode[Number(profile.mode)].padStart(maxProfLen) + " | "
-                    line += (profile.cpu.tdp.spl as String).padStart(3) + " | "
-                    line += (profile.cpu.tdp.sppl as String).padStart(3) + "  | "
-                    line += (profile.cpu.tdp.fppl as String).padStart(3) + "  | "
-                    line += (profile.cpu.smt as String).padStart(5) + " | "
-                    line += (profile.cpu.boost as String).padStart(5) + " | "
-                    Logger.info(line)
+
+                    let line: Array<SpreadSheetCell> = []
+                    line.push({ data: (isFirst ? profiles[entry.appId].name : ""), align: "right", rowspan: !isFirst })
+                    line.push({ data: (isFirst ? entry.appId : ""), align: "right", rowspan: !isFirst })
+                    line.push({ data: pwr.toUpperCase(), align: "right" })
+                    line.push({ data: Mode[Number(profile.mode)], align: "right" })
+                    line.push({ data: profile.cpu.tdp.spl, align: "right" })
+                    line.push({ data: profile.cpu.tdp.sppl, align: "right" })
+                    line.push({ data: profile.cpu.tdp.fppl, align: "right" })
+                    line.push({ data: profile.cpu.smt, align: "right" })
+                    line.push({ data: profile.cpu.boost, align: "right" })
+
+                    body.push(line)
+
                     isFirst = false
                 }
             })
         })
 
-        Logger.info(separator.padStart(separator.length + maxNameLen, "-"))
+        SpreadSheet.printSpreadSheet(headers, body)
+        Logger.info("")
+        Logger.info("* Only is used on CUSTOM mode")
+        Logger.info("")
     }
 
     public static getAppId(id: string): string {

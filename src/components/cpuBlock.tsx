@@ -185,26 +185,26 @@ export const CpuBlock: FC = () => {
               onChange={onFpplChange}
             />
           </PanelSectionRow>
+          <PanelSectionRow>
+            <ToggleField
+              label="SMT"
+              description={Translator.translate('smt.description')}
+              checked={profile.smtEnabled}
+              onChange={onSmtChange}
+              highlightOnFocus
+            />
+          </PanelSectionRow>
+          <PanelSectionRow>
+            <ToggleField
+              label="CPU Boost"
+              description={Translator.translate("cpu.boost.description")}
+              checked={profile.cpuBoost}
+              onChange={onCpuBoostChange}
+              highlightOnFocus
+            />
+          </PanelSectionRow>
         </>
       }
-      <PanelSectionRow>
-        <ToggleField
-          label="SMT"
-          description={Translator.translate('smt.description')}
-          checked={profile.smtEnabled}
-          onChange={onSmtChange}
-          highlightOnFocus
-        />
-      </PanelSectionRow>
-      <PanelSectionRow>
-        <ToggleField
-          label="CPU Boost"
-          description={Translator.translate("cpu.boost.description")}
-          checked={profile.cpuBoost}
-          onChange={onCpuBoostChange}
-          highlightOnFocus
-        />
-      </PanelSectionRow>
     </PanelSection>
   );
 };
