@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from "react"
 
 import { Logger, Translator } from "decky-plugin-framework";
 import { Profiles } from "../settings/profiles";
-import { BackendUtils } from "../utils/backend";
 import { Mode } from "../utils/mode";
 import { debounce } from 'lodash'
 import { useProfile } from "../hooks/useProfile";
@@ -16,7 +15,7 @@ import { Profile } from "../utils/models";
 const saveSettings = debounce((id: string, name: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) => {
   Logger.info("Saving profile " + id + " (" + name + ")")
   Profiles.saveProfileForId(id, mode, spl, sppl, fppl, cpuBoost, smtEnabled)
-  BackendUtils.setTdpProfile(Profiles.getProfileForId(id))
+  Profiles.applyGameProfile(id)
 }, 500)
 
 export const CpuBlock: FC = () => {
@@ -58,10 +57,10 @@ export const CpuBlock: FC = () => {
   }, [id])
 
   const onModeChange = (newVal: number) => {
-    let tdps = Profiles.getTdpForMode(newVal)
+    let tdps = Profiles.getProfileForMode(newVal)
 
-    saveSettings(id, name, newVal, tdps[0], tdps[1], tdps[2], profile.cpuBoost, profile.smtEnabled)
-    setProfile({ ...profile, spl: tdps[0], sppl: tdps[1], fppl: tdps[2], mode: newVal })
+    saveSettings(id, name, newVal, profile.spl, profile.sppl, profile.fppl, profile.cpuBoost, profile.smtEnabled)
+    setProfile({ ...profile, mode: newVal })
   }
 
   const onSplChange = (newVal: number) => {

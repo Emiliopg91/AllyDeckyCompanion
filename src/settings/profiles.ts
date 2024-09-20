@@ -100,9 +100,17 @@ export class Profiles {
 
     private static debouncedApplyGameProfile = debounce((id: string) => {
         const profile: Profile = Profiles.getProfileForId(id)
+        if (profile.mode != Mode.CUSTOM) {
+            const tdpProfile = Profiles.getProfileForMode(profile.mode)
+            profile.spl = tdpProfile.spl
+            profile.sppl = tdpProfile.sppl
+            profile.fppl = tdpProfile.fppl
+            profile.cpuBoost = tdpProfile.cpuBoost
+            profile.smtEnabled = tdpProfile.smtEnabled
+        }
         Logger.info("Applying profile " + id)
         BackendUtils.setTdpProfile(profile)
-    }, 500)
+    }, 250)
 
     public static applyGameProfile(id: string) {
         Profiles.debouncedApplyGameProfile(id)
@@ -134,12 +142,12 @@ export class Profiles {
             Logger.info("No profile found for " + id + ", creating")
 
             mode = id.endsWith(Constants.SUFIX_AC) ? Constants.TDP_AC_DEFAULT_MODE : Constants.TDP_DEFAULT_MODE
-            const tdps = Profiles.getTdpForMode(mode)
-            spl = tdps[0]
-            sppl = tdps[1]
-            fppl = tdps[2]
-            cpuBoost = Constants.CPU_DEFAULT_BOOST
-            smtEnabled = Constants.CPU_DEFAULT_SMT
+            const tmpProf = Profiles.getProfileForMode(mode)
+            spl = tmpProf.spl
+            sppl = tmpProf.sppl
+            fppl = tmpProf.fppl
+            cpuBoost = tmpProf.cpuBoost
+            smtEnabled = tmpProf.smtEnabled
 
             Profiles.saveProfileForId(id, mode, spl, sppl, fppl, cpuBoost, smtEnabled)
         } else {
@@ -156,10 +164,12 @@ export class Profiles {
         }
     }
 
-    public static getTdpForMode(mode: number) {
+    public static getProfileForMode(mode: Mode) {
         let spl = 0
         let sppl = 0
         let fppl = 0
+        let cpuBoost = Constants.CPU_DEFAULT_BOOST
+        let smtEnabled = Constants.CPU_DEFAULT_SMT
 
         switch (mode) {
             case Mode.SILENT:
@@ -179,7 +189,7 @@ export class Profiles {
                 fppl = Constants.AllyTurboFPPL
         }
 
-        return ([spl, sppl, fppl])
+        return ({ mode, spl, sppl, fppl, cpuBoost, smtEnabled } as Profile)
     }
 
     public static saveProfileForId(id: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) {
