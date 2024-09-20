@@ -16,10 +16,6 @@
 
   
 
-- [Incoming features](#incoming-features)
-
-  
-
 - [Requirements](#requirements)
 
   
@@ -62,40 +58,34 @@
   
 
   
+- [X]  Per-game performance profiles when playing on AC or battery
+  
 
-- Per game TDP Profiles (and optional separate AC Power Profiles)
+- [X] Custom TDP limit by settings SPL, SPPL and FPPL
+  
+
+- [X] SMT control
 
   
 
-- Custom TDP limit by settings SPL, SPPL and FPPL
+- [X] CPU Boost control
 
   
 
-- SMT control
+- [X] CPU and TDP boost on suspend-resume events
 
   
 
-- CPU Boost control
+- [X] Battery charge limit to 80% to expand battery lifespan
 
-  
 
-- CPU and TDP boost on suspend-resume events
+- [X] Check if SimpleDeckyTDP is enabled. Now you can disable it and import it's configuration
 
-  
 
-- Battery charge limit to 80% to expand battery lifespan
+- [ ] Support for "secure boot"
 
-  
 
-  
-
-## Incoming features
-
-- Different profiles when playing on AC or battery
-
-- Support for "secure boot"
-
-- Check for BIOS updates
+- [ ] Check for BIOS updates
 
   
 
