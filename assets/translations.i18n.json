@@ -31,7 +31,11 @@
         "en": "Performance",
         "es": "Rendimiento"
     },
-    "plugin.info": {
+    "system.info": {
+        "en": "System",
+        "es": "Sistema"
+    },
+    "plugin": {
         "en": "Plugin",
         "es": "Plugin"
     },
@@ -154,5 +158,17 @@
     "restart.to.apply": {
         "en": "Restart to apply changes",
         "es": "Reiniciar para aplicar cambios"
+    },
+    "update.available": {
+        "en": "Plugin update available. Click to apply",
+        "es": "Actualización de plugin disponible. Pulsar para aplicar"
+    },
+    "bios.update.available":{
+        "en":"BIOS update available",
+        "es":"Actualización de BIOS disponible"
+    },
+    "bios": {
+        "en": "BIOS",
+        "es": "BIOS"
     }
 }

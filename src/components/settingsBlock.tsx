@@ -7,7 +7,7 @@ import { State } from "../utils/state";
 import { Constants } from "../utils/constants";
 import { Profiles } from "../settings/profiles";
 
-export const SystemBlock: FC = () => {
+export const SettingsBlock: FC = () => {
   const batLimitIndexes: Array<number> = [100, 95, 90, 85, 80]
   const batLimitTags: Array<String> = []
   const batLimitNotchLabels: NotchLabel[] = [];

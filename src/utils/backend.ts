@@ -68,7 +68,10 @@ export class BackendUtils {
     }
 
     public static async otaUpdate(): Promise<void> {
-        Backend.backend_call<[], number>("ota_update");
+        Logger.info("Download and installation of version " + State.PLUGIN_LATEST_VERSION + " in progress")
+        Backend.backend_call<[], boolean>("ota_update").then(()=>{
+            SteamClient.System.RestartPC()
+        })
     }
 
     public static async isSdtdpEnabled(): Promise<boolean> {
@@ -84,6 +87,12 @@ export class BackendUtils {
     }
 
     public static async disableSDTDP(): Promise<void> {
-        return Backend.backend_call<[], void>("disable_sdtdp")
+        Backend.backend_call<[], boolean>("disable_sdtdp").then(()=>{
+            SteamClient.System.RestartPC()
+        })
+    }
+
+    public static async getBiosVersion(): Promise<string> {
+        return Backend.backend_call<[], string>("bios_version")
     }
 }

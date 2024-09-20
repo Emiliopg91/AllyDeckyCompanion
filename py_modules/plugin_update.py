@@ -41,7 +41,6 @@ def ota_update():
 
     try:
       recursive_chmod(plugin_dir, stat.S_IWUSR)
-
       shutil.rmtree(plugin_dir)
     except Exception as e:
       decky.logger.error(f'ota error during removal of old plugin {e}')
@@ -52,8 +51,6 @@ def ota_update():
     except Exception as e:
       decky.logger.error(f'error during install {e}')
 
-    cmd = f'echo "systemctl restart plugin_loader.service" | sh'
-
     result = subprocess.run(cmd, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-    return result
+    return True

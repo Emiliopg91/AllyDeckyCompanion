@@ -23,7 +23,7 @@ def set_charge_limit(lim: int):
             f.write(str(lim))
             f.close()
     except Exception as e:
-        logging.error(e)
+        decky.logger.error(e)
 
 def set_platform_profile(prof: str):
     decky.logger.debug(f"Setting platform profile to '{prof}' by writing to {EPP_FN}")
@@ -87,14 +87,14 @@ def set_cpb_boost(enabled):
                 file.close()
                 sleep(0.1)
     except Exception as e:
-        logging.error(e)
+        decky.logger.error(e)
 
 def set_cpu_boost(enabled = True):
     try:
         decky.logger.debug(f"Setting CPU Boost to {enabled} by writing to '/sys/devices/system/cpu/cpufreq/policy*/boost'")
         set_cpb_boost(enabled)
     except Exception as e:
-        logging.error(e)
+        decky.logger.error(e)
 
 def set_smt(enabled = True):
     try:
@@ -104,16 +104,35 @@ def set_smt(enabled = True):
             file.write(val)
             file.close()
     except Exception as e:
-        logging.error(e)
+        decky.logger.error(e)
+
+def get_pn():
+    try:
+        with open(PROD_FN) as f:
+            content = f.read().strip()
+            parts = content.replace('_', ' ').split()
+            return parts[-1]
+    except Exception as e:
+        decky.logger.error(e)
+    return ""
 
 def is_ally_x():
-    with open(PROD_FN) as f:
-        prod = f.read().strip()
-        return "RC72L" in prod
-    return False
+    return "RC72L" in get_pn()
 
 def is_ally():
-    with open(PROD_FN) as f:
-        prod = f.read().strip()
-        return "Ally" in prod
-    return False
+    return "RC71L" in get_pn()
+
+def bios_version():
+    cad="Version: "+get_pn()+"."
+    result = subprocess.run(['/usr/bin/bash', '-c', 'dmidecode | grep "'+cad+'"'], 
+                            stdout=subprocess.PIPE, 
+                            stderr=subprocess.PIPE, 
+                            text=True)
+    
+    if result.returncode != 0:
+        return "Unknown"
+    
+    output = result.stdout.strip()
+    version_line = output.split(cad)[1].strip()
+    
+    return version_line

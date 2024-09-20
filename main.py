@@ -95,9 +95,10 @@ class Plugin:
         decky.logger.debug("Executing: ota_update()")
         # trigger ota update
         try:
-            plugin_update.ota_update()
+            return plugin_update.ota_update()
         except Exception as e:
             logging.error(e)
+            return False
 
     async def get_sdtdp_cfg(self):
         decky.logger.debug("Executing: get_sdtdp_cfg()")
@@ -117,5 +118,9 @@ class Plugin:
         dst = decky.DECKY_PLUGIN_DIR+"/SimpleDeckyTDP"
         shutil.move(src, dst)
         decky.logger.info(f"Moved '{src}' to '{dst}'")
-        decky.logger.info("Restaring device")
-        subprocess.run(["reboot", "--force"], check=True)
+        return True
+    
+    async def bios_version(self):
+        decky.logger.debug("Executing: bios_version()")
+        return middleware.bios_version()
+        

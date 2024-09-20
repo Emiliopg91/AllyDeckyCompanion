@@ -1,7 +1,7 @@
 
 import { CpuBlock } from "../components/cpuBlock";
-import { SystemBlock } from "../components/settingsBlock";
-import { PluginBlock } from "../components/pluginBlock";
+import { SettingsBlock } from "../components/settingsBlock";
+import { SystemBlock } from "../components/systemBlock";
 import { State } from "../utils/state";
 import { DropdownItem, PanelSection, PanelSectionRow } from "@decky/ui";
 import { ContributeBlock } from "../components/contributeBlock";
@@ -47,12 +47,12 @@ export const MainMenu: FC = () => {
               label: Translator.translate("performance.settings")
             },
             {
-              data: "system",
+              data: "settings",
               label: Translator.translate("settings.info")
             },
             {
-              data: "plugin",
-              label: Translator.translate("plugin.info")
+              data: "system",
+              label: Translator.translate("system.info")
             }
           ]}
           onChange={(newVal) => { State.CURRENT_TAB = newVal.data }}
@@ -61,12 +61,11 @@ export const MainMenu: FC = () => {
       {State.CURRENT_TAB === "cpu" &&
         <CpuBlock />
       }
+      {State.CURRENT_TAB === "settings" &&
+        <SettingsBlock />
+      }
       {State.CURRENT_TAB === "system" &&
         <SystemBlock />
-
-      }
-      {State.CURRENT_TAB === "plugin" &&
-        <PluginBlock />
       }
       <ContributeBlock />
     </>
