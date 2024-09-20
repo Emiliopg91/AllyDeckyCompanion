@@ -71,7 +71,7 @@ class Plugin:
             middleware.set_tdp('FAST', middleware.FTDP_FN, fppl)
             sleep(0.1)  
         except Exception as e:
-            logging.error(e)
+            decky.logger.error(e)
 
     async def set_cpu_boost(self, enabled: bool):
         decky.logger.debug(f"Executing: set_cpu_boost({enabled})")
@@ -97,7 +97,7 @@ class Plugin:
         try:
             return plugin_update.ota_update()
         except Exception as e:
-            logging.error(e)
+            decky.logger.error(e)
             return False
 
     async def get_sdtdp_cfg(self):
