@@ -1,4 +1,4 @@
-import { RogIcon } from "./components/rogIcon";
+import { RogIcon } from "./components/icons/rogIcon";
 import { MainMenu } from "./pages/MainMenu"
 import { Constants } from "./utils/constants";
 

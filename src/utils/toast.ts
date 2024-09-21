@@ -1,5 +1,5 @@
 import { toaster } from "@decky/api";
-import { RogIcon } from "../components/rogIcon";
+import { RogIcon } from "../components/icons/rogIcon";
 import { Constants } from "./constants";
 
 /**
