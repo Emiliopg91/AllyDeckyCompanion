@@ -8,7 +8,7 @@ import plugin_config
 import logger_utils
 import sdtdp
 import hardware
-from performance import cpu, power
+from performance import cpu, gpu, power
 import plugin_update
 import shutil
 import subprocess
@@ -96,6 +96,10 @@ class Plugin:
         decky.logger.debug(f"Executing: set_smt({enabled})")
         cpu.set_smt(enabled)
         
+# GPU
+    async def get_gpu_frequency_range(self):
+        decky.logger.debug(f"Executing: get_gpu_frequency_range()")
+        return gpu.get_gpu_frequency_range()
 
 #MISC
     async def ota_update(self):

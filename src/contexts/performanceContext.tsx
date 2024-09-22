@@ -1,9 +1,10 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import { Profiles } from "../settings/profiles";
 import { AppOverviewExt, Profile } from '../utils/models';
 import { Router } from '@decky/ui';
 import { WhiteBoardUtils } from '../utils/whiteboard';
-import { EventBus, EventType, Logger, WhiteBoardEventData } from 'decky-plugin-framework';
+import { EventBus, EventData, EventType, Logger, WhiteBoardEventData } from 'decky-plugin-framework';
+import { debounce } from 'lodash';
 
 interface PerformanceContextType {
     id: string
@@ -12,7 +13,8 @@ interface PerformanceContextType {
     icon: string | undefined
     onBattery: boolean
     profile: Profile
-    setProfile: (profile: Profile) => void
+    setProfile: (profile: Profile) => void,
+    saveProfile: (id: string, name: string, profile: Profile) => void
 }
 
 const defaultValue: PerformanceContextType = {
@@ -22,7 +24,8 @@ const defaultValue: PerformanceContextType = {
     icon: undefined,
     onBattery: WhiteBoardUtils.getOnBattery(),
     profile: Profiles.getProfileForId(String(WhiteBoardUtils.getRunningGameId())),
-    setProfile: () => { }
+    setProfile() { },
+    saveProfile() { },
 };
 
 const loadIcon = (appId: string) => {
@@ -44,32 +47,39 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
     const [name, setName] = useState(Profiles.getAppName(id));
     const [icon, setIcon] = useState<string | undefined>(loadIcon(Profiles.getAppId(id)))
     const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(id))
+    const saveProfile = useCallback(debounce((id: string, name: string, profile: Profile) => {
+        Logger.info("Saving profile " + id + " (" + name + ")")
+        Profiles.saveProfileForId(id, profile)
+        Profiles.applyGameProfile(id)
+    }, 500), [id, name, profile])
+
+    const onBatteryEffect = (e: EventData) => {
+        const data = (e as WhiteBoardEventData)
+        if (data.getId() == "onBattery") {
+            setOnBattery(() => {
+                return data.getValue() as boolean
+            })
+        }
+    }
+
+    const onIdEffect = (e: EventData) => {
+        const data = (e as WhiteBoardEventData)
+        if (data.getId() == "runningGameId") {
+            setId((id) => {
+                if (id != (data.getValue() as string)) {
+                    setProfile(Profiles.getProfileForId(data.getValue()))
+                    setAppId(Profiles.getAppId((data.getValue() as string)))
+                    setName(Profiles.getAppName((data.getValue() as string)))
+                    setIcon(loadIcon(Profiles.getAppId((data.getValue() as string))))
+                }
+                return String((data.getValue() as string))
+            })
+        }
+    }
 
     useEffect(() => {
-        const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) => {
-            const data = (e as WhiteBoardEventData)
-            if (data.getId() == "onBattery") {
-                setOnBattery((bat) => {
-                    if (bat != data.getValue() as boolean) {
-                        Logger.info("")
-                    }
-                    return data.getValue() as boolean
-                })
-            }
-        }).unsubscribe
-        const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) => {
-            const data = (e as WhiteBoardEventData)
-            if (data.getId() == "runningGameId") {
-                setId((id) => {
-                    if (id != (data.getValue() as string)) {
-                        setAppId(Profiles.getAppId((data.getValue() as string)))
-                        setName(Profiles.getAppName((data.getValue() as string)))
-                        setIcon(loadIcon(Profiles.getAppId((data.getValue() as string))))
-                    }
-                    return String((data.getValue() as string))
-                })
-            }
-        }).unsubscribe
+        const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) => onBatteryEffect(e)).unsubscribe
+        const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) => onIdEffect(e)).unsubscribe
 
         return () => {
             unsBat()
@@ -78,7 +88,7 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
     }, [])
 
     return (
-        <PerformanceContext.Provider value={{ id, appId, name, icon, onBattery, profile, setProfile }} >
+        <PerformanceContext.Provider value={{ id, appId, name, icon, onBattery, profile, setProfile, saveProfile }} >
             {children}
         </PerformanceContext.Provider>
     );

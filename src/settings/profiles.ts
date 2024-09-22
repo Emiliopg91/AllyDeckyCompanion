@@ -161,7 +161,7 @@ export class Profiles {
             boost = tmpProf.cpu.boost
             smt = tmpProf.cpu.smt
 
-            Profiles.saveProfileForId(id, mode, spl, sppl, fppl, boost, smt)
+            Profiles.saveProfileForId(id, { mode, cpu: { tdp: { spl, sppl, fppl }, boost, smt } })
         } else {
             mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE))
             spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL))
@@ -206,14 +206,14 @@ export class Profiles {
         }
     }
 
-    public static saveProfileForId(id: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) {
+    public static saveProfileForId(id: string, profile: Profile) {
         Settings.setEntry(Constants.PREFIX_PROFILES + Profiles.getAppId(id) + Constants.SUFIX_NAME, Profiles.getAppName(id), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(mode), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(spl), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(sppl), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(fppl), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(cpuBoost), true)
-        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(smtEnabled), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE, String(profile.mode), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST, String(profile.cpu.boost), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT, String(profile.cpu.smt), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL, String(profile.cpu.tdp.spl), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL, String(profile.cpu.tdp.sppl), true)
+        Settings.setEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL, String(profile.cpu.tdp.fppl), true)
     }
 
     public static async importFromSDTDP() {
@@ -223,7 +223,7 @@ export class Profiles {
                 const id = srcId.replace("-ac-power", "")
                 const ac = srcId.includes("-ac-power")
                 const smt = cfg.tdpProfiles[id].smt
-                const cpuBoost = cfg.tdpProfiles[id].cpuBoost
+                const boost = cfg.tdpProfiles[id].cpuBoost
                 let tdp = cfg.tdpProfiles[id].tdp
                 if (tdp < 5) {
                     tdp = 5
@@ -235,7 +235,7 @@ export class Profiles {
                 const localId = id + (ac ? Constants.SUFIX_AC : Constants.SUFIX_BAT)
                 if (!Profiles.existsProfileForId(localId)) {
                     Logger.info("Importing profile " + srcId + " as " + localId)
-                    Profiles.saveProfileForId(localId, Mode.CUSTOM, tdp, tdp, tdp, cpuBoost, smt)
+                    Profiles.saveProfileForId(localId, { mode: Mode.CUSTOM, cpu: { tdp: { spl: tdp, sppl: tdp, fppl: tdp }, boost, smt } })
                 } else {
                     Logger.info("Profile " + srcId + " already exists as " + localId)
                 }

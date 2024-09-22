@@ -155,6 +155,37 @@ const checkSdtdp = () => {
   })
 }
 
+const getGpuRanges = () => {
+  return new Promise<void>((resolve) => {
+    if (WhiteBoardUtils.getIsAlly()) {
+      BackendUtils.getGpuFrequencyRange().then(([min, max]) => {
+        WhiteBoardUtils.setGpuMinFreq(min)
+        WhiteBoardUtils.setGpuMaxFreq(max)
+        Logger.info("GPU frequency range: " + min + " to " + max + " MHz")
+        resolve()
+      })
+    }
+    else {
+      resolve()
+    }
+  })
+}
+
+const getBiosVersion = () => {
+  return new Promise<void>((resolve) => {
+    if (WhiteBoardUtils.getIsAlly()) {
+      BackendUtils.getBiosVersion().then((biosVersion) => {
+        WhiteBoardUtils.setBiosVersion(biosVersion);
+        Logger.info("BIOS version " + WhiteBoardUtils.getBiosVersion());
+        resolve()
+      })
+    }
+    else {
+      resolve()
+    }
+  })
+}
+
 const migrateSchema = () => {
   Logger.info("Migrating settings file schema to v" + Constants.CFG_SCHEMA_VERS)
 
@@ -198,95 +229,95 @@ export default definePlugin(() => {
               }
             }
             Logger.info("Product: " + prod)
-            BackendUtils.getBiosVersion().then((biosVersion) => {
-              WhiteBoardUtils.setBiosVersion(biosVersion);
-              Logger.info("BIOS version " + WhiteBoardUtils.getBiosVersion());
 
-              WhiteBoardUtils.setOnlyGui(!WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled())
-              Logger.info("Mode ONLY_GUI " + (WhiteBoardUtils.getOnlyGui() ? "en" : "dis") + "abled")
+            getBiosVersion().then(() => {
+              getGpuRanges().then(() => {
+                WhiteBoardUtils.setOnlyGui(!WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled())
+                Logger.info("Mode ONLY_GUI " + (WhiteBoardUtils.getOnlyGui() ? "en" : "dis") + "abled")
 
-              BackendUtils.isSdtdpPresent().then((res) => {
-                Logger.info("SDTDP " + ((res) ? "" : "no ") + "present")
-                WhiteBoardUtils.setSdtdpSettingsPresent(res)
-              })
-
-              sleep(5000).then(() => {
-                pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-                checkPluginLatestVersion()
-                sleep(1000).then(() => {
-                  biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000)
-                  checkBiosLatestVersion()
+                BackendUtils.isSdtdpPresent().then((res) => {
+                  Logger.info("SDTDP " + ((res) ? "" : "no ") + "present")
+                  WhiteBoardUtils.setSdtdpSettingsPresent(res)
                 })
-              })
 
-              onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
-                Logger.info("New game event")
-                if (WhiteBoardUtils.getProfilePerGame()) {
-                  const prevId = WhiteBoardUtils.getRunningGameId()
-                  const newId = (e.bRunning
-                    ? String(e.unAppID) + (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-                    : (WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC))
-                  if (prevId != newId) {
-                    WhiteBoardUtils.setRunningGameId(newId);
-                  }
-                }
-              }).unregister
-
-              SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
-                const onBattery = state.eACState == 1
-                if (WhiteBoardUtils.getOnBattery() != (onBattery)) {
-                  Logger.info("New AC state: " + state.eACState)
-                  WhiteBoardUtils.setOnBattery(onBattery)
-                  const newId = WhiteBoardUtils.getRunningGameId().substring(0, WhiteBoardUtils.getRunningGameId().lastIndexOf(".")) + (onBattery ? Constants.SUFIX_BAT : Constants.SUFIX_AC);
-                  WhiteBoardUtils.setRunningGameId(newId)
-                }
-              })
-
-              runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
-                if ((e as WhiteBoardEventData).getId() == "runningGameId")
-                  Profiles.applyGameProfile((e as WhiteBoardEventData).getValue())
-              }).unsubscribe;
-
-              onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
-                AsyncUtils.runMutexForProfile((release) => {
-                  Logger.info("Setting CPU profile for suspension")
-                  BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
-                    release()
+                sleep(5000).then(() => {
+                  pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+                  checkPluginLatestVersion()
+                  sleep(1000).then(() => {
+                    biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000)
+                    checkBiosLatestVersion()
                   })
                 })
-              }).unregister
 
-              onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
-                AsyncUtils.runMutexForProfile((release) => {
-                  Logger.info("Waiting 10 seconds for restoring CPU profile")
-                  sleep(10000).then(() => {
-                    BackendUtils.setPerformanceProfile(Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())).finally(() => {
+                onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
+                  Logger.info("New game event")
+                  if (WhiteBoardUtils.getProfilePerGame()) {
+                    const prevId = WhiteBoardUtils.getRunningGameId()
+                    const newId = (e.bRunning
+                      ? String(e.unAppID) + (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
+                      : (WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC))
+                    if (prevId != newId) {
+                      WhiteBoardUtils.setRunningGameId(newId);
+                    }
+                  }
+                }).unregister
+
+                SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
+                  const onBattery = state.eACState == 1
+                  if (WhiteBoardUtils.getOnBattery() != (onBattery)) {
+                    Logger.info("New AC state: " + state.eACState)
+                    WhiteBoardUtils.setOnBattery(onBattery)
+                    const newId = WhiteBoardUtils.getRunningGameId().substring(0, WhiteBoardUtils.getRunningGameId().lastIndexOf(".")) + (onBattery ? Constants.SUFIX_BAT : Constants.SUFIX_AC);
+                    WhiteBoardUtils.setRunningGameId(newId)
+                  }
+                })
+
+                runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
+                  if ((e as WhiteBoardEventData).getId() == "runningGameId")
+                    Profiles.applyGameProfile((e as WhiteBoardEventData).getValue())
+                }).unsubscribe;
+
+                onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
+                  AsyncUtils.runMutexForProfile((release) => {
+                    Logger.info("Setting CPU profile for suspension")
+                    BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
                       release()
                     })
                   })
-                })
-              }).unregister
+                }).unregister
 
-              onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
-                AsyncUtils.runMutexForProfile((release) => {
-                  Logger.info("Setting CPU profile for shutdown/restart")
-                  BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
-                    release()
+                onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
+                  AsyncUtils.runMutexForProfile((release) => {
+                    Logger.info("Waiting 10 seconds for restoring CPU profile")
+                    sleep(10000).then(() => {
+                      BackendUtils.setPerformanceProfile(Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())).finally(() => {
+                        release()
+                      })
+                    })
                   })
-                })
-              }).unregister
+                }).unregister
 
-              BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
-              if (WhiteBoardUtils.getIsAllyX()) {
-                sleep(100).then(() => {
-                  Profiles.summary()
-                  Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
-                })
-              }
-            });
-          })
-        });
-      })
+                onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
+                  AsyncUtils.runMutexForProfile((release) => {
+                    Logger.info("Setting CPU profile for shutdown/restart")
+                    BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
+                      release()
+                    })
+                  })
+                }).unregister
+
+                BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
+                if (WhiteBoardUtils.getIsAllyX()) {
+                  sleep(100).then(() => {
+                    Profiles.summary()
+                    Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
+                  })
+                }
+              })
+            })
+          });
+        })
+      });
     })
   })()
 

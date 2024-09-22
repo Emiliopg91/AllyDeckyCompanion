@@ -4,6 +4,7 @@ import { debounce } from 'lodash'
 import { PerformanceContext, PerformanceProvider } from "../../contexts/performanceContext";
 import { HeaderBlock } from "./headerBlock";
 import { CpuBlock } from "./cpuBlock"
+import { ModeBlock } from "./modeBlock";
 
 export const PerformanceBlock: FC = () => {
   const { id, name, setProfile } = useContext(PerformanceContext)
@@ -24,7 +25,8 @@ export const PerformanceBlock: FC = () => {
   return (
     <PerformanceProvider>
       <>
-        <HeaderBlock />
+        <HeaderBlock /> 
+        <ModeBlock />
         <CpuBlock />
       </>
     </PerformanceProvider>

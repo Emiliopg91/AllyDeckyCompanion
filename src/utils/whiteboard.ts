@@ -100,4 +100,20 @@ export class WhiteBoardUtils {
     public static setBiosLatestVersion(value: string) {
         WhiteBoard.set("biosLatestVersion", value)
     }
+
+    public static getGpuMinFreq() {
+        return Number(WhiteBoard.get("gpuMinFreq") || 800)
+    }
+
+    public static setGpuMinFreq(value: number) {
+        WhiteBoard.set("gpuMinFreq", value)
+    }
+
+    public static getGpuMaxFreq() {
+        return Number(WhiteBoard.get("gpuMaxFreq") || 2700)
+    }
+
+    public static setGpuMaxFreq(value: number) {
+        WhiteBoard.set("gpuMaxFreq", value)
+    }
 }

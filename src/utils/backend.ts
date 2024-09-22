@@ -96,4 +96,8 @@ export class BackendUtils {
     public static async getBiosVersion(): Promise<string> {
         return Backend.backend_call<[], string>("bios_version")
     }
+
+    public static async getGpuFrequencyRange(): Promise<[number,number]> {
+        return Backend.backend_call<[], [number,number]>("get_gpu_frequency_range")
+    }
 }
