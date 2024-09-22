@@ -53,7 +53,9 @@ export class BackendUtils {
                 Backend.backend_call<[spl: number, sppl: number, fppl: number], number>("set_tdp", profile.cpu.tdp.spl, profile.cpu.tdp.sppl, profile.cpu.tdp.fppl).then(() => {
                     Backend.backend_call<[enabled: Boolean], number>("set_smt", profile.cpu.smt).then(() => {
                         Backend.backend_call<[enabled: Boolean], number>("set_cpu_boost", profile.cpu.boost).then(() => {
-                            Logger.info("Performance profile setted")
+                            Backend.backend_call<[min: number, max: number], void>("set_gpu_frequency_range", profile.gpu.frequency.min, profile.gpu.frequency.max).then(() => {
+                                Logger.info("Performance profile setted")
+                            })
                         })
                     })
                 })
@@ -97,7 +99,7 @@ export class BackendUtils {
         return Backend.backend_call<[], string>("bios_version")
     }
 
-    public static async getGpuFrequencyRange(): Promise<[number,number]> {
-        return Backend.backend_call<[], [number,number]>("get_gpu_frequency_range")
+    public static async getGpuFrequencyRange(): Promise<[number, number]> {
+        return Backend.backend_call<[], [number, number]>("get_gpu_frequency_range")
     }
 }

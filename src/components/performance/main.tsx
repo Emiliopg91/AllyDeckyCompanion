@@ -1,33 +1,18 @@
-import { FC, useContext, useEffect } from "react"
-import { Profiles } from "../../settings/profiles";
-import { debounce } from 'lodash'
-import { PerformanceContext, PerformanceProvider } from "../../contexts/performanceContext";
+import { FC } from "react"
+import { PerformanceProvider } from "../../contexts/performanceContext";
 import { HeaderBlock } from "./headerBlock";
 import { CpuBlock } from "./cpuBlock"
 import { ModeBlock } from "./modeBlock";
+import { GpuBlock } from "./gpuBlock";
 
 export const PerformanceBlock: FC = () => {
-  const { id, name, setProfile } = useContext(PerformanceContext)
-
-  const loadSettings = debounce((id, name) => {
-    const profile = Profiles.getProfileForId(id);
-    setProfile(profile)
-  }, 100)
-
-  useEffect(() => {
-    loadSettings(id, name);
-  }, [])
-
-  useEffect(() => {
-    loadSettings(id, name);
-  }, [id])
-
   return (
     <PerformanceProvider>
       <>
-        <HeaderBlock /> 
+        <HeaderBlock />
         <ModeBlock />
         <CpuBlock />
+        <GpuBlock />
       </>
     </PerformanceProvider>
   );

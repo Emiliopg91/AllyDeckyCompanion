@@ -163,12 +163,20 @@
         "en": "Plugin update available. Click to apply",
         "es": "Actualización de plugin disponible. Pulsar para aplicar"
     },
-    "bios.update.available":{
-        "en":"BIOS update available",
-        "es":"Actualización de BIOS disponible"
+    "bios.update.available": {
+        "en": "BIOS update available",
+        "es": "Actualización de BIOS disponible"
     },
     "bios": {
         "en": "BIOS",
         "es": "BIOS"
+    },
+    "gpu.max.freq": {
+        "en": "Maximum GPU frequency",
+        "es": "Frecuencia máxima GPU"
+    },
+    "gpu.min.freq": {
+        "en": "Minimum GPU frequency",
+        "es": "Frecuencia mínima GPU"
     }
 }

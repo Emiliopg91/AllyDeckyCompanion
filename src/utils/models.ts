@@ -17,6 +17,15 @@ export interface CpuProfile {
     tdp: TdpCpuProfile
 }
 
+export interface GpuFreqProfile {
+    min: number
+    max: number
+}
+
+export interface GpuProfile {
+    frequency: GpuFreqProfile
+}
+
 export interface TdpCpuProfile {
     spl: number
     sppl: number
@@ -26,6 +35,7 @@ export interface TdpCpuProfile {
 export interface Profile {
     mode: number
     cpu: CpuProfile
+    gpu: GpuProfile
 }
 
 export interface SdtdpSettingsTdpProfile {

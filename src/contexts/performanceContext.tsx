@@ -68,9 +68,9 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
             setId((id) => {
                 if (id != (data.getValue() as string)) {
                     setProfile(Profiles.getProfileForId(data.getValue()))
-                    setAppId(Profiles.getAppId((data.getValue() as string)))
-                    setName(Profiles.getAppName((data.getValue() as string)))
-                    setIcon(loadIcon(Profiles.getAppId((data.getValue() as string))))
+                    setAppId(Profiles.getAppId(data.getValue()))
+                    setName(Profiles.getAppName(data.getValue()))
+                    setIcon(loadIcon(Profiles.getAppId(data.getValue())))
                 }
                 return String((data.getValue() as string))
             })

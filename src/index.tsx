@@ -22,6 +22,7 @@ import { definePlugin } from "@decky/api";
 import { Toast } from "./utils/toast";
 import { WhiteBoardUtils } from "./utils/whiteboard";
 import { AsyncUtils } from "./utils/async";
+import { Profile } from "./utils/models";
 
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
@@ -196,6 +197,21 @@ const migrateSchema = () => {
     Settings.setEntry(Constants.BATTERY_LIMIT, String(100), true)
   }
 
+  const { profiles } = Settings.getConfigurationStructured() as { profiles: Record<string, Record<string, string | Profile>> }
+  Object.keys(profiles).forEach(appId => {
+    Object.keys(profiles[appId]).forEach((pwr) => {
+      if (typeof profiles[appId][pwr] != "string") {
+        const profile = profiles[appId][pwr] as Profile
+        if (!profile.gpu?.frequency?.min) {
+          Settings.setEntry(Constants.PREFIX_PROFILES + appId + "." + pwr + Constants.SUFIX_GPU_FREQ_MIN, "800", true)
+        }
+        if (!profile.gpu?.frequency?.max) {
+          Settings.setEntry(Constants.PREFIX_PROFILES + appId + "." + pwr + Constants.SUFIX_GPU_FREQ_MAX, "2700", true)
+        }
+      }
+    })
+  })
+
   Logger.info("Migration finished")
 }
 
@@ -313,6 +329,8 @@ export default definePlugin(() => {
                     Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
                   })
                 }
+
+                Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
               })
             })
           });

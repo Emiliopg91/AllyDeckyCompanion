@@ -3,8 +3,9 @@ import decky
 FTDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_fppt"
 STDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_pl2_sppt"
 CTDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_pl1_spl"
+APU_FN = "/sys/devices/platform/asus-nb-wmi/ppt_apu_sppt"
 BOOST_FN = "/sys/devices/system/cpu/cpufreq/boost"
-SMT_PATH="/sys/devices/system/cpu/smt/control"
+SMT_PATH = "/sys/devices/system/cpu/smt/control"
 
 def set_tdp(pretty: str, fn: str, val: int):
     decky.logger.debug(f"Setting tdp value '{pretty}' to {val} by writing to {fn}")

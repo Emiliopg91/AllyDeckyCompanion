@@ -1,6 +1,8 @@
 import decky
 import glob
 import re
+import time
+import subprocess
 
 GPU_FREQUENCY_PATH = glob.glob("/sys/class/drm/card?/device/pp_od_clk_voltage")[0]
 GPU_LEVEL_PATH = glob.glob("/sys/class/drm/card?/device/power_dpm_force_performance_level")[0]
@@ -20,4 +22,21 @@ def get_gpu_frequency_range():
       GPU_FREQUENCY_RANGE = frequency_range
       return frequency_range
   except Exception as e:
+    decky.logger.error(e)
+    
+def execute_gpu_frequency_command(command):
+  cmd = f"echo '{command}' | tee {GPU_FREQUENCY_PATH}"
+  result = subprocess.run(cmd, shell=True, check=True, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+def set_gpu_frequency_range(min:int, max:int):
+  with open(GPU_LEVEL_PATH,'w') as file:
+    file.write("manual")
+    file.close()
+  time.sleep(0.1)
+  try:
+    execute_gpu_frequency_command(f"s 0 {min}")
+    execute_gpu_frequency_command(f"s 1 {max}")
+    execute_gpu_frequency_command("c")
+  except Exception as e:
+    decky.logger.error(f"{__name__} error while trying to write frequency range")
     decky.logger.error(e)

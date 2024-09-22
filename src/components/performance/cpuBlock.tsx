@@ -69,7 +69,7 @@ export const CpuBlock: FC = () => {
   }
 
   return (
-    <PanelSection >
+    <PanelSection>
       {profile.mode == 3 &&
         <>
           <PanelSectionRow>

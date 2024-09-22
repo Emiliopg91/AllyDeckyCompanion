@@ -79,12 +79,14 @@ class Plugin:
         try:
             decky.logger.debug(f"Executing: set_tdp({spl, sppl, fppl})")
             sleep(0.1)
-            cpu.set_tdp('STEADY', cpu.CTDP_FN, spl)
-            sleep(0.1)
-            cpu.set_tdp('SLOW', cpu.STDP_FN, sppl)
-            sleep(0.1)
             cpu.set_tdp('FAST', cpu.FTDP_FN, fppl)
             sleep(0.1)  
+            cpu.set_tdp('SLOW', cpu.STDP_FN, sppl)
+            sleep(0.1)
+            cpu.set_tdp('APU', cpu.APU_FN, sppl)
+            sleep(0.1)
+            cpu.set_tdp('STEADY', cpu.CTDP_FN, spl)
+            sleep(0.1)
         except Exception as e:
             decky.logger.error(e)
 
@@ -100,6 +102,10 @@ class Plugin:
     async def get_gpu_frequency_range(self):
         decky.logger.debug(f"Executing: get_gpu_frequency_range()")
         return gpu.get_gpu_frequency_range()
+
+    async def set_gpu_frequency_range(self, min: int, max: int):
+        decky.logger.debug(f"Executing: set_gpu_frequency_range({min}, {max})")
+        return gpu.set_gpu_frequency_range(min, max)
 
 #MISC
     async def ota_update(self):

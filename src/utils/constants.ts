@@ -3,7 +3,7 @@ import plugin from "../../plugin.json"
 import pckage from "../../package.json"
 
 export class Constants {
-    public static CFG_SCHEMA_VERS = 2;
+    public static CFG_SCHEMA_VERS = 3;
     public static CFG_SCHEMA_PROP = "schema";
 
     public static PLUGIN_NAME = plugin.name;
@@ -30,6 +30,9 @@ export class Constants {
     public static SUFIX_CPU_BOOST = ".cpu.boost"
     public static SUFIX_CPU_SMT = ".cpu.smt"
     public static SUFIX_MODE = ".mode"
+
+    public static SUFIX_GPU_FREQ_MIN = ".gpu.frequency.min"
+    public static SUFIX_GPU_FREQ_MAX = ".gpu.frequency.max"
 
     public static DEFAULT_MODE = Constants.PREFIX_PROFILES + Constants.DEFAULT_ID + Constants.SUFIX_MODE
     public static DEFAULT_SPL = Constants.PREFIX_PROFILES + Constants.DEFAULT_ID + Constants.SUFIX_SPL
