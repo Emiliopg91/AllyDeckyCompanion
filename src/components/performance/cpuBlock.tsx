@@ -37,43 +37,43 @@ export const CpuBlock: FC = () => {
   const { id, name, profile, setProfile } = useContext(PerformanceContext)
 
   const onModeChange = (newVal: number) => {
-    saveSettings(id, name, newVal, profile.spl, profile.sppl, profile.fppl, profile.cpuBoost, profile.smtEnabled)
+    saveSettings(id, name, newVal, profile.cpu.tdp.spl, profile.cpu.tdp.sppl, profile.cpu.tdp.fppl, profile.cpu.boost, profile.cpu.smt)
     setProfile({ ...profile, mode: newVal })
   }
 
   const onSplChange = (newVal: number) => {
-    let newSppl = (newVal > profile.sppl) ? newVal : profile.sppl;
-    let newFppl = (newVal > profile.fppl) ? newVal : profile.fppl;
+    let newSppl = (newVal > profile.cpu.tdp.sppl) ? newVal : profile.cpu.tdp.sppl;
+    let newFppl = (newVal > profile.cpu.tdp.fppl) ? newVal : profile.cpu.tdp.fppl;
 
-    saveSettings(id, name, profile.mode, newVal, newSppl, newFppl, profile.cpuBoost, profile.smtEnabled)
-    setProfile({ ...profile, spl: newVal, sppl: newSppl, fppl: newFppl })
+    saveSettings(id, name, profile.mode, newVal, newSppl, newFppl, profile.cpu.boost, profile.cpu.smt)
+    setProfile({ ...profile, cpu: { ...profile.cpu, tdp: { spl: newVal, sppl: newSppl, fppl: newFppl } } })
   }
 
   const onSpplChange = (newVal: number) => {
-    if (newVal < profile.spl)
-      newVal = profile.spl;
-    let newFppl = (newVal > profile.fppl) ? newVal : profile.fppl;
+    if (newVal < profile.cpu.tdp.spl)
+      newVal = profile.cpu.tdp.spl;
+    let newFppl = (newVal > profile.cpu.tdp.fppl) ? newVal : profile.cpu.tdp.fppl;
 
-    saveSettings(id, name, profile.mode, profile.spl, newVal, newFppl, profile.cpuBoost, profile.smtEnabled)
-    setProfile({ ...profile, sppl: newVal, fppl: newFppl })
+    saveSettings(id, name, profile.mode, profile.cpu.tdp.spl, newVal, newFppl, profile.cpu.boost, profile.cpu.smt)
+    setProfile({ ...profile, cpu: { ...profile.cpu, tdp: { ...profile.cpu.tdp, sppl: newVal, fppl: newFppl } } })
   }
 
   const onFpplChange = (newVal: number) => {
-    if (newVal < profile.sppl)
-      newVal = profile.sppl;
+    if (newVal < profile.cpu.tdp.sppl)
+      newVal = profile.cpu.tdp.sppl;
 
-    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, newVal, profile.cpuBoost, profile.smtEnabled)
-    setProfile({ ...profile, fppl: newVal })
+    saveSettings(id, name, profile.mode, profile.cpu.tdp.spl, profile.cpu.tdp.sppl, newVal, profile.cpu.boost, profile.cpu.smt)
+    setProfile({ ...profile, cpu: { ...profile.cpu, tdp: { ...profile.cpu.tdp, fppl: newVal } } })
   }
 
   const onCpuBoostChange = (newVal: boolean) => {
-    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, profile.fppl, newVal, profile.smtEnabled)
-    setProfile({ ...profile, cpuBoost: newVal })
+    saveSettings(id, name, profile.mode, profile.cpu.tdp.spl, profile.cpu.tdp.sppl, profile.cpu.tdp.fppl, newVal, profile.cpu.smt)
+    setProfile({ ...profile, cpu: { ...profile.cpu, boost: newVal } })
   }
 
   const onSmtChange = (newVal: boolean) => {
-    saveSettings(id, name, profile.mode, profile.spl, profile.sppl, profile.fppl, profile.cpuBoost, newVal)
-    setProfile({ ...profile, smtEnabled: newVal })
+    saveSettings(id, name, profile.mode, profile.cpu.tdp.spl, profile.cpu.tdp.sppl, profile.cpu.tdp.fppl, profile.cpu.boost, newVal)
+    setProfile({ ...profile, cpu: { ...profile.cpu, smt: newVal } })
   }
 
   return (
@@ -97,7 +97,7 @@ export const CpuBlock: FC = () => {
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("spl.desc")}
-              value={profile.spl}
+              value={profile.cpu.tdp.spl}
               disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
@@ -112,7 +112,7 @@ export const CpuBlock: FC = () => {
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("sppl.desc")}
-              value={profile.sppl}
+              value={profile.cpu.tdp.sppl}
               disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
@@ -127,7 +127,7 @@ export const CpuBlock: FC = () => {
           <PanelSectionRow>
             <SliderField
               label={Translator.translate("fppl.desc")}
-              value={profile.fppl}
+              value={profile.cpu.tdp.fppl}
               disabled={profile.mode !== modeTags.indexOf(Mode[Mode.CUSTOM].substring(0, 1) + Mode[Mode.CUSTOM].substring(1))}
               showValue
               step={1}
@@ -143,7 +143,7 @@ export const CpuBlock: FC = () => {
             <ToggleField
               label="SMT"
               description={Translator.translate('smt.description')}
-              checked={profile.smtEnabled}
+              checked={profile.cpu.smt}
               onChange={onSmtChange}
               highlightOnFocus
             />
@@ -152,7 +152,7 @@ export const CpuBlock: FC = () => {
             <ToggleField
               label="CPU Boost"
               description={Translator.translate("cpu.boost.description")}
-              checked={profile.cpuBoost}
+              checked={profile.cpu.boost}
               onChange={onCpuBoostChange}
               highlightOnFocus
             />

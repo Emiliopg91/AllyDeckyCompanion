@@ -4,7 +4,7 @@ import { Constants } from "../../utils/constants";
 import { BackendUtils } from "../../utils/backend";
 import { Translator } from "decky-plugin-framework";
 import { Toast } from "../../utils/toast";
-import { State } from "../../utils/state";
+import { WhiteBoardUtils } from "../../utils/whiteboard";
 
 export const PluginBlock: FC = () => {
     const [isPluginDoingThings, setIsPluginDoingThings] = useState(false);
@@ -16,19 +16,19 @@ export const PluginBlock: FC = () => {
                     {Constants.PLUGIN_VERSION}
                 </Field>
             </PanelSectionRow>
-            {Boolean(State.PLUGIN_LATEST_VERSION) && (
+            {WhiteBoardUtils.getPluginLatestVersion() && (
                 <PanelSectionRow>
                     <Field label={Translator.translate("latest.version")} bottomSeparator="none">
-                        {State.PLUGIN_LATEST_VERSION}
+                        {WhiteBoardUtils.getPluginLatestVersion()}
                     </Field>
                 </PanelSectionRow>
             )}
-            {Boolean(State.PLUGIN_LATEST_VERSION) && (
+            {WhiteBoardUtils.getPluginLatestVersion() && (
                 <>
                     <PanelSectionRow>
                         <ButtonItem
                             onClick={() => {
-                                Toast.toast(Constants.PLUGIN_VERSION === State.PLUGIN_LATEST_VERSION && Boolean(State.PLUGIN_LATEST_VERSION) ? Translator.translate("reinstalling.plugin") : Translator.translate("updating.plugin"))
+                                Toast.toast(Constants.PLUGIN_VERSION === WhiteBoardUtils.getPluginLatestVersion() && Boolean(WhiteBoardUtils.getPluginLatestVersion()) ? Translator.translate("reinstalling.plugin") : Translator.translate("updating.plugin"))
                                 setIsPluginDoingThings(true)
                                 BackendUtils.otaUpdate();
                             }}
@@ -40,7 +40,7 @@ export const PluginBlock: FC = () => {
                             }}
                             disabled={isPluginDoingThings}
                         >
-                            {Constants.PLUGIN_VERSION === State.PLUGIN_LATEST_VERSION && Boolean(State.PLUGIN_LATEST_VERSION) ? Translator.translate("reinstall.plugin") : Translator.translate("update.to", { "version": State.PLUGIN_LATEST_VERSION })}
+                            {Constants.PLUGIN_VERSION === WhiteBoardUtils.getPluginLatestVersion() && Boolean(WhiteBoardUtils.getPluginLatestVersion()) ? Translator.translate("reinstall.plugin") : Translator.translate("update.to", { "version": WhiteBoardUtils.getPluginLatestVersion() })}
                         </ButtonItem>
                     </PanelSectionRow>
                 </>

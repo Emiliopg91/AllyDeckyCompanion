@@ -2,16 +2,16 @@ import { DropdownItem } from "@decky/ui"
 import { FC } from "react"
 
 import { Translator } from "decky-plugin-framework";
-import { State } from "../../utils/state";
+import { WhiteBoardUtils } from "../../utils/whiteboard"
 
 export const MenuBlock: FC = () => {
 
   return (
     <div>
-      <DropdownItem selectedOption={State.CURRENT_TAB}
+      <DropdownItem selectedOption={WhiteBoardUtils.getTab()}
         rgOptions={[
           {
-            data: "cpu",
+            data: "performance",
             label: Translator.translate("performance.settings")
           },
           {
@@ -23,7 +23,7 @@ export const MenuBlock: FC = () => {
             label: Translator.translate("system.info")
           }
         ]}
-        onChange={(newVal) => { State.CURRENT_TAB = newVal.data }}
+        onChange={(newVal) => { WhiteBoardUtils.setTab(newVal.data) }}
       />
     </div>
   );

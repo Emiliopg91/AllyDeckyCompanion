@@ -7,7 +7,8 @@ import decky
 import plugin_config
 import logger_utils
 import sdtdp
-import middleware
+import hardware
+from performance import cpu, power
 import plugin_update
 import shutil
 import subprocess
@@ -50,47 +51,53 @@ class Plugin:
         decky.logger.info("Migrating plugin configuration")
         plugin_config.migrate()
 
-# BATTERY 
+# HARDWARE 
     async def set_charge_limit(self, limit: int):
         decky.logger.debug(f"Executing: set_charge_limit({limit})")
-        middleware.set_charge_limit(limit)
+        hardware.set_charge_limit(limit)
+        
+    async def is_ally_x(self):
+        decky.logger.debug("Executing: is_ally_x()")
+        return hardware.is_ally_x()
 
-# TDP 
+    async def is_ally(self):
+        decky.logger.debug("Executing: is_ally()")
+        return hardware.is_ally()
+    
+    async def bios_version(self):
+        decky.logger.debug("Executing: bios_version()")
+        return hardware.bios_version()
+
+# POWER
     async def set_platform_profile(self, prof: str):
         decky.logger.debug(f"Executing: set_platform_profile({prof})")
-        middleware.set_platform_profile(prof)
+        power.set_platform_profile(prof)
+        sleep(0.1)
 
+# CPU 
     async def set_tdp(self, spl: int, sppl: int, fppl: int):
         try:
             decky.logger.debug(f"Executing: set_tdp({spl, sppl, fppl})")
             sleep(0.1)
-            middleware.set_tdp('STEADY', middleware.CTDP_FN, spl)
+            cpu.set_tdp('STEADY', cpu.CTDP_FN, spl)
             sleep(0.1)
-            middleware.set_tdp('SLOW', middleware.STDP_FN, sppl)
+            cpu.set_tdp('SLOW', cpu.STDP_FN, sppl)
             sleep(0.1)
-            middleware.set_tdp('FAST', middleware.FTDP_FN, fppl)
+            cpu.set_tdp('FAST', cpu.FTDP_FN, fppl)
             sleep(0.1)  
         except Exception as e:
             decky.logger.error(e)
 
     async def set_cpu_boost(self, enabled: bool):
         decky.logger.debug(f"Executing: set_cpu_boost({enabled})")
-        middleware.set_cpu_boost(enabled)
+        cpu.set_cpu_boost(enabled)
 
     async def set_smt(self, enabled: bool):
         decky.logger.debug(f"Executing: set_smt({enabled})")
-        middleware.set_smt(enabled)
+        cpu.set_smt(enabled)
         
 
 #MISC
-    async def is_ally_x(self):
-        decky.logger.debug("Executing: is_ally_x()")
-        return middleware.is_ally_x()
-
-    async def is_ally(self):
-        decky.logger.debug("Executing: is_ally()")
-        return middleware.is_ally()
-
     async def ota_update(self):
         decky.logger.debug("Executing: ota_update()")
         # trigger ota update
@@ -119,8 +126,4 @@ class Plugin:
         shutil.move(src, dst)
         decky.logger.info(f"Moved '{src}' to '{dst}'")
         return True
-    
-    async def bios_version(self):
-        decky.logger.debug("Executing: bios_version()")
-        return middleware.bios_version()
         

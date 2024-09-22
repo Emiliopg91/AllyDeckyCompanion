@@ -1,9 +1,9 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { State } from "../utils/state";
+import { createContext, useEffect, useState } from 'react';
 import { Profiles } from "../settings/profiles";
 import { AppOverviewExt, Profile } from '../utils/models';
 import { Router } from '@decky/ui';
-import { GlobalContext } from './globalContext';
+import { WhiteBoardUtils } from '../utils/whiteboard';
+import { EventBus, EventType, Logger, WhiteBoardEventData } from 'decky-plugin-framework';
 
 interface PerformanceContextType {
     id: string
@@ -16,12 +16,12 @@ interface PerformanceContextType {
 }
 
 const defaultValue: PerformanceContextType = {
-    id: State.RUNNING_GAME_ID,
-    appId: Profiles.getAppId(State.RUNNING_GAME_ID),
-    name: Profiles.getAppName(State.RUNNING_GAME_ID),
+    id: WhiteBoardUtils.getRunningGameId(),
+    appId: Profiles.getAppId(String(WhiteBoardUtils.getRunningGameId())),
+    name: Profiles.getAppName(String(WhiteBoardUtils.getRunningGameId())),
     icon: undefined,
-    onBattery: State.ON_BATTERY,
-    profile: Profiles.getProfileForId(State.RUNNING_GAME_ID),
+    onBattery: WhiteBoardUtils.getOnBattery(),
+    profile: Profiles.getProfileForId(String(WhiteBoardUtils.getRunningGameId())),
     setProfile: () => { }
 };
 
@@ -38,27 +38,44 @@ const loadIcon = (appId: string) => {
 export const PerformanceContext = createContext(defaultValue);
 
 export function PerformanceProvider({ children }: { children: JSX.Element }): JSX.Element {
-    const [onBattery, setOnBattery] = useState(State.ON_BATTERY);
-    const [id, setId] = useState(State.RUNNING_GAME_ID);
+    const [onBattery, setOnBattery] = useState(WhiteBoardUtils.getOnBattery())
+    const [id, setId] = useState(WhiteBoardUtils.getRunningGameId())
     const [appId, setAppId] = useState(Profiles.getAppId(id));
     const [name, setName] = useState(Profiles.getAppName(id));
     const [icon, setIcon] = useState<string | undefined>(loadIcon(Profiles.getAppId(id)))
     const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(id))
-    const { refreshTrigger } = useContext(GlobalContext)
 
     useEffect(() => {
-        setOnBattery(() => {
-            return State.ON_BATTERY
-        })
-        setId(id => {
-            if (id != State.RUNNING_GAME_ID) {
-                setAppId(Profiles.getAppId(id))
-                setName(Profiles.getAppName(id))
-                setIcon(loadIcon(Profiles.getAppId(id)))
+        const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) => {
+            const data = (e as WhiteBoardEventData)
+            if (data.getId() == "onBattery") {
+                setOnBattery((bat) => {
+                    if (bat != data.getValue() as boolean) {
+                        Logger.info("")
+                    }
+                    return data.getValue() as boolean
+                })
             }
-            return State.RUNNING_GAME_ID
-        })
-    }, [refreshTrigger])
+        }).unsubscribe
+        const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) => {
+            const data = (e as WhiteBoardEventData)
+            if (data.getId() == "runningGameId") {
+                setId((id) => {
+                    if (id != (data.getValue() as string)) {
+                        setAppId(Profiles.getAppId((data.getValue() as string)))
+                        setName(Profiles.getAppName((data.getValue() as string)))
+                        setIcon(loadIcon(Profiles.getAppId((data.getValue() as string))))
+                    }
+                    return String((data.getValue() as string))
+                })
+            }
+        }).unsubscribe
+
+        return () => {
+            unsBat()
+            unsID()
+        }
+    }, [])
 
     return (
         <PerformanceContext.Provider value={{ id, appId, name, icon, onBattery, profile, setProfile }} >

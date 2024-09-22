@@ -1,8 +1,7 @@
 import { Backend, Logger } from "decky-plugin-framework"
 import { Constants } from "./constants";
-import { debounce } from "lodash";
-import { State } from "./state";
 import { Profile, SdtdpSettings } from "./models";
+import { WhiteBoardUtils } from "./whiteboard";
 
 /**
  * The Backend class provides access to plugin Python backend methods
@@ -39,37 +38,39 @@ export class BackendUtils {
         return Backend.backend_call<[], boolean>("is_ally");
     }
 
-    private static debouncedSetTdpProfile = debounce(async (profile: Profile) => {
-        let epp = 'performance'
-        if (profile.spl <= Constants.AllySilentSPL) {
-            epp = 'quiet'
-        } else if (profile.spl <= Constants.AllyPerformanceSPL) {
-            epp = 'balanced'
+    public static async setPerformanceProfile(profile: Profile): Promise<void> {
+        if (WhiteBoardUtils.getIsAllyX()) {
+            let epp = 'performance'
+            if (profile.cpu.tdp.spl <= Constants.AllySilentSPL) {
+                epp = 'quiet'
+            } else if (profile.cpu.tdp.spl <= Constants.AllyPerformanceSPL) {
+                epp = 'balanced'
+            }
+
+            Logger.info("Setting performance profile to '" + epp + "':", profile)
+
+            Backend.backend_call<[prof: String], number>("set_platform_profile", epp).then(() => {
+                Backend.backend_call<[spl: number, sppl: number, fppl: number], number>("set_tdp", profile.cpu.tdp.spl, profile.cpu.tdp.sppl, profile.cpu.tdp.fppl).then(() => {
+                    Backend.backend_call<[enabled: Boolean], number>("set_smt", profile.cpu.smt).then(() => {
+                        Backend.backend_call<[enabled: Boolean], number>("set_cpu_boost", profile.cpu.boost).then(() => {
+                            Logger.info("Performance profile setted")
+                        })
+                    })
+                })
+            })
         }
-
-        Logger.info("Setting CPU performance to '" + epp + "':", profile)
-
-        Backend.backend_call<[prof: String], number>("set_platform_profile", epp);
-        Backend.backend_call<[spl: number, sppl: number, fppl: number], number>("set_tdp", profile.spl, profile.sppl, profile.fppl);
-        Backend.backend_call<[enabled: Boolean], number>("set_smt", profile.smtEnabled);
-        Backend.backend_call<[enabled: Boolean], number>("set_cpu_boost", profile.cpuBoost);
-    }, 500)
-
-    public static async setTdpProfile(profile: Profile): Promise<void> {
-        if (State.IS_ALLY)
-            BackendUtils.debouncedSetTdpProfile(profile)
     }
 
     public static async setBatteryLimit(limit: number): Promise<void> {
-        if (State.IS_ALLY) {
+        if (WhiteBoardUtils.getIsAllyX()) {
             Logger.info("Setting battery limit to " + limit + "%")
             Backend.backend_call<[limit: number], number>("set_charge_limit", limit);
         }
     }
 
     public static async otaUpdate(): Promise<void> {
-        Logger.info("Download and installation of version " + State.PLUGIN_LATEST_VERSION + " in progress")
-        Backend.backend_call<[], boolean>("ota_update").then(()=>{
+        Logger.info("Download and installation of version " + WhiteBoardUtils.getPluginLatestVersion() + " in progress")
+        Backend.backend_call<[], boolean>("ota_update").then(() => {
             SteamClient.System.RestartPC()
         })
     }
@@ -87,7 +88,7 @@ export class BackendUtils {
     }
 
     public static async disableSDTDP(): Promise<void> {
-        Backend.backend_call<[], boolean>("disable_sdtdp").then(()=>{
+        Backend.backend_call<[], boolean>("disable_sdtdp").then(() => {
             SteamClient.System.RestartPC()
         })
     }

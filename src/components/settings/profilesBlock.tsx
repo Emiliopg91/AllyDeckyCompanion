@@ -1,28 +1,27 @@
 import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "@decky/ui"
 import { FC, useContext, useState } from "react"
 import { SystemSettings } from "../../settings/system";
-import { Translator } from "decky-plugin-framework";
+import { Translator, WhiteBoard } from "decky-plugin-framework";
 import { Toast } from "../../utils/toast";
-import { State } from "../../utils/state";
 import { Constants } from "../../utils/constants";
 import { Profiles } from "../../settings/profiles";
 import { GlobalContext } from "../../contexts/globalContext";
+import { WhiteBoardUtils } from "../../utils/whiteboard";
 
 export const ProfilesBlock: FC = () => {
-  const {profilePerGame, setProfilePerGame} = useContext(GlobalContext)
+  const { profilePerGame, setProfilePerGame } = useContext(GlobalContext)
   const [isDoingThings, setIsDoingThings] = useState(false);
 
   const onProfilePerGameChange = (newVal: boolean) => {
     SystemSettings.setProfilePerGame(newVal);
 
     if (newVal) {
-      State.RUNNING_GAME_ID = Router.MainRunningApp
-        ? Router.MainRunningApp.appid + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-        : (State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC)
+      WhiteBoardUtils.getRunningGameId() == Router.MainRunningApp?.appid
+        ? Router.MainRunningApp?.appid + (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
+        : (WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC)
     } else {
-      State.RUNNING_GAME_ID = State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC
+      WhiteBoardUtils.setRunningGameId(WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC)
     }
-    Profiles.applyGameProfile(State.RUNNING_GAME_ID)
 
     setProfilePerGame(newVal)
   }
@@ -38,7 +37,7 @@ export const ProfilesBlock: FC = () => {
           highlightOnFocus
         />
       </PanelSectionRow>
-      {State.SDTDP_SETTINGS_PRESENT &&
+      {WhiteBoardUtils.getSdtdpSettingsPresent() &&
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {

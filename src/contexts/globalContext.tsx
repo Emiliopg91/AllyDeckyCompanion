@@ -1,39 +1,24 @@
-import { createContext, useEffect, useState } from 'react';
-import { State } from "../utils/state";
+import { createContext, useState } from 'react';
+import { WhiteBoardUtils } from '../utils/whiteboard';
 
 
 interface GlobalContextType {
     profilePerGame: boolean
     setProfilePerGame: (newVal: boolean) => void
-    refreshTrigger: boolean
 }
 
 const defaultValue: GlobalContextType = {
-    profilePerGame: State.PROFILE_PER_GAME,
-    setProfilePerGame: () => { },
-    refreshTrigger: true,
+    profilePerGame: WhiteBoardUtils.getProfilePerGame(),
+    setProfilePerGame: () => { }
 };
 
 export const GlobalContext = createContext(defaultValue);
 
 export function GlobalProvider({ children }: { children: JSX.Element }): JSX.Element {
-    const [profilePerGame, setProfilePerGame] = useState(State.PROFILE_PER_GAME)
-    const [refreshTrigger, setRefreshTrigger] = useState(defaultValue.refreshTrigger)
-
-    const refreshFn = () => {
-        setRefreshTrigger(prev => !prev)
-    }
-
-    useEffect(() => {
-        const profRefresh = setInterval(() => refreshFn(), 500)
-
-        return () => {
-            clearInterval(profRefresh)
-        }
-    }, [])
+    const [profilePerGame, setProfilePerGame] = useState(WhiteBoardUtils.getProfilePerGame())
 
     return (
-        <GlobalContext.Provider value={{ profilePerGame, setProfilePerGame, refreshTrigger }} >
+        <GlobalContext.Provider value={{ profilePerGame, setProfilePerGame }} >
             {children}
         </GlobalContext.Provider>
     );

@@ -2,14 +2,13 @@
 import { Game, Logger, Settings, Translator } from "decky-plugin-framework"
 import { Constants } from '../utils/constants'
 import { Mode } from "../utils/mode"
-import { State } from "../utils/state"
-import { debounce } from "lodash"
+import { AsyncUtils } from "../utils/async"
 import { BackendUtils } from "../utils/backend"
 import { Profile } from "../utils/models"
 import { SpreadSheet, SpreadSheetCell } from "../utils/spreadsheet"
+import { WhiteBoardUtils } from "../utils/whiteboard"
 
 export class Profiles {
-
     public static summary() {
 
         const profiles = Settings.getConfigurationStructured()["profiles"]
@@ -98,30 +97,35 @@ export class Profiles {
     public static getFullPowerProfile(): Profile {
         return {
             mode: Mode.TURBO,
-            spl: Constants.AllyTurboFPPL,
-            sppl: Constants.AllyTurboFPPL,
-            fppl: Constants.AllyTurboFPPL,
-            cpuBoost: false,
-            smtEnabled: true
+            cpu: {
+                boost: false,
+                smt: true,
+                tdp: {
+                    spl: Constants.AllyTurboFPPL,
+                    sppl: Constants.AllyTurboFPPL,
+                    fppl: Constants.AllyTurboFPPL,
+                }
+            }
         }
     }
 
-    private static debouncedApplyGameProfile = debounce((id: string) => {
+
+    public static applyGameProfile(id: string) {
         const profile: Profile = Profiles.getProfileForId(id)
         if (profile.mode != Mode.CUSTOM) {
             const tdpProfile = Profiles.getProfileForMode(profile.mode)
-            profile.spl = tdpProfile.spl
-            profile.sppl = tdpProfile.sppl
-            profile.fppl = tdpProfile.fppl
-            profile.cpuBoost = tdpProfile.cpuBoost
-            profile.smtEnabled = tdpProfile.smtEnabled
+            profile.cpu.tdp.spl = tdpProfile.cpu.tdp.spl
+            profile.cpu.tdp.sppl = tdpProfile.cpu.tdp.sppl
+            profile.cpu.tdp.fppl = tdpProfile.cpu.tdp.fppl
+            profile.cpu.boost = tdpProfile.cpu.boost
+            profile.cpu.smt = tdpProfile.cpu.smt
         }
-        Logger.info("Applying profile " + id)
-        BackendUtils.setTdpProfile(profile)
-    }, 250)
-
-    public static applyGameProfile(id: string) {
-        Profiles.debouncedApplyGameProfile(id)
+        AsyncUtils.runMutexForProfile((release) => {
+            Logger.info("Applying profile " + id)
+            BackendUtils.setPerformanceProfile(profile).finally(() => {
+                release()
+            })
+        })
     }
 
     public static getDefaultProfile(): Profile {
@@ -143,32 +147,32 @@ export class Profiles {
         let spl: number
         let sppl: number
         let fppl: number
-        let cpuBoost: boolean
-        let smtEnabled: boolean
+        let boost: boolean
+        let smt: boolean
 
         if (!Profiles.existsProfileForId(id)) {
             Logger.info("No profile found for " + id + ", creating")
 
             mode = id.endsWith(Constants.SUFIX_AC) ? Constants.TDP_AC_DEFAULT_MODE : Constants.TDP_DEFAULT_MODE
             const tmpProf = Profiles.getProfileForMode(mode)
-            spl = tmpProf.spl
-            sppl = tmpProf.sppl
-            fppl = tmpProf.fppl
-            cpuBoost = tmpProf.cpuBoost
-            smtEnabled = tmpProf.smtEnabled
+            spl = tmpProf.cpu.tdp.spl
+            sppl = tmpProf.cpu.tdp.sppl
+            fppl = tmpProf.cpu.tdp.fppl
+            boost = tmpProf.cpu.boost
+            smt = tmpProf.cpu.smt
 
-            Profiles.saveProfileForId(id, mode, spl, sppl, fppl, cpuBoost, smtEnabled)
+            Profiles.saveProfileForId(id, mode, spl, sppl, fppl, boost, smt)
         } else {
             mode = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE))
             spl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL))
             sppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL))
             fppl = Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL))
-            cpuBoost = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST) == "true"
-            smtEnabled = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT) == "true"
+            boost = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST) == "true"
+            smt = Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT) == "true"
         }
 
         return {
-            mode, spl, sppl, fppl, cpuBoost, smtEnabled
+            mode, cpu: { tdp: { spl, sppl, fppl }, boost, smt }
         }
     }
 
@@ -176,28 +180,30 @@ export class Profiles {
         let spl = 0
         let sppl = 0
         let fppl = 0
-        let cpuBoost = Constants.CPU_DEFAULT_BOOST
-        let smtEnabled = Constants.CPU_DEFAULT_SMT
+        let boost = Constants.CPU_DEFAULT_BOOST
+        let smt = Constants.CPU_DEFAULT_SMT
 
         switch (mode) {
             case Mode.SILENT:
-                spl = State.IS_ALLY_X ? Constants.AllyXSilentSPL : Constants.AllySilentSPL
+                spl = WhiteBoardUtils.getIsAllyX() ? Constants.AllyXSilentSPL : Constants.AllySilentSPL
                 sppl = Constants.AllySilentSPPL
                 fppl = Constants.AllySilentFPPL
                 break;
             case Mode.PERFORMANCE:
             case Mode.CUSTOM:
-                spl = State.IS_ALLY_X ? Constants.AllyXPerformanceSPL : Constants.AllyPerformanceSPL
+                spl = WhiteBoardUtils.getIsAllyX() ? Constants.AllyXPerformanceSPL : Constants.AllyPerformanceSPL
                 sppl = Constants.AllyPerformanceSPPL
                 fppl = Constants.AllyPerformanceFPPL
                 break;
             case Mode.TURBO:
-                spl = State.IS_ALLY_X ? Constants.AllyXTurboSPL : Constants.AllyTurboSPL
+                spl = WhiteBoardUtils.getIsAllyX() ? Constants.AllyXTurboSPL : Constants.AllyTurboSPL
                 sppl = Constants.AllyTurboSPPL
                 fppl = Constants.AllyTurboFPPL
         }
 
-        return ({ mode, spl, sppl, fppl, cpuBoost, smtEnabled } as Profile)
+        return {
+            mode, cpu: { tdp: { spl, sppl, fppl }, boost, smt }
+        }
     }
 
     public static saveProfileForId(id: string, mode: Number, spl: Number, sppl: Number, fppl: Number, cpuBoost: Boolean, smtEnabled: Boolean) {

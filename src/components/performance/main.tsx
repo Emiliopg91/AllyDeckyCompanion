@@ -1,6 +1,4 @@
 import { FC, useContext, useEffect } from "react"
-
-import { Logger } from "decky-plugin-framework";
 import { Profiles } from "../../settings/profiles";
 import { debounce } from 'lodash'
 import { PerformanceContext, PerformanceProvider } from "../../contexts/performanceContext";
@@ -11,7 +9,6 @@ export const PerformanceBlock: FC = () => {
   const { id, name, setProfile } = useContext(PerformanceContext)
 
   const loadSettings = debounce((id, name) => {
-    Logger.info("Loading profile " + id + " (" + name + ")")
     const profile = Profiles.getProfileForId(id);
     setProfile(profile)
   }, 100)

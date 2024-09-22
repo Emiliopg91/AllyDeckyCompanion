@@ -5,18 +5,23 @@ import { Constants } from "./utils/constants";
 import translations from "../assets/translations.i18n.json";
 
 import {
+  EventBus,
+  EventData,
+  EventType,
   Framework,
   Logger,
   Settings,
   Translator,
+  WhiteBoardEventData,
 } from "decky-plugin-framework";
-import { State } from "./utils/state";
 import { Profiles } from './settings/profiles'
 import { BackendUtils } from "./utils/backend";
 import { SystemSettings } from "./settings/system";
 import { ConfirmModal, showModal, sleep, staticClasses } from "@decky/ui";
-import { definePlugin, fetchNoCors } from "@decky/api";
+import { definePlugin } from "@decky/api";
 import { Toast } from "./utils/toast";
+import { WhiteBoardUtils } from "./utils/whiteboard";
+import { AsyncUtils } from "./utils/async";
 
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
@@ -24,6 +29,7 @@ let onGameUnregister: Function | undefined;
 let onShutdownUnregister: Function | undefined;
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
 let biosUpdateCheckTimer: NodeJS.Timeout | undefined;
+let runningGameIdUnregister: Function | undefined
 
 const checkProfilePerGame = () => {
   return new Promise<void>((resolve) => {
@@ -35,19 +41,19 @@ const checkProfilePerGame = () => {
         strCancelButtonText={Translator.translate("disable")}
         onCancel={() => {
           Settings.setEntry(Constants.PROFILE_PER_GAME, "false", true)
-          State.PROFILE_PER_GAME = false
+          WhiteBoardUtils.setProfilePerGame(false)
           Logger.info("Disabled profile per-game")
           resolve()
         }}
         onOK={() => {
           Settings.setEntry(Constants.PROFILE_PER_GAME, "true", true)
-          State.PROFILE_PER_GAME = true
+          WhiteBoardUtils.setProfilePerGame(true)
           Logger.info("Enabled profile per-game")
           resolve()
         }}
       />)
     } else {
-      State.PROFILE_PER_GAME = Settings.getEntry(Constants.PROFILE_PER_GAME) == "true"
+      WhiteBoardUtils.setProfilePerGame(Settings.getEntry(Constants.PROFILE_PER_GAME) == "true")
       resolve()
     }
   })
@@ -68,7 +74,7 @@ const checkPluginLatestVersion = async () => {
 
     const vers = (await result.json())["version"]
     Logger.info("Latest plugin version: " + vers)
-    if (vers != State.PLUGIN_LATEST_VERSION && Constants.PLUGIN_VERSION != vers) {
+    if (vers != WhiteBoardUtils.getPluginLatestVersion() && Constants.PLUGIN_VERSION != vers) {
       Logger.info("New plugin update available!")
       Toast.toast(Translator.translate("update.available"), 3000, () => {
         BackendUtils.otaUpdate();
@@ -76,11 +82,11 @@ const checkPluginLatestVersion = async () => {
       clearInterval(pluginUpdateCheckTimer)
       pluginUpdateCheckTimer = undefined
     }
-    State.PLUGIN_LATEST_VERSION = vers
+    WhiteBoardUtils.setPluginLatestVersion(vers)
 
   } catch (e) {
     Logger.error("Error fetching latest plugin version", e)
-    State.PLUGIN_LATEST_VERSION = ""
+    WhiteBoardUtils.setPluginLatestVersion("")
   }
 }
 
@@ -88,7 +94,7 @@ const checkBiosLatestVersion = async () => {
   try {
     Logger.info("Checking for BIOS update")
 
-    const url = State.IS_ALLY_X
+    const url = WhiteBoardUtils.getIsAllyX()
       ? "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-x-2024&pdid=0&m1id=26436&cpu=RC72LA&LevelTagId=230371&systemCode=rog"
       : "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-2023&pdid=0&m1id=23629&cpu=RC71L&LevelTagId=220680&systemCode=rog"
     const response = await fetch("https://corsproxy.io/?" + url);
@@ -109,13 +115,13 @@ const checkBiosLatestVersion = async () => {
     if (versions.length > 0) {
       const vers = String(Math.max(...versions))
       Logger.info("Latest BIOS version: " + vers)
-      if (vers != State.BIOS_LATEST_VERSION && State.BIOS_VERSION != vers) {
+      if (vers != WhiteBoardUtils.getBiosLatestVersion() && WhiteBoardUtils.getBiosVersion() != vers) {
         Logger.info("New BIOS update available!")
         Toast.toast(Translator.translate("bios.update.available"))
         clearInterval(biosUpdateCheckTimer)
         biosUpdateCheckTimer = undefined
       }
-      State.BIOS_LATEST_VERSION = vers;
+      WhiteBoardUtils.setBiosLatestVersion(vers)
     }
 
   } catch (e) {
@@ -133,7 +139,7 @@ const checkSdtdp = () => {
           strCancelButtonText={Translator.translate("enable")}
           strOKButtonText={Translator.translate("disable")}
           onCancel={() => {
-            State.SDTDP_ENABLED = true
+            WhiteBoardUtils.setSdtdpEnabled(true)
             Logger.info("SimpleDeckyTDP not disabled")
             resolve()
           }}
@@ -175,33 +181,33 @@ export default definePlugin(() => {
 
     checkSdtdp().then(() => {
       checkProfilePerGame().then(() => {
-        Logger.info("Profile per-game " + (State.PROFILE_PER_GAME ? "en" : "dis") + "abled")
+        Logger.info("Profile per-game " + (WhiteBoardUtils.getProfilePerGame() ? "en" : "dis") + "abled")
 
         Profiles.getDefaultProfile()
         Profiles.getDefaultACProfile()
 
         BackendUtils.isAlly().then(isAlly => {
           BackendUtils.isAllyX().then(isX => {
-            State.IS_ALLY_X = isX
-            State.IS_ALLY = isX || isAlly
+            WhiteBoardUtils.setisAllyX(isX)
+            WhiteBoardUtils.setIsAlly(isX || isAlly)
             let prod = "Unknown"
-            if (State.IS_ALLY) {
+            if (WhiteBoardUtils.getIsAllyX()) {
               prod = "ASUS ROG Ally "
-              if (State.IS_ALLY_X) {
+              if (WhiteBoardUtils.getIsAllyX()) {
                 prod += "X"
               }
             }
             Logger.info("Product: " + prod)
             BackendUtils.getBiosVersion().then((biosVersion) => {
-              State.BIOS_VERSION = biosVersion;
-              Logger.info("BIOS version " + State.BIOS_VERSION);
+              WhiteBoardUtils.setBiosVersion(biosVersion);
+              Logger.info("BIOS version " + WhiteBoardUtils.getBiosVersion());
 
-              State.ONLY_GUI = !State.IS_ALLY || State.SDTDP_ENABLED
-              Logger.info("Mode ONLY_GUI " + (State.ONLY_GUI ? "en" : "dis") + "abled")
+              WhiteBoardUtils.setOnlyGui(!WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled())
+              Logger.info("Mode ONLY_GUI " + (WhiteBoardUtils.getOnlyGui() ? "en" : "dis") + "abled")
 
               BackendUtils.isSdtdpPresent().then((res) => {
                 Logger.info("SDTDP " + ((res) ? "" : "no ") + "present")
-                State.SDTDP_SETTINGS_PRESENT = res
+                WhiteBoardUtils.setSdtdpSettingsPresent(res)
               })
 
               sleep(5000).then(() => {
@@ -214,49 +220,67 @@ export default definePlugin(() => {
               })
 
               onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications((e: any) => {
-                if (State.PROFILE_PER_GAME) {
-                  const prevId = State.RUNNING_GAME_ID
-                  State.RUNNING_GAME_ID = (e.bRunning
-                    ? String(e.unAppID) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-                    : (State.ON_BATTERY ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC));
-                  if (prevId != State.RUNNING_GAME_ID) {
-                    Profiles.applyGameProfile(State.RUNNING_GAME_ID)
+                Logger.info("New game event")
+                if (WhiteBoardUtils.getProfilePerGame()) {
+                  const prevId = WhiteBoardUtils.getRunningGameId()
+                  const newId = (e.bRunning
+                    ? String(e.unAppID) + (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
+                    : (WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC))
+                  if (prevId != newId) {
+                    WhiteBoardUtils.setRunningGameId(newId);
                   }
                 }
               }).unregister
 
               SteamClient.System.RegisterForBatteryStateChanges((state: any) => {
-                if (State.ON_BATTERY != (state.eACState == 1)) {
+                const onBattery = state.eACState == 1
+                if (WhiteBoardUtils.getOnBattery() != (onBattery)) {
                   Logger.info("New AC state: " + state.eACState)
-                  State.ON_BATTERY = state.eACState == 1
-
-                  State.RUNNING_GAME_ID = State.RUNNING_GAME_ID.substring(0, State.RUNNING_GAME_ID.lastIndexOf(".")) + (State.ON_BATTERY ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-                  Profiles.applyGameProfile(State.RUNNING_GAME_ID)
+                  WhiteBoardUtils.setOnBattery(onBattery)
+                  const newId = WhiteBoardUtils.getRunningGameId().substring(0, WhiteBoardUtils.getRunningGameId().lastIndexOf(".")) + (onBattery ? Constants.SUFIX_BAT : Constants.SUFIX_AC);
+                  WhiteBoardUtils.setRunningGameId(newId)
                 }
               })
 
+              runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
+                if ((e as WhiteBoardEventData).getId() == "runningGameId")
+                  Profiles.applyGameProfile((e as WhiteBoardEventData).getValue())
+              }).unsubscribe;
+
               onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
-                Logger.info("Setting CPU profile for suspension")
-                BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
+                AsyncUtils.runMutexForProfile((release) => {
+                  Logger.info("Setting CPU profile for suspension")
+                  BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
+                    release()
+                  })
+                })
               }).unregister
 
               onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
-                Logger.info("Waiting 10 seconds for restoring CPU profile")
-                sleep(10000).then(() => {
-                  BackendUtils.setTdpProfile(Profiles.getProfileForId(State.RUNNING_GAME_ID))
+                AsyncUtils.runMutexForProfile((release) => {
+                  Logger.info("Waiting 10 seconds for restoring CPU profile")
+                  sleep(10000).then(() => {
+                    BackendUtils.setPerformanceProfile(Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())).finally(() => {
+                      release()
+                    })
+                  })
                 })
               }).unregister
 
               onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
-                Logger.info("Setting CPU profile for shutdown/restart")
-                BackendUtils.setTdpProfile(Profiles.getFullPowerProfile())
+                AsyncUtils.runMutexForProfile((release) => {
+                  Logger.info("Setting CPU profile for shutdown/restart")
+                  BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
+                    release()
+                  })
+                })
               }).unregister
 
               BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery())
-              if (State.IS_ALLY) {
+              if (WhiteBoardUtils.getIsAllyX()) {
                 sleep(100).then(() => {
                   Profiles.summary()
-                  Profiles.applyGameProfile(State.RUNNING_GAME_ID)
+                  Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
                 })
               }
             });
@@ -284,6 +308,8 @@ export default definePlugin(() => {
         clearInterval(pluginUpdateCheckTimer)
       if (biosUpdateCheckTimer)
         clearInterval(biosUpdateCheckTimer)
+      if (runningGameIdUnregister)
+        runningGameIdUnregister()
 
       Framework.shutdown()
     }

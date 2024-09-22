@@ -7,24 +7,24 @@ import { FC } from "react";
 import { WarningBlock } from "../components/others/warningBlock";
 import { GlobalProvider } from "../contexts/globalContext";
 import { MenuBlock } from "../components/others/menuBlock";
-import { State } from "../utils/state";
+import { WhiteBoardUtils } from "../utils/whiteboard";
 
 export const MainMenu: FC = () => {
   return (
     <GlobalProvider>
       <>
         <WarningBlock />
-        <MenuBlock/>
-          {State.CURRENT_TAB === "cpu" &&
+        <MenuBlock />
+        {WhiteBoardUtils.getTab() === "performance" &&
           <PerformanceBlock />
-          }
-          {State.CURRENT_TAB === "settings" &&
+        }
+        {WhiteBoardUtils.getTab() === "settings" &&
           <SettingsBlock />
-          }
-          {State.CURRENT_TAB === "system" &&
+        }
+        {WhiteBoardUtils.getTab() === "system" &&
           <SystemBlock />
-          }
-      <ContributeBlock />
+        }
+        <ContributeBlock />
       </>
     </GlobalProvider>
   );

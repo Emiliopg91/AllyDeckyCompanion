@@ -2,26 +2,26 @@ import { PanelSection, PanelSectionRow } from "@decky/ui"
 import { FC } from "react"
 
 import { Translator } from "decky-plugin-framework";
-import { State } from "../../utils/state";
+import { WhiteBoardUtils } from "../../utils/whiteboard";
 
 export const WarningBlock: FC = () => {
 
   return (
     <>
-      {State.ONLY_GUI &&
+      {WhiteBoardUtils.getOnlyGui() &&
         <>
           <>
             <PanelSection>
               <PanelSectionRow>
                 <span>{Translator.translate("no.profiles.applied")} </span>
                 <br />
-                {State.SDTDP_ENABLED &&
+                {WhiteBoardUtils.getSdtdpEnabled() &&
                   <>
                     <br />
                     <span>{Translator.translate("sdtdp.enabled")}</span>
                   </>
                 }
-                {!State.IS_ALLY &&
+                {!WhiteBoardUtils.getIsAlly() &&
                   <>
                     <br />
                     <span>{Translator.translate("incompatible.device")}</span>

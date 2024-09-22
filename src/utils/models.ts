@@ -11,14 +11,21 @@ export interface AppOverviewExt extends AppOverview {
     m_gameid: string; // base, id for non-steam games
 }
 
+export interface CpuProfile {
+    boost: boolean
+    smt: boolean
+    tdp: TdpCpuProfile
+}
 
-export interface Profile {
-    mode: number
+export interface TdpCpuProfile {
     spl: number
     sppl: number
     fppl: number
-    cpuBoost: boolean
-    smtEnabled: boolean
+}
+
+export interface Profile {
+    mode: number
+    cpu: CpuProfile
 }
 
 export interface SdtdpSettingsTdpProfile {

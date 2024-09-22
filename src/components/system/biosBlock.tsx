@@ -1,7 +1,7 @@
 import { Field, PanelSection, PanelSectionRow } from "@decky/ui"
 import { FC } from "react"
 import { Translator } from "decky-plugin-framework";
-import { State } from "../../utils/state";
+import { WhiteBoardUtils } from "../../utils/whiteboard";
 
 export const BiosBlock: FC = () => {
 
@@ -9,13 +9,13 @@ export const BiosBlock: FC = () => {
         <PanelSection title={Translator.translate("bios")}>
             <PanelSectionRow>
                 <Field label={Translator.translate("installed.version")} bottomSeparator="none">
-                    {State.BIOS_VERSION}
+                    {WhiteBoardUtils.getBiosVersion()}
                 </Field>
             </PanelSectionRow>
-            {Boolean(State.BIOS_LATEST_VERSION) && (
+            {WhiteBoardUtils.getBiosLatestVersion() && (
                 <PanelSectionRow>
                     <Field label={Translator.translate("latest.version")} bottomSeparator="none">
-                        {State.BIOS_LATEST_VERSION}
+                        {WhiteBoardUtils.getBiosLatestVersion()}
                     </Field>
                 </PanelSectionRow>
             )}

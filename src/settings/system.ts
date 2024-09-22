@@ -1,7 +1,7 @@
 import { Settings } from 'decky-plugin-framework'
 import { Constants } from '../utils/constants'
 import { BackendUtils } from '../utils/backend'
-import { State } from '../utils/state'
+import { WhiteBoardUtils } from '../utils/whiteboard'
 
 export class SystemSettings {
     public static getLimitBattery() {
@@ -18,6 +18,6 @@ export class SystemSettings {
 
     public static setProfilePerGame(enabled: boolean) {
         Settings.setEntry(Constants.PROFILE_PER_GAME, String(enabled), true)
-        State.PROFILE_PER_GAME = enabled
+        WhiteBoardUtils.setProfilePerGame(enabled)
     }
 }

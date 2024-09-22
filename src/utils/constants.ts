@@ -60,4 +60,5 @@ export class Constants {
     public static AllyXSilentSPL = 10
     public static AllyXPerformanceSPL = 15
     public static AllyXTurboSPL = 25
+
 }
