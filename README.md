@@ -70,6 +70,7 @@
 
 - [X] CPU Boost control
 
+- [X] GPU frequency control
   
 
 - [X] CPU and TDP boost on suspend-resume events
