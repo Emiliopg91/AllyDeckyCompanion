@@ -46,7 +46,9 @@
 
   
 
-![plugin image](./img/plugin_image_updated.png)
+![plugin image](./img/performance.png)
+![plugin image](./img/settings.png)
+![plugin image](./img/system.png)
 
  
   
