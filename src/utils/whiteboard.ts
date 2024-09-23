@@ -1,23 +1,24 @@
-import { Router } from "@decky/ui";
-import { WhiteBoard } from "decky-plugin-framework";
-import { Constants } from "./constants";
+import { Router } from '@decky/ui';
+import { WhiteBoard } from 'decky-plugin-framework';
+
+import { Constants } from './constants';
 
 export class WhiteBoardUtils {
   public static getOnBattery(): boolean {
     return (
-      WhiteBoard.get("onBattery") ||
+      WhiteBoard.get('onBattery') ||
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).SystemPowerStore.m_eACState == 1
     );
   }
 
   public static setOnBattery(value: boolean): void {
-    WhiteBoard.set("onBattery", value);
+    WhiteBoard.set('onBattery', value);
   }
 
   public static getRunningGameId(): string {
     return (
-      WhiteBoard.get<string>("runningGameId") ||
+      WhiteBoard.get<string>('runningGameId') ||
       (Router.MainRunningApp
         ? Router.MainRunningApp.appid +
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,110 +33,110 @@ export class WhiteBoardUtils {
   }
 
   public static setRunningGameId(value: string): void {
-    WhiteBoard.set("runningGameId", value);
+    WhiteBoard.set('runningGameId', value);
   }
 
   public static getIsAlly(): boolean {
-    return WhiteBoard.get("isAlly") || false;
+    return WhiteBoard.get('isAlly') || false;
   }
 
   public static setIsAlly(value: boolean): void {
-    WhiteBoard.set("isAlly", value);
+    WhiteBoard.set('isAlly', value);
   }
 
   public static getIsAllyX(): boolean {
-    return WhiteBoard.get("isAllyX") || false;
+    return WhiteBoard.get('isAllyX') || false;
   }
 
   public static setisAllyX(value: boolean): void {
-    WhiteBoard.set("isAllyX", value);
+    WhiteBoard.set('isAllyX', value);
   }
 
   public static getTab(): string {
-    return WhiteBoard.get("tab") || "performance";
+    return WhiteBoard.get('tab') || 'performance';
   }
 
   public static setTab(value: string): void {
-    WhiteBoard.set("tab", value);
+    WhiteBoard.set('tab', value);
   }
 
   public static getProfilePerGame(): boolean {
-    return WhiteBoard.get("profilePerGame") || false;
+    return WhiteBoard.get('profilePerGame') || false;
   }
 
   public static setProfilePerGame(value: boolean): void {
-    WhiteBoard.set("profilePerGame", value);
+    WhiteBoard.set('profilePerGame', value);
   }
 
   public static getSdtdpSettingsPresent(): boolean {
-    return WhiteBoard.get("sdtdpSettingsPresent") || false;
+    return WhiteBoard.get('sdtdpSettingsPresent') || false;
   }
 
   public static setSdtdpSettingsPresent(value: boolean): void {
-    WhiteBoard.set("sdtdpSettingsPresent", value);
+    WhiteBoard.set('sdtdpSettingsPresent', value);
   }
 
   public static getSdtdpEnabled(): boolean {
-    return WhiteBoard.get("sdtdpEnabled") || false;
+    return WhiteBoard.get('sdtdpEnabled') || false;
   }
 
   public static setSdtdpEnabled(value: boolean): void {
-    WhiteBoard.set("sdtdpEnabled", value);
+    WhiteBoard.set('sdtdpEnabled', value);
   }
 
   public static getOnlyGui(): boolean {
-    return WhiteBoard.get("onlyGui") || false;
+    return WhiteBoard.get('onlyGui') || false;
   }
 
   public static setOnlyGui(value: boolean): void {
-    WhiteBoard.set("onlyGui", value);
+    WhiteBoard.set('onlyGui', value);
   }
 
   public static getPluginLatestVersion(): string {
-    return WhiteBoard.get("pluginLatestVersion") || "";
+    return WhiteBoard.get('pluginLatestVersion') || '';
   }
 
   public static setPluginLatestVersion(value: string): void {
-    WhiteBoard.set("pluginLatestVersion", value);
+    WhiteBoard.set('pluginLatestVersion', value);
   }
 
   public static getBiosVersion(): string {
-    return WhiteBoard.get("biosVersion") || "";
+    return WhiteBoard.get('biosVersion') || '';
   }
 
   public static setBiosVersion(value: string): void {
-    WhiteBoard.set("biosVersion", value);
+    WhiteBoard.set('biosVersion', value);
   }
 
   public static getBiosLatestVersion(): string {
-    return WhiteBoard.get("biosLatestVersion") || "";
+    return WhiteBoard.get('biosLatestVersion') || '';
   }
 
   public static setBiosLatestVersion(value: string): void {
-    WhiteBoard.set("biosLatestVersion", value);
+    WhiteBoard.set('biosLatestVersion', value);
   }
 
   public static getGpuMinFreq(): number {
-    return Number(WhiteBoard.get("gpuMinFreq") || 800);
+    return Number(WhiteBoard.get('gpuMinFreq') || 800);
   }
 
   public static setGpuMinFreq(value: number): void {
-    WhiteBoard.set("gpuMinFreq", value);
+    WhiteBoard.set('gpuMinFreq', value);
   }
 
   public static getGpuMaxFreq(): number {
-    return Number(WhiteBoard.get("gpuMaxFreq") || 2700);
+    return Number(WhiteBoard.get('gpuMaxFreq') || 2700);
   }
 
   public static setGpuMaxFreq(value: number): void {
-    WhiteBoard.set("gpuMaxFreq", value);
+    WhiteBoard.set('gpuMaxFreq', value);
   }
 
   public static getAvailableGovernors(): Array<string> {
-    return WhiteBoard.get("availableGovernors") || [];
+    return WhiteBoard.get('availableGovernors') || [];
   }
 
   public static setAvailableGovernors(governors: Array<string>): void {
-    WhiteBoard.set("availableGovernors", governors);
+    WhiteBoard.set('availableGovernors', governors);
   }
 }

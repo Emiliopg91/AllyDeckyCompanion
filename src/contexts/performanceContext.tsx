@@ -1,20 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable @typescript-eslint/no-empty-function*/
-import { createContext, useEffect, useState } from "react";
-import { Profiles } from "../settings/profiles";
-import { AppOverviewExt, Profile } from "../utils/models";
-import { Router } from "@decky/ui";
-import { WhiteBoardUtils } from "../utils/whiteboard";
+import { Router } from '@decky/ui';
 import {
   EventBus,
   EventData,
   EventType,
   Logger,
-  WhiteBoardEventData,
-} from "decky-plugin-framework";
-import { debounce } from "lodash";
-import { BackendUtils } from "../utils/backend";
-import { CorsClient } from "../utils/cors";
+  WhiteBoardEventData
+} from 'decky-plugin-framework';
+import { debounce } from 'lodash';
+import { createContext, useEffect, useState } from 'react';
+
+import { Profiles } from '../settings/profiles';
+import { BackendUtils } from '../utils/backend';
+import { CorsClient } from '../utils/cors';
+import { AppOverviewExt, Profile } from '../utils/models';
+import { WhiteBoardUtils } from '../utils/whiteboard';
 
 interface PerformanceContextType {
   id: string;
@@ -38,20 +40,20 @@ const defaultValue: PerformanceContextType = {
     cpu: {
       boost: false,
       smt: false,
-      governor: "powersave",
-      tdp: { fppl: 5, spl: 5, sppl: 5 },
+      governor: 'powersave',
+      tdp: { fppl: 5, spl: 5, sppl: 5 }
     },
-    gpu: { frequency: { min: 800, max: 2700 } },
+    gpu: { frequency: { min: 800, max: 2700 } }
   },
   setProfile() {},
-  saveProfile() {},
+  saveProfile() {}
 };
 
 export const PerformanceContext = createContext(defaultValue);
 
 const loadIcon = async (
   appId: string,
-  setIcon: (icon: string | undefined) => void,
+  setIcon: (icon: string | undefined) => void
 ): Promise<void> => {
   let appDetail: AppOverviewExt | undefined = undefined;
   (Router.RunningApps as AppOverviewExt[]).forEach((app: AppOverviewExt) => {
@@ -63,9 +65,7 @@ const loadIcon = async (
   if (appDetail) {
     const app = appDetail as AppOverviewExt;
     if (app.icon_data) {
-      setIcon(
-        "data:image/" + app.icon_data_format + ";base64," + app.icon_data,
-      );
+      setIcon('data:image/' + app.icon_data_format + ';base64,' + app.icon_data);
     } else {
       if (app.icon_hash) {
         const icon = await BackendUtils.getIconForApp(appId);
@@ -87,7 +87,7 @@ const loadIcon = async (
               throw new Error(response.statusText);
             }
           } catch (e) {
-            Logger.error("Error getting icon from URL: ", e);
+            Logger.error('Error getting icon from URL: ', e);
             setIcon(undefined);
           }
         }
@@ -99,16 +99,12 @@ const loadIcon = async (
 };
 
 const saveProfile = debounce((id: string, name: string, profile: Profile) => {
-  Logger.info("Saving profile " + id + " (" + name + ")");
+  Logger.info('Saving profile ' + id + ' (' + name + ')');
   Profiles.saveProfileForId(id, profile);
   Profiles.applyGameProfile(id);
 }, 500);
 
-export function PerformanceProvider({
-  children,
-}: {
-  children: JSX.Element;
-}): JSX.Element {
+export function PerformanceProvider({ children }: { children: JSX.Element }): JSX.Element {
   const [onBattery, setOnBattery] = useState(WhiteBoardUtils.getOnBattery());
   const [id, setId] = useState(WhiteBoardUtils.getRunningGameId());
   const [appId, setAppId] = useState(Profiles.getAppId(id));
@@ -118,7 +114,7 @@ export function PerformanceProvider({
 
   const onBatteryEffect = (e: EventData): void => {
     const data = e as WhiteBoardEventData;
-    if (data.getId() == "onBattery") {
+    if (data.getId() == 'onBattery') {
       setOnBattery(() => {
         return data.getValue() as boolean;
       });
@@ -127,7 +123,7 @@ export function PerformanceProvider({
 
   const onIdEffect = (e: EventData): void => {
     const data = e as WhiteBoardEventData;
-    if (data.getId() == "runningGameId") {
+    if (data.getId() == 'runningGameId') {
       setId((id) => {
         if (id != (data.getValue() as string)) {
           setProfile(Profiles.getProfileForId(data.getValue()));
@@ -141,12 +137,8 @@ export function PerformanceProvider({
   };
 
   useEffect(() => {
-    const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) =>
-      onBatteryEffect(e),
-    ).unsubscribe;
-    const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) =>
-      onIdEffect(e),
-    ).unsubscribe;
+    const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) => onBatteryEffect(e)).unsubscribe;
+    const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) => onIdEffect(e)).unsubscribe;
     loadIcon(appId, setIcon);
 
     return (): void => {
@@ -165,7 +157,7 @@ export function PerformanceProvider({
         onBattery,
         profile,
         setProfile,
-        saveProfile,
+        saveProfile
       }}
     >
       {children}

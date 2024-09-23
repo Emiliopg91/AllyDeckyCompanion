@@ -1,4 +1,4 @@
-import { AppOverview, DisplayStatus } from "@decky/ui";
+import { AppOverview, DisplayStatus } from '@decky/ui';
 
 export interface AppOverviewExt extends AppOverview {
   appid: string; // base

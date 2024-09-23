@@ -1,186 +1,186 @@
 {
-    "profile.for": {
-        "en": "Profile",
-        "es": "Perfil"
-    },
-    "smt.description": {
-        "en": "Enable multithreading. Best disabled for no CPU intensive software",
-        "es": "Habilitar multithreading. Desactivar para aplicaciones no intesivas"
-    },
-    "cpu.boost.description": {
-        "en": "Allow scale CPU clock speed. Produces huge impact on battery drain",
-        "es": "Permitir subir reloj de CPU. Gran impacto en gasto de batería"
-    },
-    "fppl.desc": {
-        "en": "FPPL",
-        "es": "FPPL"
-    },
-    "sppl.desc": {
-        "en": "SPPL",
-        "es": "SPPL"
-    },
-    "spl.desc": {
-        "en": "SPL",
-        "es": "SPL"
-    },
-    "performance.mode": {
-        "en": "Performance mode",
-        "es": "Modo de rendimieno"
-    },
-    "performance.settings": {
-        "en": "Performance",
-        "es": "Rendimiento"
-    },
-    "system.info": {
-        "en": "System",
-        "es": "Sistema"
-    },
-    "plugin": {
-        "en": "Plugin",
-        "es": "Plugin"
-    },
-    "installed.version": {
-        "en": "Installed Version",
-        "es": "Versión instalada"
-    },
-    "latest.version": {
-        "en": "Latest Version",
-        "es": "Última versión"
-    },
-    "reinstalling.plugin": {
-        "en": "Reinstalling plugin",
-        "es": "Reinstalando plugin"
-    },
-    "reinstall.plugin": {
-        "en": "Reinstall plugin",
-        "es": "Reinstalar plugin"
-    },
-    "updating.plugin": {
-        "en": "Updating plugin",
-        "es": "Actualizando plugin"
-    },
-    "update.to": {
-        "en": "Update to {{version}}",
-        "es": "Actualizar a {{version}}"
-    },
-    "settings.info": {
-        "en": "Settings",
-        "es": "Configuración"
-    },
-    "limit.battery": {
-        "en": "Limit battery charge",
-        "es": "Limitar carga de batería"
-    },
-    "limit.battery.desc": {
-        "en": "Increase battery lifespan setting max charge",
-        "es": "Incrementa la vida útil de batería limitando la carga"
-    },
-    "main.menu": {
-        "en": "SteamOS",
-        "es": "SteamOS"
-    },
-    "mode.SILENT": {
-        "en": "SILENT",
-        "es": "SILENCIO"
-    },
-    "mode.PERFORMANCE": {
-        "en": "PERFORMANCE",
-        "es": "RENDIMIENTO"
-    },
-    "mode.TURBO": {
-        "en": "TURBO",
-        "es": "TURBO"
-    },
-    "mode.CUSTOM": {
-        "en": "CUSTOM",
-        "es": "CUSTOM"
-    },
-    "contribute.info": {
-        "en": "Contribute",
-        "es": "Contribuye"
-    },
-    "make.a.donation": {
-        "en": "Make a donation",
-        "es": "Haz una donación"
-    },
-    "report.a.bug": {
-        "en": "Report bug",
-        "es": "Reportar error"
-    },
-    "profile.per.game.ask": {
-        "en": "Enable per-game performance profile?",
-        "es": "¿Habilitar perfil de rendimiento por juego?"
-    },
-    "enable": {
-        "en": "Enable",
-        "es": "Habilitar"
-    },
-    "disable": {
-        "en": "Disable",
-        "es": "Deshabilitar"
-    },
-    "profile.per.game": {
-        "en": "Performance profile per-game",
-        "es": "Perfil de rendimiento por juego"
-    },
-    "profile.per.game.desc": {
-        "en": "Allow different performance profiles per game or use a global profile",
-        "es": "Permitir diferentes perfiles de rendimiento por juego o utilizar un perfil global"
-    },
-    "import.sdtdp.settings": {
-        "en": "Import SimpleDeckyTDP performance profiles",
-        "es": "Importar perfiles de rendimiento de SimpleDeckyTDP"
-    },
-    "import.sdtdp.settings.in.progress": {
-        "en": "Import in progress",
-        "es": "Importación en proceso"
-    },
-    "import.sdtdp.settings.finished": {
-        "en": "Import finished",
-        "es": "Importación finalizada"
-    },
-    "disable.sdtdp.ask": {
-        "en": "SimpleDeckyTDP plugin has been detected. To ensure system stability, we recommend disabling it. If you do not disable it, AllyDeckyCompanion will not apply performance profiles.",
-        "es": "Se ha detectado el plugin SimpleDeckyTDP. Para garantizar la estabilidad del sistema, recomendamos deshabilitarlo. De no deshabilitarlo, AllyDeckyCompanion no aplicará los perfiles de rendimiento."
-    },
-    "no.profiles.applied": {
-        "en": "No performance profile will be aplied. Reasons:",
-        "es": "No se aplicarán los perfiles de rendimiento. Razones:"
-    },
-    "sdtdp.enabled": {
-        "en": "SimpleDeckyTDP enabled",
-        "es": "SimpleDeckyTDP activo"
-    },
-    "incompatible.device": {
-        "en": "Incompatible device",
-        "es": "Dispositivo incompatible"
-    },
-    "restart.to.apply": {
-        "en": "Restart to apply changes",
-        "es": "Reiniciar para aplicar cambios"
-    },
-    "update.available": {
-        "en": "Plugin update available. Click to apply",
-        "es": "Actualización de plugin disponible. Pulsar para aplicar"
-    },
-    "bios.update.available": {
-        "en": "BIOS update available",
-        "es": "Actualización de BIOS disponible"
-    },
-    "bios": {
-        "en": "BIOS",
-        "es": "BIOS"
-    },
-    "gpu.max.freq": {
-        "en": "Maximum GPU frequency",
-        "es": "Frecuencia máxima GPU"
-    },
-    "gpu.min.freq": {
-        "en": "Minimum GPU frequency",
-        "es": "Frecuencia mínima GPU"
-    },
-    "cpu.governor":{
-        "en":"CPU Gobernor",
-        "es":"Gobernador de CPU"
-    }
+  "profile.for": {
+    "en": "Profile",
+    "es": "Perfil"
+  },
+  "smt.description": {
+    "en": "Enable multithreading. Best disabled for no CPU intensive software",
+    "es": "Habilitar multithreading. Desactivar para aplicaciones no intesivas"
+  },
+  "cpu.boost.description": {
+    "en": "Allow scale CPU clock speed. Produces huge impact on battery drain",
+    "es": "Permitir subir reloj de CPU. Gran impacto en gasto de batería"
+  },
+  "fppl.desc": {
+    "en": "FPPL",
+    "es": "FPPL"
+  },
+  "sppl.desc": {
+    "en": "SPPL",
+    "es": "SPPL"
+  },
+  "spl.desc": {
+    "en": "SPL",
+    "es": "SPL"
+  },
+  "performance.mode": {
+    "en": "Performance mode",
+    "es": "Modo de rendimieno"
+  },
+  "performance.settings": {
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "system.info": {
+    "en": "System",
+    "es": "Sistema"
+  },
+  "plugin": {
+    "en": "Plugin",
+    "es": "Plugin"
+  },
+  "installed.version": {
+    "en": "Installed Version",
+    "es": "Versión instalada"
+  },
+  "latest.version": {
+    "en": "Latest Version",
+    "es": "Última versión"
+  },
+  "reinstalling.plugin": {
+    "en": "Reinstalling plugin",
+    "es": "Reinstalando plugin"
+  },
+  "reinstall.plugin": {
+    "en": "Reinstall plugin",
+    "es": "Reinstalar plugin"
+  },
+  "updating.plugin": {
+    "en": "Updating plugin",
+    "es": "Actualizando plugin"
+  },
+  "update.to": {
+    "en": "Update to {{version}}",
+    "es": "Actualizar a {{version}}"
+  },
+  "settings.info": {
+    "en": "Settings",
+    "es": "Configuración"
+  },
+  "limit.battery": {
+    "en": "Limit battery charge",
+    "es": "Limitar carga de batería"
+  },
+  "limit.battery.desc": {
+    "en": "Increase battery lifespan setting max charge",
+    "es": "Incrementa la vida útil de batería limitando la carga"
+  },
+  "main.menu": {
+    "en": "SteamOS",
+    "es": "SteamOS"
+  },
+  "mode.SILENT": {
+    "en": "SILENT",
+    "es": "SILENCIO"
+  },
+  "mode.PERFORMANCE": {
+    "en": "PERFORMANCE",
+    "es": "RENDIMIENTO"
+  },
+  "mode.TURBO": {
+    "en": "TURBO",
+    "es": "TURBO"
+  },
+  "mode.CUSTOM": {
+    "en": "CUSTOM",
+    "es": "CUSTOM"
+  },
+  "contribute.info": {
+    "en": "Contribute",
+    "es": "Contribuye"
+  },
+  "make.a.donation": {
+    "en": "Make a donation",
+    "es": "Haz una donación"
+  },
+  "report.a.bug": {
+    "en": "Report bug",
+    "es": "Reportar error"
+  },
+  "profile.per.game.ask": {
+    "en": "Enable per-game performance profile?",
+    "es": "¿Habilitar perfil de rendimiento por juego?"
+  },
+  "enable": {
+    "en": "Enable",
+    "es": "Habilitar"
+  },
+  "disable": {
+    "en": "Disable",
+    "es": "Deshabilitar"
+  },
+  "profile.per.game": {
+    "en": "Performance profile per-game",
+    "es": "Perfil de rendimiento por juego"
+  },
+  "profile.per.game.desc": {
+    "en": "Allow different performance profiles per game or use a global profile",
+    "es": "Permitir diferentes perfiles de rendimiento por juego o utilizar un perfil global"
+  },
+  "import.sdtdp.settings": {
+    "en": "Import SimpleDeckyTDP performance profiles",
+    "es": "Importar perfiles de rendimiento de SimpleDeckyTDP"
+  },
+  "import.sdtdp.settings.in.progress": {
+    "en": "Import in progress",
+    "es": "Importación en proceso"
+  },
+  "import.sdtdp.settings.finished": {
+    "en": "Import finished",
+    "es": "Importación finalizada"
+  },
+  "disable.sdtdp.ask": {
+    "en": "SimpleDeckyTDP plugin has been detected. To ensure system stability, we recommend disabling it. If you do not disable it, AllyDeckyCompanion will not apply performance profiles.",
+    "es": "Se ha detectado el plugin SimpleDeckyTDP. Para garantizar la estabilidad del sistema, recomendamos deshabilitarlo. De no deshabilitarlo, AllyDeckyCompanion no aplicará los perfiles de rendimiento."
+  },
+  "no.profiles.applied": {
+    "en": "No performance profile will be aplied. Reasons:",
+    "es": "No se aplicarán los perfiles de rendimiento. Razones:"
+  },
+  "sdtdp.enabled": {
+    "en": "SimpleDeckyTDP enabled",
+    "es": "SimpleDeckyTDP activo"
+  },
+  "incompatible.device": {
+    "en": "Incompatible device",
+    "es": "Dispositivo incompatible"
+  },
+  "restart.to.apply": {
+    "en": "Restart to apply changes",
+    "es": "Reiniciar para aplicar cambios"
+  },
+  "update.available": {
+    "en": "Plugin update available. Click to apply",
+    "es": "Actualización de plugin disponible. Pulsar para aplicar"
+  },
+  "bios.update.available": {
+    "en": "BIOS update available",
+    "es": "Actualización de BIOS disponible"
+  },
+  "bios": {
+    "en": "BIOS",
+    "es": "BIOS"
+  },
+  "gpu.max.freq": {
+    "en": "Maximum GPU frequency",
+    "es": "Frecuencia máxima GPU"
+  },
+  "gpu.min.freq": {
+    "en": "Minimum GPU frequency",
+    "es": "Frecuencia mínima GPU"
+  },
+  "cpu.governor": {
+    "en": "CPU Gobernor",
+    "es": "Gobernador de CPU"
+  }
 }

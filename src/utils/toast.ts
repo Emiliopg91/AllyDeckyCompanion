@@ -1,6 +1,7 @@
-import { toaster } from "@decky/api";
-import { RogIcon } from "../components/icons/rogIcon";
-import { Constants } from "./constants";
+import { toaster } from '@decky/api';
+
+import { RogIcon } from '../components/icons/rogIcon';
+import { Constants } from './constants';
 
 /**
  * Represents a toast notification utility.
@@ -13,7 +14,7 @@ export class Toast {
    */
   private static ico = window.SP_REACT.createElement(RogIcon, {
     width: 30,
-    height: 30,
+    height: 30
   });
 
   /**
@@ -28,14 +29,14 @@ export class Toast {
     msg: any,
     ms: number = 2000,
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    clickAction = (): void => {},
+    clickAction = (): void => {}
   ): void {
     toaster.toast({
       title: Constants.PLUGIN_NAME,
       body: msg,
       duration: ms,
       logo: Toast.ico,
-      onClick: clickAction,
+      onClick: clickAction
     });
   }
 }

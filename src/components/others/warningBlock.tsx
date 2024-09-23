@@ -1,8 +1,8 @@
-import { PanelSection, PanelSectionRow } from "@decky/ui";
-import { FC } from "react";
+import { PanelSection, PanelSectionRow } from '@decky/ui';
+import { Translator } from 'decky-plugin-framework';
+import { FC } from 'react';
 
-import { Translator } from "decky-plugin-framework";
-import { WhiteBoardUtils } from "../../utils/whiteboard";
+import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const WarningBlock: FC = () => {
   return (
@@ -12,18 +12,18 @@ export const WarningBlock: FC = () => {
           <>
             <PanelSection>
               <PanelSectionRow>
-                <span>{Translator.translate("no.profiles.applied")} </span>
+                <span>{Translator.translate('no.profiles.applied')} </span>
                 <br />
                 {WhiteBoardUtils.getSdtdpEnabled() && (
                   <>
                     <br />
-                    <span>{Translator.translate("sdtdp.enabled")}</span>
+                    <span>{Translator.translate('sdtdp.enabled')}</span>
                   </>
                 )}
                 {!WhiteBoardUtils.getIsAlly() && (
                   <>
                     <br />
-                    <span>{Translator.translate("incompatible.device")}</span>
+                    <span>{Translator.translate('incompatible.device')}</span>
                   </>
                 )}
               </PanelSectionRow>

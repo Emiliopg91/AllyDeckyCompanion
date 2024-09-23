@@ -1,18 +1,13 @@
-import {
-  ButtonItem,
-  PanelSection,
-  PanelSectionRow,
-  Router,
-  ToggleField,
-} from "@decky/ui";
-import { FC, useContext, useState } from "react";
-import { SystemSettings } from "../../settings/system";
-import { Translator } from "decky-plugin-framework";
-import { Toast } from "../../utils/toast";
-import { Constants } from "../../utils/constants";
-import { Profiles } from "../../settings/profiles";
-import { GlobalContext } from "../../contexts/globalContext";
-import { WhiteBoardUtils } from "../../utils/whiteboard";
+import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from '@decky/ui';
+import { Translator } from 'decky-plugin-framework';
+import { FC, useContext, useState } from 'react';
+
+import { GlobalContext } from '../../contexts/globalContext';
+import { Profiles } from '../../settings/profiles';
+import { SystemSettings } from '../../settings/system';
+import { Constants } from '../../utils/constants';
+import { Toast } from '../../utils/toast';
+import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const ProfilesBlock: FC = () => {
   const { profilePerGame, setProfilePerGame } = useContext(GlobalContext);
@@ -24,17 +19,13 @@ export const ProfilesBlock: FC = () => {
     if (newVal) {
       WhiteBoardUtils.getRunningGameId() == Router.MainRunningApp?.appid
         ? Router.MainRunningApp?.appid +
-          (WhiteBoardUtils.getOnBattery()
-            ? Constants.SUFIX_BAT
-            : Constants.SUFIX_AC)
+          (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
         : WhiteBoardUtils.getOnBattery()
           ? Constants.DEFAULT_ID
           : Constants.DEFAULT_ID_AC;
     } else {
       WhiteBoardUtils.setRunningGameId(
-        WhiteBoardUtils.getOnBattery()
-          ? Constants.DEFAULT_ID
-          : Constants.DEFAULT_ID_AC,
+        WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC
       );
     }
 
@@ -45,8 +36,8 @@ export const ProfilesBlock: FC = () => {
     <PanelSection>
       <PanelSectionRow>
         <ToggleField
-          label={Translator.translate("profile.per.game")}
-          description={Translator.translate("profile.per.game.desc")}
+          label={Translator.translate('profile.per.game')}
+          description={Translator.translate('profile.per.game.desc')}
           checked={profilePerGame}
           onChange={onProfilePerGameChange}
           highlightOnFocus
@@ -56,26 +47,22 @@ export const ProfilesBlock: FC = () => {
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {
-              Toast.toast(
-                Translator.translate("import.sdtdp.settings.in.progress"),
-              );
+              Toast.toast(Translator.translate('import.sdtdp.settings.in.progress'));
               setIsDoingThings(true);
               Profiles.importFromSDTDP().then(() => {
                 setIsDoingThings(false);
-                Toast.toast(
-                  Translator.translate("import.sdtdp.settings.finished"),
-                );
+                Toast.toast(Translator.translate('import.sdtdp.settings.finished'));
               });
             }}
             disabled={isDoingThings}
             style={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
           >
-            {Translator.translate("import.sdtdp.settings")}
+            {Translator.translate('import.sdtdp.settings')}
           </ButtonItem>
         </PanelSectionRow>
       )}

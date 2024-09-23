@@ -1,10 +1,11 @@
-import { FC } from "react";
-import { PerformanceProvider } from "../../contexts/performanceContext";
-import { HeaderBlock } from "./headerBlock";
-import { CpuBlock } from "./cpuBlock";
-import { ModeBlock } from "./modeBlock";
-import { GpuBlock } from "./gpuBlock";
-import { PowerBlock } from "./powerBlock";
+import { FC } from 'react';
+
+import { PerformanceProvider } from '../../contexts/performanceContext';
+import { CpuBlock } from './cpuBlock';
+import { GpuBlock } from './gpuBlock';
+import { HeaderBlock } from './headerBlock';
+import { ModeBlock } from './modeBlock';
+import { PowerBlock } from './powerBlock';
 
 export const PerformanceBlock: FC = () => {
   return (

@@ -1,6 +1,6 @@
-import { Logger } from "decky-plugin-framework";
+import { Logger } from 'decky-plugin-framework';
 
-export type SpreadSheetAlignment = "left" | "center" | "right";
+export type SpreadSheetAlignment = 'left' | 'center' | 'right';
 
 export interface SpreadSheetCell {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,59 +14,58 @@ export interface SpreadSheetCell {
 export class SpreadSheet {
   public static printSpreadSheet(
     headers: Array<SpreadSheetCell>,
-    body: Array<Array<SpreadSheetCell>>,
+    body: Array<Array<SpreadSheetCell>>
   ): void {
     const lengths = SpreadSheet.calcLengths(headers, body);
-    const totalLineLength =
-      lengths.reduce((sum, current) => sum + current + 3, 0) + 1;
-    let head = "";
-    let line = "";
+    const totalLineLength = lengths.reduce((sum, current) => sum + current + 3, 0) + 1;
+    let head = '';
+    let line = '';
     for (let i = 0; i < headers.length; i++) {
       if (headers[i].rowspan) {
-        head += "|" + SpreadSheet.padCell("", "left", lengths[i] + 2, " ");
+        head += '|' + SpreadSheet.padCell('', 'left', lengths[i] + 2, ' ');
       } else {
-        head += SpreadSheet.padCell("", "left", lengths[i] + 3, "-");
+        head += SpreadSheet.padCell('', 'left', lengths[i] + 3, '-');
       }
       line +=
-        (headers[i].colspan ? "  " : "| ") +
+        (headers[i].colspan ? '  ' : '| ') +
         SpreadSheet.padCell(
           String(headers[i].data),
           headers[i].align,
           lengths[i],
-          headers[i].padding,
+          headers[i].padding
         ) +
-        " ";
+        ' ';
     }
-    Logger.info(head + "-");
-    Logger.info(line + "|");
+    Logger.info(head + '-');
+    Logger.info(line + '|');
     for (let i = 0; i < body.length; i++) {
-      let head = "";
-      let line = "";
+      let head = '';
+      let line = '';
       for (let j = 0; j < body[i].length; j++) {
         if (body[i][j].rowspan) {
-          head += "|" + SpreadSheet.padCell("", "left", lengths[j] + 2, " ");
+          head += '|' + SpreadSheet.padCell('', 'left', lengths[j] + 2, ' ');
         } else {
-          head += SpreadSheet.padCell("", "left", lengths[j] + 3, "-");
+          head += SpreadSheet.padCell('', 'left', lengths[j] + 3, '-');
         }
         line +=
-          (body[i][j].colspan ? "  " : "| ") +
+          (body[i][j].colspan ? '  ' : '| ') +
           SpreadSheet.padCell(
             String(body[i][j].data),
             body[i][j].align,
             lengths[j],
-            body[i][j].padding,
+            body[i][j].padding
           ) +
-          " ";
+          ' ';
       }
-      Logger.info(head + "-");
-      Logger.info(line + "|");
+      Logger.info(head + '-');
+      Logger.info(line + '|');
     }
-    Logger.info(SpreadSheet.padCell("", "left", totalLineLength, "-"));
+    Logger.info(SpreadSheet.padCell('', 'left', totalLineLength, '-'));
   }
 
   private static calcLengths(
     headers: Array<SpreadSheetCell>,
-    body: Array<Array<SpreadSheetCell>>,
+    body: Array<Array<SpreadSheetCell>>
   ): Array<number> {
     const lengths: Array<number> = [];
 
@@ -85,13 +84,13 @@ export class SpreadSheet {
     data: string,
     align: SpreadSheetAlignment,
     size: number,
-    padding?: string,
+    padding?: string
   ): string {
-    if (align == "left") {
+    if (align == 'left') {
       return data.padEnd(size, padding);
     }
 
-    if (align == "right") {
+    if (align == 'right') {
       return data.padStart(size, padding);
     }
 

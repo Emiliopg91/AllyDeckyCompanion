@@ -1,14 +1,9 @@
-import {
-  NotchLabel,
-  PanelSection,
-  PanelSectionRow,
-  SliderField,
-} from "@decky/ui";
-import { FC, useContext } from "react";
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField } from '@decky/ui';
+import { Translator } from 'decky-plugin-framework';
+import { FC, useContext } from 'react';
 
-import { Translator } from "decky-plugin-framework";
-import { Mode } from "../../utils/mode";
-import { PerformanceContext } from "../../contexts/performanceContext";
+import { PerformanceContext } from '../../contexts/performanceContext';
+import { Mode } from '../../utils/mode';
 
 export const ModeBlock: FC = () => {
   const modeIndexes: Array<number> = [];
@@ -25,13 +20,12 @@ export const ModeBlock: FC = () => {
       notchLabels.push({
         notchIndex: notchIdx,
         value: notchIdx,
-        label: Translator.translate("mode." + String(value)),
+        label: Translator.translate('mode.' + String(value))
       });
       notchIdx++;
     });
 
-  const { id, name, profile, setProfile, saveProfile } =
-    useContext(PerformanceContext);
+  const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
   const onModeChange = (newVal: number): void => {
     const newProf = { ...profile, mode: newVal };
@@ -51,7 +45,7 @@ export const ModeBlock: FC = () => {
           notchLabels={notchLabels}
           notchTicksVisible={true}
           showValue={false}
-          bottomSeparator={"none"}
+          bottomSeparator={'none'}
           onChange={onModeChange}
         />
       </PanelSectionRow>

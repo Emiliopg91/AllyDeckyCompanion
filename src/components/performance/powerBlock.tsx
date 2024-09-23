@@ -1,14 +1,9 @@
-import {
-  NotchLabel,
-  PanelSection,
-  PanelSectionRow,
-  SliderField,
-} from "@decky/ui";
-import { FC, useContext } from "react";
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField } from '@decky/ui';
+import { Translator } from 'decky-plugin-framework';
+import { FC, useContext } from 'react';
 
-import { PerformanceContext } from "../../contexts/performanceContext";
-import { WhiteBoardUtils } from "../../utils/whiteboard";
-import { Translator } from "decky-plugin-framework";
+import { PerformanceContext } from '../../contexts/performanceContext';
+import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const PowerBlock: FC = () => {
   const notchLabels: NotchLabel[] = [];
@@ -18,21 +13,20 @@ export const PowerBlock: FC = () => {
     notchLabels.push({
       notchIndex: notchIdx,
       value: notchIdx,
-      label: value,
+      label: value
     });
     notchIdx++;
   });
 
-  const { id, name, profile, setProfile, saveProfile } =
-    useContext(PerformanceContext);
+  const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
   const onGovernorChange = (newVal: number): void => {
     const newProf = {
       ...profile,
       cpu: {
         ...profile.cpu,
-        governor: WhiteBoardUtils.getAvailableGovernors()[newVal],
-      },
+        governor: WhiteBoardUtils.getAvailableGovernors()[newVal]
+      }
     };
     saveProfile(id, name, newProf);
     setProfile(newProf);
@@ -45,10 +39,8 @@ export const PowerBlock: FC = () => {
           <PanelSection>
             <PanelSectionRow>
               <SliderField
-                label={Translator.translate("cpu.governor")}
-                value={WhiteBoardUtils.getAvailableGovernors().indexOf(
-                  profile.cpu.governor,
-                )}
+                label={Translator.translate('cpu.governor')}
+                value={WhiteBoardUtils.getAvailableGovernors().indexOf(profile.cpu.governor)}
                 min={0}
                 max={notchLabels.length - 1}
                 step={1}
@@ -56,7 +48,7 @@ export const PowerBlock: FC = () => {
                 notchLabels={notchLabels}
                 notchTicksVisible={true}
                 showValue={false}
-                bottomSeparator={"none"}
+                bottomSeparator={'none'}
                 onChange={onGovernorChange}
               />
             </PanelSectionRow>

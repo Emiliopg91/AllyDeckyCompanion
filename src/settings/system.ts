@@ -1,15 +1,13 @@
-import { Settings } from "decky-plugin-framework";
-import { Constants } from "../utils/constants";
-import { BackendUtils } from "../utils/backend";
-import { WhiteBoardUtils } from "../utils/whiteboard";
+import { Settings } from 'decky-plugin-framework';
+
+import { BackendUtils } from '../utils/backend';
+import { Constants } from '../utils/constants';
+import { WhiteBoardUtils } from '../utils/whiteboard';
 
 export class SystemSettings {
   public static getLimitBattery(): number {
     return Number(
-      Settings.getEntry(
-        Constants.BATTERY_LIMIT,
-        String(Constants.DEFAULT_BATTERY_LIMIT),
-      ),
+      Settings.getEntry(Constants.BATTERY_LIMIT, String(Constants.DEFAULT_BATTERY_LIMIT))
     );
   }
 
@@ -18,7 +16,7 @@ export class SystemSettings {
     BackendUtils.setBatteryLimit(limit);
   }
   public static getProfilePerGame(): boolean {
-    return Settings.getEntry(Constants.PROFILE_PER_GAME) == "true";
+    return Settings.getEntry(Constants.PROFILE_PER_GAME) == 'true';
   }
 
   public static setProfilePerGame(enabled: boolean): void {
