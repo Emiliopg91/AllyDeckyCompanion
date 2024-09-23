@@ -23,6 +23,7 @@ import { Toast } from "./utils/toast";
 import { WhiteBoardUtils } from "./utils/whiteboard";
 import { AsyncUtils } from "./utils/async";
 import { Profile } from "./utils/models";
+import { CorsClient } from "./utils/cors";
 
 let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
@@ -95,10 +96,7 @@ const checkBiosLatestVersion = async () => {
   try {
     Logger.info("Checking for BIOS update")
 
-    const url = WhiteBoardUtils.getIsAllyX()
-      ? "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-x-2024&pdid=0&m1id=26436&cpu=RC72LA&LevelTagId=230371&systemCode=rog"
-      : "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-2023&pdid=0&m1id=23629&cpu=RC71L&LevelTagId=220680&systemCode=rog"
-    const response = await fetch("https://corsproxy.io/?" + url);
+    const response = await CorsClient.fetchUrl(WhiteBoardUtils.getIsAllyX() ? Constants.ALLY_X_BIOS_URL : Constants.ALLY_BIOS_URL);
 
     if (!response.ok) {
       throw new Error(response.statusText);
@@ -289,7 +287,7 @@ export default definePlugin(() => {
                 })
 
                 runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
-                  if ((e as WhiteBoardEventData).getId() == "runningGameId"){
+                  if ((e as WhiteBoardEventData).getId() == "runningGameId") {
                     Profiles.applyGameProfile((e as WhiteBoardEventData).getValue())
                   }
                 }).unsubscribe;

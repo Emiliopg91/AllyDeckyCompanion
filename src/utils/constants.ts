@@ -64,4 +64,6 @@ export class Constants {
     public static AllyXPerformanceSPL = 15
     public static AllyXTurboSPL = 25
 
+    public static ALLY_BIOS_URL = "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-2023&pdid=0&m1id=23629&cpu=RC71L&LevelTagId=220680&systemCode=rog"
+    public static ALLY_X_BIOS_URL = "https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-x-2024&pdid=0&m1id=26436&cpu=RC72LA&LevelTagId=230371&systemCode=rog"
 }
