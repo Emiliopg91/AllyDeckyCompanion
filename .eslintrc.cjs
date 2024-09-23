@@ -11,7 +11,6 @@ module.exports = {
       version: 'detect'
     }
   },
-  ignorePatterns: ['dist/**/*', 'out/**/*'],
   rules: {
     '@typescript-eslint/no-empty-function': [
       'error',

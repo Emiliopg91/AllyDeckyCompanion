@@ -5,9 +5,8 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
-    "build": "npm run lint && npm run format && shx rm -rf dist && rollup -c --silent",
-    "watch": "rollup -c -w",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --cache",
+    "build": "npm run format && npm run lint && shx rm -rf dist && rollup -c --silent",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
