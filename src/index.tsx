@@ -289,8 +289,9 @@ export default definePlugin(() => {
                 })
 
                 runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
-                  if ((e as WhiteBoardEventData).getId() == "runningGameId")
+                  if ((e as WhiteBoardEventData).getId() == "runningGameId"){
                     Profiles.applyGameProfile((e as WhiteBoardEventData).getValue())
+                  }
                 }).unsubscribe;
 
                 onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
@@ -329,8 +330,6 @@ export default definePlugin(() => {
                     Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
                   })
                 }
-
-                Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId())
               })
             })
           });

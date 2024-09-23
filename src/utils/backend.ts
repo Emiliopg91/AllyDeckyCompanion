@@ -102,4 +102,12 @@ export class BackendUtils {
     public static async getGpuFrequencyRange(): Promise<[number, number]> {
         return Backend.backend_call<[], [number, number]>("get_gpu_frequency_range")
     }
+
+    public static async getIconForApp(appId: string): Promise<string | null> {
+        return Backend.backend_call<[appId: string], string>("get_icon_for_app", appId)
+    }
+
+    static setIconForApp(appId: string, img: string) {
+        return Backend.backend_call<[appId: string, img: string], string>("save_icon_for_app", appId, img)
+    }
 }

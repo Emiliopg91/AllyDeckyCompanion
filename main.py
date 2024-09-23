@@ -12,6 +12,7 @@ from performance import cpu, gpu, power
 import plugin_update
 import shutil
 import subprocess
+import miscelanea
 from time import sleep
 
 class Plugin:
@@ -43,6 +44,8 @@ class Plugin:
     async def _main(self):
         logger_utils.configure_logger()
         decky.logger.info("Running "+decky.DECKY_PLUGIN_NAME)
+        if not os.path.exists(miscelanea.ICONS_PATH):
+            os.makedirs(miscelanea.ICONS_PATH, exist_ok=True)
 
     async def _unload(self):
         decky.logger.info("Unloading "+decky.DECKY_PLUGIN_NAME)
@@ -107,7 +110,7 @@ class Plugin:
         decky.logger.debug(f"Executing: set_gpu_frequency_range({min}, {max})")
         return gpu.set_gpu_frequency_range(min, max)
 
-#MISC
+#Plugin update
     async def ota_update(self):
         decky.logger.debug("Executing: ota_update()")
         # trigger ota update
@@ -117,6 +120,7 @@ class Plugin:
             decky.logger.error(e)
             return False
 
+#SDTDP
     async def get_sdtdp_cfg(self):
         decky.logger.debug("Executing: get_sdtdp_cfg()")
         return sdtdp.get_config()
@@ -137,3 +141,11 @@ class Plugin:
         decky.logger.info(f"Moved '{src}' to '{dst}'")
         return True
         
+#Miscelanea
+    async def get_icon_for_app(self, appId:str):
+        decky.logger.debug(f"Executing: get_icon_for_app({appId})")
+        return miscelanea.get_icon_for_app(appId)
+        
+    async def save_icon_for_app(self, appId:str, img:str):
+        decky.logger.debug(f"Executing: save_icon_for_app({appId}, {img})")
+        return miscelanea.save_icon_for_app(appId, img)

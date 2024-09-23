@@ -49,6 +49,7 @@ export class Profiles {
         headers.push({ data: "FPPL*", align: "center" })
         headers.push({ data: "SMT*", align: "center" })
         headers.push({ data: "BOOST*", align: "center" })
+        headers.push({ data: "GPU MIN FREQ*", align: "center" })
         headers.push({ data: "GPU MAX FREQ*", align: "center" })
 
         const body: Array<Array<SpreadSheetCell>> = []
@@ -68,7 +69,8 @@ export class Profiles {
                     line.push({ data: profile.cpu.tdp.fppl + " W", align: "right" })
                     line.push({ data: profile.cpu.smt, align: "right" })
                     line.push({ data: profile.cpu.boost, align: "right" })
-                    line.push({ data: (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) + "MHz", align: "right" })
+                    line.push({ data: (profile.gpu.frequency.min || WhiteBoardUtils.getGpuMinFreq()) + " MHz", align: "right" })
+                    line.push({ data: (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) + " MHz", align: "right" })
 
                     body.push(line)
 

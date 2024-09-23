@@ -24,7 +24,7 @@ export const HeaderBlock: FC = () => {
             <>
               <span> </span>
               <img
-                style={{ maxWidth: 16, maxHeight: 16 }}
+                style={{ maxWidth: 16, maxHeight: 16, border:"1px solid gray" }}
                 src={icon}
               />
             </>
