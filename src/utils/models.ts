@@ -1,50 +1,51 @@
-import { AppOverview, DisplayStatus } from "@decky/ui"
+import { AppOverview, DisplayStatus } from "@decky/ui";
 
 export interface AppOverviewExt extends AppOverview {
-    appid: string; // base
-    display_name: string; // base
-    display_status: DisplayStatus; // base
-    sort_as: string; // base
-    icon_data: string; // base, base64 encoded image
-    icon_data_format: string; // base, image type without "image/" (e.g.: jpg, png)
-    icon_hash: string; // base, url hash to fetch the icon for steam games (e.g.: "/assets/" + appid + "_icon.jpg?v=" + icon_hash)
-    img_logo_url: string;
-    m_gameid: string; // base, id for non-steam games
+  appid: string; // base
+  display_name: string; // base
+  display_status: DisplayStatus; // base
+  sort_as: string; // base
+  icon_data: string; // base, base64 encoded image
+  icon_data_format: string; // base, image type without "image/" (e.g.: jpg, png)
+  icon_hash: string; // base, url hash to fetch the icon for steam games (e.g.: "/assets/" + appid + "_icon.jpg?v=" + icon_hash)
+  img_logo_url: string;
+  m_gameid: string; // base, id for non-steam games
 }
 
 export interface CpuProfile {
-    boost: boolean
-    smt: boolean
-    tdp: TdpCpuProfile
+  boost: boolean;
+  smt: boolean;
+  tdp: TdpCpuProfile;
+  governor: string;
 }
 
 export interface GpuFreqProfile {
-    min: number
-    max: number
+  min: number;
+  max: number;
 }
 
 export interface GpuProfile {
-    frequency: GpuFreqProfile
+  frequency: GpuFreqProfile;
 }
 
 export interface TdpCpuProfile {
-    spl: number
-    sppl: number
-    fppl: number
+  spl: number;
+  sppl: number;
+  fppl: number;
 }
 
 export interface Profile {
-    mode: number
-    cpu: CpuProfile
-    gpu: GpuProfile
+  mode: number;
+  cpu: CpuProfile;
+  gpu: GpuProfile;
 }
 
 export interface SdtdpSettingsTdpProfile {
-    tdp: number
-    cpuBoost: boolean
-    smt: boolean
+  tdp: number;
+  cpuBoost: boolean;
+  smt: boolean;
 }
 
 export interface SdtdpSettings {
-    tdpProfiles: Record<string, SdtdpSettingsTdpProfile>
+  tdpProfiles: Record<string, SdtdpSettingsTdpProfile>;
 }

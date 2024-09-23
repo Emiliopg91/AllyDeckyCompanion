@@ -1,6 +1,6 @@
 export enum Mode {
-    SILENT,
-    PERFORMANCE,
-    TURBO,
-    CUSTOM
+  SILENT,
+  PERFORMANCE,
+  TURBO,
+  CUSTOM,
 }

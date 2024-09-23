@@ -1,7 +1,13 @@
-import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "@decky/ui"
-import { FC, useContext, useState } from "react"
+import {
+  ButtonItem,
+  PanelSection,
+  PanelSectionRow,
+  Router,
+  ToggleField,
+} from "@decky/ui";
+import { FC, useContext, useState } from "react";
 import { SystemSettings } from "../../settings/system";
-import { Translator, WhiteBoard } from "decky-plugin-framework";
+import { Translator } from "decky-plugin-framework";
 import { Toast } from "../../utils/toast";
 import { Constants } from "../../utils/constants";
 import { Profiles } from "../../settings/profiles";
@@ -9,22 +15,31 @@ import { GlobalContext } from "../../contexts/globalContext";
 import { WhiteBoardUtils } from "../../utils/whiteboard";
 
 export const ProfilesBlock: FC = () => {
-  const { profilePerGame, setProfilePerGame } = useContext(GlobalContext)
+  const { profilePerGame, setProfilePerGame } = useContext(GlobalContext);
   const [isDoingThings, setIsDoingThings] = useState(false);
 
-  const onProfilePerGameChange = (newVal: boolean) => {
+  const onProfilePerGameChange = (newVal: boolean): void => {
     SystemSettings.setProfilePerGame(newVal);
 
     if (newVal) {
       WhiteBoardUtils.getRunningGameId() == Router.MainRunningApp?.appid
-        ? Router.MainRunningApp?.appid + (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-        : (WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC)
+        ? Router.MainRunningApp?.appid +
+          (WhiteBoardUtils.getOnBattery()
+            ? Constants.SUFIX_BAT
+            : Constants.SUFIX_AC)
+        : WhiteBoardUtils.getOnBattery()
+          ? Constants.DEFAULT_ID
+          : Constants.DEFAULT_ID_AC;
     } else {
-      WhiteBoardUtils.setRunningGameId(WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC)
+      WhiteBoardUtils.setRunningGameId(
+        WhiteBoardUtils.getOnBattery()
+          ? Constants.DEFAULT_ID
+          : Constants.DEFAULT_ID_AC,
+      );
     }
 
-    setProfilePerGame(newVal)
-  }
+    setProfilePerGame(newVal);
+  };
 
   return (
     <PanelSection>
@@ -37,16 +52,20 @@ export const ProfilesBlock: FC = () => {
           highlightOnFocus
         />
       </PanelSectionRow>
-      {WhiteBoardUtils.getSdtdpSettingsPresent() &&
+      {WhiteBoardUtils.getSdtdpSettingsPresent() && (
         <PanelSectionRow>
           <ButtonItem
             onClick={() => {
-              Toast.toast(Translator.translate("import.sdtdp.settings.in.progress"))
-              setIsDoingThings(true)
+              Toast.toast(
+                Translator.translate("import.sdtdp.settings.in.progress"),
+              );
+              setIsDoingThings(true);
               Profiles.importFromSDTDP().then(() => {
-                setIsDoingThings(false)
-                Toast.toast(Translator.translate("import.sdtdp.settings.finished"))
-              })
+                setIsDoingThings(false);
+                Toast.toast(
+                  Translator.translate("import.sdtdp.settings.finished"),
+                );
+              });
             }}
             disabled={isDoingThings}
             style={{
@@ -59,7 +78,7 @@ export const ProfilesBlock: FC = () => {
             {Translator.translate("import.sdtdp.settings")}
           </ButtonItem>
         </PanelSectionRow>
-      }
+      )}
     </PanelSection>
   );
 };

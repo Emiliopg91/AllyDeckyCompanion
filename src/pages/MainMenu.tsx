@@ -1,4 +1,3 @@
-
 import { PerformanceBlock } from "../components/performance/main";
 import { SettingsBlock } from "../components/settings/main";
 import { SystemBlock } from "../components/system/main";
@@ -15,15 +14,9 @@ export const MainMenu: FC = () => {
       <>
         <WarningBlock />
         <MenuBlock />
-        {WhiteBoardUtils.getTab() === "performance" &&
-          <PerformanceBlock />
-        }
-        {WhiteBoardUtils.getTab() === "settings" &&
-          <SettingsBlock />
-        }
-        {WhiteBoardUtils.getTab() === "system" &&
-          <SystemBlock />
-        }
+        {WhiteBoardUtils.getTab() === "performance" && <PerformanceBlock />}
+        {WhiteBoardUtils.getTab() === "settings" && <SettingsBlock />}
+        {WhiteBoardUtils.getTab() === "system" && <SystemBlock />}
         <ContributeBlock />
       </>
     </GlobalProvider>

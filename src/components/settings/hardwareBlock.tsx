@@ -1,30 +1,37 @@
-import { NotchLabel, PanelSection, PanelSectionRow, SliderField } from "@decky/ui"
-import { FC, useState } from "react"
+import {
+  NotchLabel,
+  PanelSection,
+  PanelSectionRow,
+  SliderField,
+} from "@decky/ui";
+import { FC, useState } from "react";
 import { SystemSettings } from "../../settings/system";
 import { Translator } from "decky-plugin-framework";
 
 export const HardwareBlock: FC = () => {
-  const batLimitIndexes: Array<number> = [100, 95, 90, 85, 80]
-  const batLimitTags: Array<String> = []
+  const batLimitIndexes: Array<number> = [100, 95, 90, 85, 80];
+  const batLimitTags: Array<string> = [];
   const batLimitNotchLabels: NotchLabel[] = [];
 
   let notchIdx = 0;
   batLimitIndexes.forEach((idx) => {
-    batLimitTags.push(String(idx) + "%")
+    batLimitTags.push(String(idx) + "%");
     batLimitNotchLabels.push({
       notchIndex: notchIdx,
       value: notchIdx,
-      label: String(idx) + "%"
+      label: String(idx) + "%",
     });
     notchIdx++;
-  })
+  });
 
-  const [limitBattery, setLimitBattery] = useState(batLimitIndexes.indexOf(SystemSettings.getLimitBattery()))
+  const [limitBattery, setLimitBattery] = useState(
+    batLimitIndexes.indexOf(SystemSettings.getLimitBattery()),
+  );
 
-  const onLimitBatteryChange = (newVal: number) => {
+  const onLimitBatteryChange = (newVal: number): void => {
     SystemSettings.setLimitBattery(batLimitIndexes[newVal]);
-    setLimitBattery(newVal)
-  }
+    setLimitBattery(newVal);
+  };
 
   return (
     <PanelSection>

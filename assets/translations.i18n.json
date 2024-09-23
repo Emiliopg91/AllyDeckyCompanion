@@ -178,5 +178,9 @@
     "gpu.min.freq": {
         "en": "Minimum GPU frequency",
         "es": "Frecuencia mínima GPU"
+    },
+    "cpu.governor":{
+        "en":"CPU Gobernor",
+        "es":"Gobernador de CPU"
     }
 }

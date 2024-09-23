@@ -24,5 +24,5 @@ declare module "*.json" {
 }
 
 declare interface Config {
-  time
+  time;
 }

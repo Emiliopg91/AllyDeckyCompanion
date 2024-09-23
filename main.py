@@ -8,7 +8,7 @@ import plugin_config
 import logger_utils
 import sdtdp
 import hardware
-from performance import cpu, gpu, power
+from performance import cpu, gpu
 import plugin_update
 import shutil
 import subprocess
@@ -71,13 +71,20 @@ class Plugin:
         decky.logger.debug("Executing: bios_version()")
         return hardware.bios_version()
 
-# POWER
+# CPU 
+    async def get_available_governors(self):
+        decky.logger.debug("Executing: get_available_governors()")
+        return cpu.get_available_governors()
+
+    async def set_governor(self, governor:str):
+        decky.logger.debug(f"Executing: set_governor({governor})")
+        return cpu.set_governor(governor)
+
     async def set_platform_profile(self, prof: str):
         decky.logger.debug(f"Executing: set_platform_profile({prof})")
-        power.set_platform_profile(prof)
+        cpu.set_platform_profile(prof)
         sleep(0.1)
 
-# CPU 
     async def set_tdp(self, spl: int, sppl: int, fppl: int):
         try:
             decky.logger.debug(f"Executing: set_tdp({spl, sppl, fppl})")

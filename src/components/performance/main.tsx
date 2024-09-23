@@ -1,9 +1,10 @@
-import { FC } from "react"
+import { FC } from "react";
 import { PerformanceProvider } from "../../contexts/performanceContext";
 import { HeaderBlock } from "./headerBlock";
-import { CpuBlock } from "./cpuBlock"
+import { CpuBlock } from "./cpuBlock";
 import { ModeBlock } from "./modeBlock";
 import { GpuBlock } from "./gpuBlock";
+import { PowerBlock } from "./powerBlock";
 
 export const PerformanceBlock: FC = () => {
   return (
@@ -12,6 +13,7 @@ export const PerformanceBlock: FC = () => {
         <HeaderBlock />
         <ModeBlock />
         <CpuBlock />
+        <PowerBlock />
         <GpuBlock />
       </>
     </PerformanceProvider>
