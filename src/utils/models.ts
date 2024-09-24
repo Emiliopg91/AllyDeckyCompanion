@@ -62,7 +62,7 @@ export enum Governor {
   PERFORMANCE
 }
 
-export enum AcpiEpp {
+export enum Acpi {
   QUIET,
   BALANCED,
   PERFORMANCE

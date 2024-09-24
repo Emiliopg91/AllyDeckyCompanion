@@ -5,11 +5,7 @@ import { Constants } from './constants';
 
 export class WhiteBoardUtils {
   public static getOnBattery(): boolean {
-    return (
-      WhiteBoard.get('onBattery') ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).SystemPowerStore.m_eACState == 1
-    );
+    return WhiteBoard.get('onBattery') || false;
   }
 
   public static setOnBattery(value: boolean): void {
@@ -20,13 +16,10 @@ export class WhiteBoardUtils {
     return (
       WhiteBoard.get<string>('runningGameId') ||
       (Router.MainRunningApp
-        ? Router.MainRunningApp.appid +
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ((window as any).SystemPowerStore.m_eACState == 1
-            ? Constants.SUFIX_BAT
-            : Constants.SUFIX_AC)
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (window as any).SystemPowerStore.m_eACState == 1
+        ? Router.MainRunningApp.appid + WhiteBoardUtils.getOnBattery()
+          ? Constants.SUFIX_BAT
+          : Constants.SUFIX_AC
+        : WhiteBoardUtils.getOnBattery()
           ? Constants.DEFAULT_ID
           : Constants.DEFAULT_ID_AC)
     );

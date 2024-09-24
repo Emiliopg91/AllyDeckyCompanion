@@ -7,18 +7,19 @@ import { Governor } from '../../../utils/models';
 
 export const AdvancedBlock: FC = () => {
   const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
-  const modeIndexes: Array<number> = [];
-  const modeTags: Array<string> = [];
-  const notchLabels: NotchLabel[] = [];
+
+  const governorIndexes: Array<number> = [];
+  const governorTags: Array<string> = [];
+  const governorLabels: NotchLabel[] = [];
 
   let notchIdx = 0;
   Object.entries(Governor)
     .filter(([key]) => !isNaN(Number(key)))
     .map(([key, value]) => {
-      modeIndexes.push(Number(key));
-      modeTags.push(String(value));
+      governorIndexes.push(Number(key));
+      governorTags.push(String(value));
 
-      notchLabels.push({
+      governorLabels.push({
         notchIndex: notchIdx,
         value: notchIdx,
         label: Translator.translate('governor.' + String(value).toLocaleLowerCase())
@@ -75,10 +76,10 @@ export const AdvancedBlock: FC = () => {
           label={Translator.translate('cpu.governor')}
           value={profile.cpu.governor}
           min={0}
-          max={notchLabels.length - 1}
+          max={governorLabels.length - 1}
           step={1}
-          notchCount={notchLabels.length}
-          notchLabels={notchLabels}
+          notchCount={governorLabels.length}
+          notchLabels={governorLabels}
           notchTicksVisible={true}
           showValue={false}
           bottomSeparator={'none'}

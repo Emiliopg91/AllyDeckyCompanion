@@ -3,7 +3,7 @@ import { Game, Logger, Settings, Translator } from 'decky-plugin-framework';
 import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { AcpiEpp, Governor, Mode, Profile } from '../utils/models';
+import { Acpi, Governor, Mode, Profile } from '../utils/models';
 import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
@@ -71,7 +71,7 @@ export class Profiles {
             rowspan: !isFirst
           });
           line.push({ data: pwr.toUpperCase(), align: 'right' });
-          line.push({ data: Number(profile.mode), align: 'right' });
+          line.push({ data: Mode[profile.mode].toUpperCase(), align: 'right' });
           line.push({ data: profile.cpu.tdp.spl + ' W', align: 'right' });
           line.push({ data: profile.cpu.tdp.sppl + ' W', align: 'right' });
           line.push({ data: profile.cpu.tdp.fppl + ' W', align: 'right' });
@@ -163,12 +163,12 @@ export class Profiles {
     return Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE) !== null;
   }
 
-  public static getAcpiProfile(spl: number): AcpiEpp {
-    let epp = AcpiEpp.PERFORMANCE;
+  public static getAcpiProfile(spl: number): Acpi {
+    let epp = Acpi.PERFORMANCE;
     if (spl <= Constants.AllySilentSPL) {
-      epp = AcpiEpp.QUIET;
+      epp = Acpi.QUIET;
     } else if (spl <= Constants.AllyPerformanceSPL) {
-      epp = AcpiEpp.BALANCED;
+      epp = Acpi.BALANCED;
     }
     return epp;
   }

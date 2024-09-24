@@ -103,6 +103,7 @@ class Plugin:
     async def set_smt(self, enabled: bool):
         decky.logger.debug(f"Executing: set_smt({enabled})")
         cpu.set_smt(enabled)
+        sleep(0.1)
         
 # GPU
     async def get_gpu_frequency_range(self):

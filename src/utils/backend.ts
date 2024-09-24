@@ -1,7 +1,7 @@
 import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
-import { AcpiEpp, Governor, Profile, SdtdpSettings } from './models';
+import { Acpi, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -39,20 +39,20 @@ export class BackendUtils {
 
   public static async setPerformanceProfile(profile: Profile): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
-      const epp = AcpiEpp[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
+      const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
       Logger.info(
-        'Setting ACPI Platform Profile to "' + epp + '" and performance profile to:',
+        'Setting ACPI Platform Profile to "' + acpi + '" and performance profile to:',
         profile
       );
 
-      Backend.backend_call<[prof: string], number>('set_platform_profile', epp).then(() => {
-        Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
-          'set_tdp',
-          profile.cpu.tdp.spl,
-          profile.cpu.tdp.sppl,
-          profile.cpu.tdp.fppl
-        ).then(() => {
-          Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt).then(() => {
+      Backend.backend_call<[enabled: boolean], number>('set_smt', true).then(() => {
+        Backend.backend_call<[prof: string], number>('set_platform_profile', acpi).then(() => {
+          Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
+            'set_tdp',
+            profile.cpu.tdp.spl,
+            profile.cpu.tdp.sppl,
+            profile.cpu.tdp.fppl
+          ).then(() => {
             Backend.backend_call<[enabled: boolean], number>(
               'set_cpu_boost',
               profile.cpu.boost
@@ -61,13 +61,17 @@ export class BackendUtils {
                 'set_governor',
                 Governor[profile.cpu.governor].toLowerCase()
               ).then(() => {
-                Backend.backend_call<[min: number, max: number], void>(
-                  'set_gpu_frequency_range',
-                  profile.gpu.frequency.min,
-                  profile.gpu.frequency.max
-                ).then(() => {
-                  Logger.info('Performance profile setted');
-                });
+                Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt).then(
+                  () => {
+                    Backend.backend_call<[min: number, max: number], void>(
+                      'set_gpu_frequency_range',
+                      profile.gpu.frequency.min,
+                      profile.gpu.frequency.max
+                    ).then(() => {
+                      Logger.info('Performance profile setted');
+                    });
+                  }
+                );
               });
             });
           });

@@ -18,6 +18,8 @@ import { CorsClient } from '../utils/cors';
 import { AppOverviewExt, Governor, Mode, Profile } from '../utils/models';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
+declare const appStore: typeof window.appStore;
+
 interface PerformanceContextType {
   id: string;
   appId: string;
@@ -73,7 +75,7 @@ const loadIcon = async (
           setIcon(icon);
         } else {
           try {
-            const iconUrl = (window as any).appStore.GetIconURLForApp(app);
+            const iconUrl = appStore.GetIconURLForApp(app);
             const response = await CorsClient.fetchUrl(iconUrl);
             if (response.ok) {
               const reader = new FileReader();

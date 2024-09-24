@@ -1,7 +1,7 @@
 import decky
 import subprocess
 
-EPP_FN = "/sys/firmware/acpi/platform_profile"
+ACPI_FN = "/sys/firmware/acpi/platform_profile"
 FTDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_fppt"
 STDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_pl2_sppt"
 CTDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_pl1_spl"
@@ -53,8 +53,8 @@ def set_smt(enabled = True):
         decky.logger.error(e)
 
 def set_platform_profile(prof: str):
-    decky.logger.debug(f"Setting platform profile to '{prof}' by writing to {EPP_FN}")
-    with open(EPP_FN, "w") as f:
+    decky.logger.debug(f"Setting platform profile to '{prof}' by writing to {ACPI_FN}")
+    with open(ACPI_FN, "w") as f:
         f.write(prof)
 
 def set_governor(governor:str):

@@ -213,7 +213,7 @@ const migrateSchema = (): void => {
         if (!profile.cpu?.governor) {
           Settings.setEntry(
             Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_CPU_GOVERNOR,
-            Governor[Governor.POWERSAVE],
+            String(Governor.POWERSAVE),
             true
           );
         } else {
