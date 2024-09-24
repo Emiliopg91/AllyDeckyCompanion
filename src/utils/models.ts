@@ -67,3 +67,9 @@ export enum Acpi {
   BALANCED,
   PERFORMANCE
 }
+
+export interface SystemInfoSchema {
+  biosVersion: string;
+  isAlly: boolean;
+  isAllyX: boolean;
+}

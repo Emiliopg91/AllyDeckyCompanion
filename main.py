@@ -58,18 +58,6 @@ class Plugin:
     async def set_charge_limit(self, limit: int):
         decky.logger.debug(f"Executing: set_charge_limit({limit})")
         hardware.set_charge_limit(limit)
-        
-    async def is_ally_x(self):
-        decky.logger.debug("Executing: is_ally_x()")
-        return hardware.is_ally_x()
-
-    async def is_ally(self):
-        decky.logger.debug("Executing: is_ally()")
-        return hardware.is_ally()
-    
-    async def bios_version(self):
-        decky.logger.debug("Executing: bios_version()")
-        return hardware.bios_version()
 
 # CPU 
     async def set_governor(self, governor:str):

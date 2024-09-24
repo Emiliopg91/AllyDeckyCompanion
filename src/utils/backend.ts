@@ -29,14 +29,6 @@ export class BackendUtils {
     return Backend.backend_call<[], string>('get_plugin_name');
   }
 
-  public static async isAllyX(): Promise<boolean> {
-    return Backend.backend_call<[], boolean>('is_ally_x');
-  }
-
-  public static async isAlly(): Promise<boolean> {
-    return Backend.backend_call<[], boolean>('is_ally');
-  }
-
   public static async setPerformanceProfile(profile: Profile): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
       const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
