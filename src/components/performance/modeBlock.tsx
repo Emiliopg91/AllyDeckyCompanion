@@ -3,7 +3,7 @@ import { Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 
 import { PerformanceContext } from '../../contexts/performanceContext';
-import { Mode } from '../../utils/mode';
+import { Mode } from '../../utils/models';
 
 export const ModeBlock: FC = () => {
   const modeIndexes: Array<number> = [];

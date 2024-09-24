@@ -16,7 +16,7 @@ export interface CpuProfile {
   boost: boolean;
   smt: boolean;
   tdp: TdpCpuProfile;
-  governor: string;
+  governor: number;
 }
 
 export interface GpuFreqProfile {
@@ -48,4 +48,16 @@ export interface SdtdpSettingsTdpProfile {
 
 export interface SdtdpSettings {
   tdpProfiles: Record<string, SdtdpSettingsTdpProfile>;
+}
+
+export enum Mode {
+  SILENT,
+  PERFORMANCE,
+  TURBO,
+  CUSTOM
+}
+
+export enum Governor {
+  POWERSAVE,
+  PERFORMANCE
 }

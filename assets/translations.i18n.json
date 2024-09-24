@@ -182,5 +182,13 @@
   "cpu.governor": {
     "en": "CPU Gobernor",
     "es": "Gobernador de CPU"
+  },
+  "governor.powersave": {
+    "en": "Powersave",
+    "es": "Ahorro energía"
+  },
+  "governor.performance": {
+    "en": "Performance",
+    "es": "Rendimiento"
   }
 }

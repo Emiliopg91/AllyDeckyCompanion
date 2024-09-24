@@ -1,13 +1,13 @@
 import pckage from '../../package.json';
 import plugin from '../../plugin.json';
-import { Mode } from './mode';
+import { Mode } from './models';
 
 export class Constants {
-  public static CFG_SCHEMA_VERS = 4;
-  public static CFG_SCHEMA_PROP = 'schema';
-
   public static PLUGIN_NAME = plugin.name;
   public static PLUGIN_VERSION = pckage.version;
+
+  public static CFG_SCHEMA_VERS = Constants.PLUGIN_VERSION;
+  public static CFG_SCHEMA_PROP = 'schema';
 
   public static SUFIX_AC = '.acpower';
   public static SUFIX_BAT = '.battery';

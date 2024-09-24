@@ -3,8 +3,7 @@ import { Game, Logger, Settings, Translator } from 'decky-plugin-framework';
 import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { Mode } from '../utils/mode';
-import { Profile } from '../utils/models';
+import { Governor, Mode, Profile } from '../utils/models';
 import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
@@ -79,7 +78,7 @@ export class Profiles {
           line.push({ data: profile.cpu.smt, align: 'right' });
           line.push({ data: profile.cpu.boost, align: 'right' });
           line.push({
-            data: profile.cpu.governor.toUpperCase(),
+            data: Governor[profile.cpu.governor].toUpperCase(),
             align: 'right'
           });
           line.push({
@@ -128,7 +127,7 @@ export class Profiles {
           sppl: Constants.AllyTurboFPPL,
           fppl: Constants.AllyTurboFPPL
         },
-        governor: 'performance'
+        governor: Governor.POWERSAVE
       },
       gpu: {
         frequency: {
@@ -187,7 +186,7 @@ export class Profiles {
             Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST) == 'true',
           smt:
             Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT) == 'true',
-          governor: String(
+          governor: Number(
             Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_GOVERNOR)
           )
         },
@@ -228,7 +227,7 @@ export class Profiles {
         },
         boost: Constants.CPU_DEFAULT_BOOST,
         smt: Constants.CPU_DEFAULT_SMT,
-        governor: 'powersave'
+        governor: Governor.POWERSAVE
       },
       gpu: {
         frequency: {
@@ -260,7 +259,6 @@ export class Profiles {
           : Constants.AllyTurboSPL;
         profile.cpu.tdp.sppl = Constants.AllyTurboSPPL;
         profile.cpu.tdp.fppl = Constants.AllyTurboFPPL;
-        profile.cpu.governor = 'performance';
     }
 
     return profile;
@@ -343,7 +341,7 @@ export class Profiles {
             },
             boost: cfg.tdpProfiles[id].cpuBoost,
             smt: cfg.tdpProfiles[id].smt,
-            governor: 'powersave'
+            governor: Governor.POWERSAVE
           },
           gpu: {
             frequency: {

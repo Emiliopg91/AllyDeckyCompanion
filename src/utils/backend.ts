@@ -1,7 +1,7 @@
 import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Constants } from './constants';
-import { Profile, SdtdpSettings } from './models';
+import { Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -62,7 +62,7 @@ export class BackendUtils {
             ).then(() => {
               Backend.backend_call<[governor: string], void>(
                 'set_governor',
-                profile.cpu.governor
+                Governor[profile.cpu.governor].toLowerCase()
               ).then(() => {
                 Backend.backend_call<[min: number, max: number], void>(
                   'set_gpu_frequency_range',
@@ -133,9 +133,5 @@ export class BackendUtils {
       appId,
       img
     );
-  }
-
-  public static getAvailableGovernors(): Promise<Array<string>> {
-    return Backend.backend_call<[], Array<string>>('get_available_governors');
   }
 }

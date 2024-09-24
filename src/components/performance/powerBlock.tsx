@@ -3,20 +3,27 @@ import { Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 
 import { PerformanceContext } from '../../contexts/performanceContext';
-import { WhiteBoardUtils } from '../../utils/whiteboard';
+import { Governor } from '../../utils/models';
 
 export const PowerBlock: FC = () => {
+  const modeIndexes: Array<number> = [];
+  const modeTags: Array<string> = [];
   const notchLabels: NotchLabel[] = [];
 
   let notchIdx = 0;
-  WhiteBoardUtils.getAvailableGovernors().forEach((value: string) => {
-    notchLabels.push({
-      notchIndex: notchIdx,
-      value: notchIdx,
-      label: value
+  Object.entries(Governor)
+    .filter(([key]) => !isNaN(Number(key)))
+    .map(([key, value]) => {
+      modeIndexes.push(Number(key));
+      modeTags.push(String(value));
+
+      notchLabels.push({
+        notchIndex: notchIdx,
+        value: notchIdx,
+        label: Translator.translate('governor.' + String(value).toLocaleLowerCase())
+      });
+      notchIdx++;
     });
-    notchIdx++;
-  });
 
   const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
@@ -25,7 +32,7 @@ export const PowerBlock: FC = () => {
       ...profile,
       cpu: {
         ...profile.cpu,
-        governor: WhiteBoardUtils.getAvailableGovernors()[newVal]
+        governor: newVal
       }
     };
     saveProfile(id, name, newProf);
@@ -40,7 +47,7 @@ export const PowerBlock: FC = () => {
             <PanelSectionRow>
               <SliderField
                 label={Translator.translate('cpu.governor')}
-                value={WhiteBoardUtils.getAvailableGovernors().indexOf(profile.cpu.governor)}
+                value={profile.cpu.governor}
                 min={0}
                 max={notchLabels.length - 1}
                 step={1}

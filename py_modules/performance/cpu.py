@@ -8,7 +8,6 @@ CTDP_FN = "/sys/devices/platform/asus-nb-wmi/ppt_pl1_spl"
 APU_FN = "/sys/devices/platform/asus-nb-wmi/ppt_apu_sppt"
 BOOST_FN = "/sys/devices/system/cpu/cpufreq/boost"
 SMT_PATH = "/sys/devices/system/cpu/smt/control"
-GOV_AVAIL_FN = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"
 GOV_FN = "/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
 
 def get_online_cpus():
@@ -57,18 +56,6 @@ def set_platform_profile(prof: str):
     decky.logger.debug(f"Setting platform profile to '{prof}' by writing to {EPP_FN}")
     with open(EPP_FN, "w") as f:
         f.write(prof)
-
-def get_available_governors():
-  try:
-    with open(GOV_AVAIL_FN, 'r') as file:
-        available_options = file.read().strip().split(' ') or []
-        available_options.reverse()
-        file.close()
-        return available_options
-  except Exception as e:
-    decky.logger.error(f'Error getting power governor options {e}')
-
-  return []
 
 def set_governor(governor:str):
     decky.logger.debug(f"Setting governor to {governor} by writing to {GOV_FN}")

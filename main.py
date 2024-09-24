@@ -72,10 +72,6 @@ class Plugin:
         return hardware.bios_version()
 
 # CPU 
-    async def get_available_governors(self):
-        decky.logger.debug("Executing: get_available_governors()")
-        return cpu.get_available_governors()
-
     async def set_governor(self, governor:str):
         decky.logger.debug(f"Executing: set_governor({governor})")
         return cpu.set_governor(governor)

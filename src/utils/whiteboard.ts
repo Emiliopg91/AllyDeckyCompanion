@@ -131,12 +131,4 @@ export class WhiteBoardUtils {
   public static setGpuMaxFreq(value: number): void {
     WhiteBoard.set('gpuMaxFreq', value);
   }
-
-  public static getAvailableGovernors(): Array<string> {
-    return WhiteBoard.get('availableGovernors') || [];
-  }
-
-  public static setAvailableGovernors(governors: Array<string>): void {
-    WhiteBoard.set('availableGovernors', governors);
-  }
 }
