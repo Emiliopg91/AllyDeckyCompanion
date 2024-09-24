@@ -39,38 +39,34 @@ export const GpuBlock: FC = () => {
 
   return (
     <PanelSection>
-      {profile.mode == 3 && (
-        <>
-          <PanelSectionRow>
-            <SliderField
-              label={Translator.translate('gpu.min.freq')}
-              value={profile.gpu.frequency.min}
-              showValue
-              step={100}
-              valueSuffix=" MHz"
-              min={WhiteBoardUtils.getGpuMinFreq()}
-              max={WhiteBoardUtils.getGpuMaxFreq()}
-              validValues="range"
-              bottomSeparator="none"
-              onChange={onMinFreqChange}
-            />
-          </PanelSectionRow>
-          <PanelSectionRow>
-            <SliderField
-              label={Translator.translate('gpu.max.freq')}
-              value={profile.gpu.frequency.max}
-              showValue
-              step={100}
-              valueSuffix=" MHz"
-              min={WhiteBoardUtils.getGpuMinFreq()}
-              max={WhiteBoardUtils.getGpuMaxFreq()}
-              validValues="range"
-              bottomSeparator="none"
-              onChange={onMaxFreqChange}
-            />
-          </PanelSectionRow>
-        </>
-      )}
+      <PanelSectionRow>
+        <SliderField
+          label={Translator.translate('gpu.min.freq')}
+          value={profile.gpu.frequency.min}
+          showValue
+          step={100}
+          valueSuffix=" MHz"
+          min={WhiteBoardUtils.getGpuMinFreq()}
+          max={WhiteBoardUtils.getGpuMaxFreq()}
+          validValues="range"
+          bottomSeparator="none"
+          onChange={onMinFreqChange}
+        />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <SliderField
+          label={Translator.translate('gpu.max.freq')}
+          value={profile.gpu.frequency.max}
+          showValue
+          step={100}
+          valueSuffix=" MHz"
+          min={WhiteBoardUtils.getGpuMinFreq()}
+          max={WhiteBoardUtils.getGpuMaxFreq()}
+          validValues="range"
+          bottomSeparator="none"
+          onChange={onMaxFreqChange}
+        />
+      </PanelSectionRow>
     </PanelSection>
   );
 };

@@ -15,7 +15,7 @@ import { createContext, useEffect, useState } from 'react';
 import { Profiles } from '../settings/profiles';
 import { BackendUtils } from '../utils/backend';
 import { CorsClient } from '../utils/cors';
-import { AppOverviewExt, Profile } from '../utils/models';
+import { AppOverviewExt, Governor, Mode, Profile } from '../utils/models';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
 interface PerformanceContextType {
@@ -36,11 +36,11 @@ const defaultValue: PerformanceContextType = {
   icon: undefined,
   onBattery: WhiteBoardUtils.getOnBattery(),
   profile: {
-    mode: -1,
+    mode: Mode.PERFORMANCE,
     cpu: {
       boost: false,
       smt: false,
-      governor: 'powersave',
+      governor: Governor.POWERSAVE,
       tdp: { fppl: 5, spl: 5, sppl: 5 }
     },
     gpu: { frequency: { min: 800, max: 2700 } }

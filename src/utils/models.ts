@@ -16,7 +16,7 @@ export interface CpuProfile {
   boost: boolean;
   smt: boolean;
   tdp: TdpCpuProfile;
-  governor: number;
+  governor: Governor;
 }
 
 export interface GpuFreqProfile {
@@ -35,7 +35,7 @@ export interface TdpCpuProfile {
 }
 
 export interface Profile {
-  mode: number;
+  mode: Mode;
   cpu: CpuProfile;
   gpu: GpuProfile;
 }
@@ -59,5 +59,11 @@ export enum Mode {
 
 export enum Governor {
   POWERSAVE,
+  PERFORMANCE
+}
+
+export enum AcpiEpp {
+  QUIET,
+  BALANCED,
   PERFORMANCE
 }

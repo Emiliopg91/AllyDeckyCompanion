@@ -1,7 +1,7 @@
 import { Backend, Logger } from 'decky-plugin-framework';
 
-import { Constants } from './constants';
-import { Governor, Profile, SdtdpSettings } from './models';
+import { Profiles } from '../settings/profiles';
+import { AcpiEpp, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -38,15 +38,12 @@ export class BackendUtils {
   }
 
   public static async setPerformanceProfile(profile: Profile): Promise<void> {
-    if (WhiteBoardUtils.getIsAllyX()) {
-      let epp = 'performance';
-      if (profile.cpu.tdp.spl <= Constants.AllySilentSPL) {
-        epp = 'quiet';
-      } else if (profile.cpu.tdp.spl <= Constants.AllyPerformanceSPL) {
-        epp = 'balanced';
-      }
-
-      Logger.info("Setting performance profile to '" + epp + "':", profile);
+    if (WhiteBoardUtils.getIsAlly()) {
+      const epp = AcpiEpp[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
+      Logger.info(
+        'Setting ACPI Platform Profile to "' + epp + '" and performance profile to:',
+        profile
+      );
 
       Backend.backend_call<[prof: string], number>('set_platform_profile', epp).then(() => {
         Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
@@ -80,7 +77,7 @@ export class BackendUtils {
   }
 
   public static async setBatteryLimit(limit: number): Promise<void> {
-    if (WhiteBoardUtils.getIsAllyX()) {
+    if (WhiteBoardUtils.getIsAlly()) {
       Logger.info('Setting battery limit to ' + limit + '%');
       Backend.backend_call<[limit: number], number>('set_charge_limit', limit);
     }

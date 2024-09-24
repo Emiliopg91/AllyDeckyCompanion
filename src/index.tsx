@@ -14,6 +14,7 @@ import {
 
 import translations from '../assets/translations.i18n.json';
 import { RogIcon } from './components/icons/rogIcon';
+import { GlobalProvider } from './contexts/globalContext';
 import { MainMenu } from './pages/MainMenu';
 import { Profiles } from './settings/profiles';
 import { SystemSettings } from './settings/system';
@@ -212,7 +213,7 @@ const migrateSchema = (): void => {
         if (!profile.cpu?.governor) {
           Settings.setEntry(
             Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_CPU_GOVERNOR,
-            'powersave',
+            Governor[Governor.POWERSAVE],
             true
           );
         } else {
@@ -409,7 +410,11 @@ export default definePlugin(() => {
   return {
     name: Constants.PLUGIN_NAME,
     title: <div className={staticClasses.Title}>{Constants.PLUGIN_NAME}</div>,
-    content: <MainMenu />,
+    content: (
+      <GlobalProvider>
+        <MainMenu />
+      </GlobalProvider>
+    ),
     icon: <RogIcon width={20} height={20} />,
     onDismount(): void {
       if (onGameUnregister) onGameUnregister();

@@ -1,22 +1,25 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 
-import { PerformanceProvider } from '../../contexts/performanceContext';
-import { CpuBlock } from './cpuBlock';
+import { PerformanceContext } from '../../contexts/performanceContext';
+import { Mode } from '../../utils/models';
+import { CpuBlock } from './cpu/main';
 import { GpuBlock } from './gpuBlock';
 import { HeaderBlock } from './headerBlock';
 import { ModeBlock } from './modeBlock';
-import { PowerBlock } from './powerBlock';
 
 export const PerformanceBlock: FC = () => {
+  const { profile } = useContext(PerformanceContext);
+
   return (
-    <PerformanceProvider>
-      <>
-        <HeaderBlock />
-        <ModeBlock />
-        <CpuBlock />
-        <PowerBlock />
-        <GpuBlock />
-      </>
-    </PerformanceProvider>
+    <>
+      <HeaderBlock />
+      <ModeBlock />
+      {profile.mode == Mode.CUSTOM && (
+        <>
+          <CpuBlock />
+          <GpuBlock />
+        </>
+      )}
+    </>
   );
 };
