@@ -1,24 +1,14 @@
-name: Release
-
-permissions:
-  contents: write
+name: Build and Publish Release
 
 on:
-  push:
+  push: 
     branches:
       - main
 
 jobs:
-  build_plugin:
+  CompileAndRelease:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:latest
     steps:
-      - name: set git global safe directory
-        run: |
-          pacman -Syu git npm jq --noconfirm
-          git config --global --add safe.directory $(realpath .)
-
       - uses: actions/checkout@v3
 
       - name: Get version from package.json
@@ -45,6 +35,7 @@ jobs:
       - name: Fix permissions
         run: |
           chmod 777 -R .
+          
       - name: Setup Docker
         uses: docker/setup-buildx-action@v1
 
