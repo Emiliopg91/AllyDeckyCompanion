@@ -62,6 +62,8 @@ jobs:
           cp -r dist output/dist
           cp LICENSE output/LICENSE
           cp main.py output/main.py
+          cp -r py_modules output/py_modules
+          cp  output/plugin.json
           cp package.json output/package.json
           cp plugin.json output/plugin.json
           cp README.md output/README.md
