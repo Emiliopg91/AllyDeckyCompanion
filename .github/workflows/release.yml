@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: set git global safe directory
         run: |
-          pacman -Syu git npm --noconfirm
+          pacman -Syu git npm jq --noconfirm
           git config --global --add safe.directory $(realpath .)
 
       - uses: actions/checkout@v3
