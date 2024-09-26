@@ -69,8 +69,11 @@ export class PluginSettings {
       return undefined;
     } else {
       const profile = PluginSettings.settings.profiles[appId][pwr] as Profile;
-      if (!profile.brightness) {
-        profile.brightness = WhiteBoardUtils.getBrightness();
+      if (!profile.display) {
+        PluginSettings.createParents(PluginSettings.settings, 'display');
+      }
+      if (!profile.display.brightness) {
+        profile.display.brightness = WhiteBoardUtils.getBrightness();
       }
 
       return JSON.parse(JSON.stringify(profile));
@@ -93,6 +96,10 @@ export class PluginSettings {
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id);
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.cpu.tdp');
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.gpu.frequency');
+      PluginSettings.createParents(
+        PluginSettings.settings,
+        'profiles.' + id + '.display.brightness'
+      );
     }
 
     const gameEntry = PluginSettings.settings.profiles[appId];
@@ -108,6 +115,6 @@ export class PluginSettings {
     prof.cpu.tdp.fppl = profile.cpu.tdp.fppl;
     prof.gpu.frequency.min = profile.gpu.frequency.min;
     prof.gpu.frequency.max = profile.gpu.frequency.max;
-    prof.brightness = profile.brightness;
+    prof.display.brightness = profile.display.brightness;
   }
 }

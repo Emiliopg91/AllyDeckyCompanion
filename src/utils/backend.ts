@@ -34,10 +34,10 @@ export class BackendUtils {
     if (WhiteBoardUtils.getIsAlly()) {
       sleep(50).then(() => {
         Logger.info(
-          'Setting display brightness to: ' + Math.floor(profile.brightness! * 100) + '%'
+          'Setting display brightness to: ' + Math.floor(profile.display.brightness! * 100) + '%'
         );
-        SteamClient.System.Display.SetBrightness(profile.brightness);
-        WhiteBoardUtils.setBrightness(profile.brightness!);
+        SteamClient.System.Display.SetBrightness(profile.display.brightness);
+        WhiteBoardUtils.setBrightness(profile.display.brightness!);
 
         const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
         Logger.info(

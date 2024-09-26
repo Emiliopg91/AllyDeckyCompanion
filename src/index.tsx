@@ -202,8 +202,8 @@ const debouncedBrightnessListener = debounce((event: any) => {
     if (event.flBrightness != WhiteBoardUtils.getBrightness()) {
       WhiteBoardUtils.setBrightness(event.flBrightness);
       Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
-      release();
     }
+    release();
   });
 }, 1000);
 
@@ -301,7 +301,11 @@ export default definePlugin(() => {
             onBrightnessUnregister = SteamClient.System.Display.RegisterForBrightnessChanges(
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (event: any) => {
-                debouncedBrightnessListener(e);
+                if (WhiteBoardUtils.getBrightness() == undefined) {
+                  WhiteBoardUtils.setBrightness(event.flBrightness);
+                } else {
+                  debouncedBrightnessListener(event);
+                }
               }
             ).unsubscribe;
 

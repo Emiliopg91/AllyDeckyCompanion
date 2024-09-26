@@ -36,6 +36,10 @@ export interface Profile {
   mode: Mode;
   cpu: CpuProfile;
   gpu: GpuProfile;
+  display: Display;
+}
+
+export interface Display {
   brightness?: number;
 }
 

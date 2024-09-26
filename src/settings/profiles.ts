@@ -135,19 +135,19 @@ export class Profiles {
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
       },
-      brightness: WhiteBoardUtils.getBrightness()
+      display: { brightness: WhiteBoardUtils.getBrightness() }
     };
   }
 
   public static applyGameProfile(id: string): void {
     let profile: Profile = Profiles.getProfileForId(id);
     if (profile.mode != Mode.CUSTOM) {
-      profile = { ...Profiles.getProfileForMode(profile.mode), brightness: profile.brightness };
+      profile = { ...Profiles.getProfileForMode(profile.mode), display: profile.display };
     }
-    AsyncUtils.runMutexForProfile((release) => {
+    AsyncUtils.runMutexForProfile((releaseProfile) => {
       Logger.info('Applying profile ' + id);
       BackendUtils.applyProfile(profile).finally(() => {
-        release();
+        releaseProfile();
       });
     });
   }
@@ -204,7 +204,9 @@ export class Profiles {
             max: Math.min(WhiteBoardUtils.getGpuMaxFreq(), prof.gpu.frequency.max)
           }
         },
-        brightness: prof.brightness
+        display: {
+          brightness: prof.display.brightness
+        }
       };
     }
   }
@@ -228,7 +230,9 @@ export class Profiles {
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
       },
-      brightness: WhiteBoardUtils.getBrightness()
+      display: {
+        brightness: WhiteBoardUtils.getBrightness()
+      }
     };
 
     switch (mode) {
@@ -260,7 +264,7 @@ export class Profiles {
 
   public static setBrightnessForProfileId(id: string, flBrightness: number): void {
     const profile = Profiles.getProfileForId(id);
-    profile.brightness = flBrightness;
+    profile.display.brightness = flBrightness;
     Profiles.saveProfileForId(id, profile);
     Profiles.applyGameProfile(id);
   }
@@ -301,7 +305,9 @@ export class Profiles {
               max: WhiteBoardUtils.getGpuMaxFreq()
             }
           },
-          brightness: WhiteBoardUtils.getBrightness()
+          display: {
+            brightness: WhiteBoardUtils.getBrightness()
+          }
         };
 
         if (!Profiles.existsProfileForId(localId)) {
