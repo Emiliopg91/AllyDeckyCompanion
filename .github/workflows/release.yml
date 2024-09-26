@@ -83,11 +83,6 @@ jobs:
           git push origin HEAD:develop --force
           git checkout main
 
-  publish:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [build_plugin]
-    steps:
       - run: mkdir /tmp/artifacts
 
       - name: download artifact
