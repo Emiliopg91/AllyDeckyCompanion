@@ -89,6 +89,7 @@ jobs:
 
       - name: Checkout develop branch
         run: |
+          git restore .
           git fetch origin
           git checkout develop
           git pull origin develop
