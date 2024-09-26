@@ -1,5 +1,6 @@
 # AllyDeckyCompanion
 
+[![Release](https://github.com/Emiliopg91/AllyDeckyCompanion/actions/workflows/release.yml/badge.svg)](https://github.com/Emiliopg91/AllyDeckyCompanion/actions/workflows/release.yml)
 [![](https://img.shields.io/github/downloads/Emiliopg91/AllyDeckyCompanion/total.svg)](https://github.com/Emiliopg91/AllyDeckyCompanion/releases)
 
 - [Features](#features)
