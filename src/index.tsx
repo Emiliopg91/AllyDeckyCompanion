@@ -213,7 +213,6 @@ export default definePlugin(() => {
     PluginSettings.initialize();
 
     const prevSchemaVers = PluginSettings.getSchemaVersion();
-    Logger.info(prevSchemaVers);
     if (prevSchemaVers && prevSchemaVers != Constants.CFG_SCHEMA_VERS) {
       migrateSchema();
     }
