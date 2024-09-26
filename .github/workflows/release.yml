@@ -59,7 +59,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
+          git add package.json
           git commit -m "Bump version to prepatch"
           git push origin HEAD
           
