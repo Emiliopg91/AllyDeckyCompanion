@@ -46,7 +46,7 @@ jobs:
           name: AllyDeckyCompanion
           path: AllyDeckyCompanion.tar.gz
 
-      - name: Bump version to prepatch
+      - name: Bump version to next DEV version
         run: |
           npm version --no-commit-hooks --no-git-tag-version prepatch --preid dev
           jq '.version |= sub("-dev\\.0$"; "-dev")' package.json > package.tmp.json
@@ -79,8 +79,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git merge origin/main
-          git push origin HEAD:develop
+          git rebase origin/main
+          git push origin HEAD:develop --force
 
   publish:
     if: github.ref == 'refs/heads/main'
