@@ -4,6 +4,7 @@ import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
 import { Acpi, Governor, Mode, Profile } from '../utils/models';
+import { PluginSettings } from '../utils/settings';
 import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
@@ -49,8 +50,7 @@ export class Profiles {
     headers.push({ data: 'SMT*', align: 'center' });
     headers.push({ data: 'BOOST*', align: 'center' });
     headers.push({ data: 'GOVERNOR*', align: 'center' });
-    headers.push({ data: 'GPU MIN FREQ*', align: 'center' });
-    headers.push({ data: 'GPU MAX FREQ*', align: 'center' });
+    headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
 
     const body: Array<Array<SpreadSheetCell>> = [];
     sortedAppIds.forEach((entry) => {
@@ -82,11 +82,11 @@ export class Profiles {
             align: 'right'
           });
           line.push({
-            data: (profile.gpu.frequency.min || WhiteBoardUtils.getGpuMinFreq()) + ' MHz',
-            align: 'right'
-          });
-          line.push({
-            data: (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) + ' MHz',
+            data:
+              (profile.gpu.frequency.min || WhiteBoardUtils.getGpuMinFreq()) +
+              '-' +
+              (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) +
+              ' MHz',
             align: 'right'
           });
 
@@ -134,18 +134,19 @@ export class Profiles {
           min: WhiteBoardUtils.getGpuMinFreq(),
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
-      }
+      },
+      brightness: WhiteBoardUtils.getBrightness()
     };
   }
 
   public static applyGameProfile(id: string): void {
     let profile: Profile = Profiles.getProfileForId(id);
     if (profile.mode != Mode.CUSTOM) {
-      profile = Profiles.getProfileForMode(profile.mode);
+      profile = { ...Profiles.getProfileForMode(profile.mode), brightness: profile.brightness };
     }
     AsyncUtils.runMutexForProfile((release) => {
       Logger.info('Applying profile ' + id);
-      BackendUtils.setPerformanceProfile(profile).finally(() => {
+      BackendUtils.applyProfile(profile).finally(() => {
         release();
       });
     });
@@ -159,10 +160,6 @@ export class Profiles {
     return Profiles.getProfileForId(Constants.DEFAULT_ID_AC);
   }
 
-  public static existsProfileForId(id: string | number): boolean {
-    return Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE) !== null;
-  }
-
   public static getAcpiProfile(spl: number): Acpi {
     let epp = Acpi.PERFORMANCE;
     if (spl <= Constants.AllySilentSPL) {
@@ -173,8 +170,12 @@ export class Profiles {
     return epp;
   }
 
+  public static existsProfileForId(id: string): boolean {
+    return PluginSettings.existsProfile(id);
+  }
+
   public static getProfileForId(id: string): Profile {
-    if (!Profiles.existsProfileForId(id)) {
+    if (!PluginSettings.existsProfile(id)) {
       Logger.info('No profile found for ' + id + ', creating');
 
       const mode = id.endsWith(Constants.SUFIX_AC)
@@ -184,44 +185,26 @@ export class Profiles {
       Profiles.saveProfileForId(id, tmpProf);
       return tmpProf;
     } else {
+      const prof = PluginSettings.getProfileForId(id)!;
       return {
-        mode: Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE)),
+        mode: prof.mode,
         cpu: {
           tdp: {
-            spl: Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL)),
-            sppl: Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL)),
-            fppl: Number(Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL))
+            spl: prof.cpu.tdp.spl,
+            sppl: prof.cpu.tdp.sppl,
+            fppl: prof.cpu.tdp.fppl
           },
-          boost:
-            Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST) == 'true',
-          smt:
-            Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT) == 'true',
-          governor: Number(
-            Settings.getEntry(Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_GOVERNOR)
-          )
+          boost: prof.cpu.boost,
+          smt: prof.cpu.smt,
+          governor: prof.cpu.governor
         },
         gpu: {
           frequency: {
-            min: Math.max(
-              WhiteBoardUtils.getGpuMinFreq(),
-              Number(
-                Settings.getEntry(
-                  Constants.PREFIX_PROFILES + id + Constants.SUFIX_GPU_FREQ_MIN,
-                  String(WhiteBoardUtils.getGpuMinFreq())
-                )
-              )
-            ),
-            max: Math.min(
-              WhiteBoardUtils.getGpuMaxFreq(),
-              Number(
-                Settings.getEntry(
-                  Constants.PREFIX_PROFILES + id + Constants.SUFIX_GPU_FREQ_MAX,
-                  String(WhiteBoardUtils.getGpuMaxFreq())
-                )
-              )
-            )
+            min: Math.max(WhiteBoardUtils.getGpuMinFreq(), prof.gpu.frequency.min),
+            max: Math.min(WhiteBoardUtils.getGpuMaxFreq(), prof.gpu.frequency.max)
           }
-        }
+        },
+        brightness: prof.brightness
       };
     }
   }
@@ -244,7 +227,8 @@ export class Profiles {
           min: WhiteBoardUtils.getGpuMinFreq(),
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
-      }
+      },
+      brightness: WhiteBoardUtils.getBrightness()
     };
 
     switch (mode) {
@@ -274,57 +258,15 @@ export class Profiles {
     return profile;
   }
 
+  public static setBrightnessForProfileId(id: string, flBrightness: number): void {
+    const profile = Profiles.getProfileForId(id);
+    profile.brightness = flBrightness;
+    Profiles.saveProfileForId(id, profile);
+    Profiles.applyGameProfile(id);
+  }
+
   public static saveProfileForId(id: string, profile: Profile): void {
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + Profiles.getAppId(id) + Constants.SUFIX_NAME,
-      Profiles.getAppName(id),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_MODE,
-      String(profile.mode),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_BOOST,
-      String(profile.cpu.boost),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_SMT,
-      String(profile.cpu.smt),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_CPU_GOVERNOR,
-      String(profile.cpu.governor),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPL,
-      String(profile.cpu.tdp.spl),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_SPPL,
-      String(profile.cpu.tdp.sppl),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_FPPL,
-      String(profile.cpu.tdp.fppl),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_GPU_FREQ_MIN,
-      String(profile.gpu.frequency.min),
-      true
-    );
-    Settings.setEntry(
-      Constants.PREFIX_PROFILES + id + Constants.SUFIX_GPU_FREQ_MAX,
-      String(profile.gpu.frequency.max),
-      true
-    );
+    PluginSettings.setProfileForId(id, Profiles.getAppName(id), profile);
   }
 
   public static async importFromSDTDP(): Promise<void> {
@@ -358,7 +300,8 @@ export class Profiles {
               min: WhiteBoardUtils.getGpuMinFreq(),
               max: WhiteBoardUtils.getGpuMaxFreq()
             }
-          }
+          },
+          brightness: WhiteBoardUtils.getBrightness()
         };
 
         if (!Profiles.existsProfileForId(localId)) {

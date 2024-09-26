@@ -1,7 +1,7 @@
 import { AppOverview, DisplayStatus } from '@decky/ui';
 
 export interface AppOverviewExt extends AppOverview {
-  appid: string; // base
+  appid: number; // base
   display_name: string; // base
   display_status: DisplayStatus; // base
   sort_as: string; // base
@@ -10,6 +10,33 @@ export interface AppOverviewExt extends AppOverview {
   icon_hash: string; // base, url hash to fetch the icon for steam games (e.g.: "/assets/" + appid + "_icon.jpg?v=" + icon_hash)
   img_logo_url: string;
   m_gameid: string; // base, id for non-steam games
+  BIsModOrShortcut: () => boolean;
+  BIsShortcut: () => boolean;
+  gameid: string;
+}
+
+export interface Configuration {
+  schema: string;
+  profiles: Record<string, GameEntry>;
+  settings: Settings;
+}
+
+export interface Settings {
+  profile_per_game: boolean;
+  limit_battery: number;
+}
+
+export interface GameEntry {
+  name: string;
+  battery: Profile;
+  acpower: Profile;
+}
+
+export interface Profile {
+  mode: Mode;
+  cpu: CpuProfile;
+  gpu: GpuProfile;
+  brightness?: number;
 }
 
 export interface CpuProfile {
@@ -17,6 +44,18 @@ export interface CpuProfile {
   smt: boolean;
   tdp: TdpCpuProfile;
   governor: Governor;
+}
+
+export enum Mode {
+  SILENT,
+  PERFORMANCE,
+  TURBO,
+  CUSTOM
+}
+
+export enum Governor {
+  POWERSAVE,
+  PERFORMANCE
 }
 
 export interface GpuFreqProfile {
@@ -34,12 +73,6 @@ export interface TdpCpuProfile {
   fppl: number;
 }
 
-export interface Profile {
-  mode: Mode;
-  cpu: CpuProfile;
-  gpu: GpuProfile;
-}
-
 export interface SdtdpSettingsTdpProfile {
   tdp: number;
   cpuBoost: boolean;
@@ -48,18 +81,6 @@ export interface SdtdpSettingsTdpProfile {
 
 export interface SdtdpSettings {
   tdpProfiles: Record<string, SdtdpSettingsTdpProfile>;
-}
-
-export enum Mode {
-  SILENT,
-  PERFORMANCE,
-  TURBO,
-  CUSTOM
-}
-
-export enum Governor {
-  POWERSAVE,
-  PERFORMANCE
 }
 
 export enum Acpi {

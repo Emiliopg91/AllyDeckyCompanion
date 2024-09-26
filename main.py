@@ -15,19 +15,15 @@ import subprocess
 import miscelanea
 from time import sleep
 
-class Plugin:
-    # A normal method. It can be called from JavaScript using call_plugin_function("method_1", argument1, argument2)
-    async def add(self, left, right):
-        return left + right
-    
+class Plugin:    
 # Configuration
 
     async def get_config(self):
         decky.logger.debug("Executing: get_config()")
         return plugin_config.get_config()
 
-    async def set_config(self, key: str, value: str):
-        decky.logger.debug("Executing: set_config(%s, %s)", key, value)
+    async def set_config(self, key: str, value):
+        decky.logger.debug("Executing: set_config(%s, %s)", key, str(value))
         plugin_config.set_config(key, value)
 
 # Logger

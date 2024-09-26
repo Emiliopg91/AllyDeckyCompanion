@@ -7,10 +7,10 @@ import {
   EventType,
   Framework,
   Logger,
-  Settings,
   Translator,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
+import { debounce } from 'lodash';
 
 import translations from '../assets/translations.i18n.json';
 import { RogIcon } from './components/icons/rogIcon';
@@ -22,7 +22,8 @@ import { AsyncUtils } from './utils/async';
 import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { CorsClient } from './utils/cors';
-import { Governor, Profile, SystemInfoSchema } from './utils/models';
+import { SystemInfoSchema } from './utils/models';
+import { PluginSettings } from './utils/settings';
 import { Toast } from './utils/toast';
 import { WhiteBoardUtils } from './utils/whiteboard';
 
@@ -30,13 +31,14 @@ let onSuspendUnregister: Function | undefined;
 let onResumeUnregister: Function | undefined;
 let onGameUnregister: Function | undefined;
 let onShutdownUnregister: Function | undefined;
+let onBrightnessUnregister: Function | undefined;
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
 let biosUpdateCheckTimer: NodeJS.Timeout | undefined;
 let runningGameIdUnregister: Function | undefined;
 
 const checkProfilePerGame = (): Promise<void> => {
   return new Promise<void>((resolve) => {
-    if (!Settings.getEntry(Constants.PROFILE_PER_GAME)) {
+    if (!PluginSettings.getProfilePerGame()) {
       showModal(
         <ConfirmModal
           strTitle={Constants.PLUGIN_NAME}
@@ -44,21 +46,18 @@ const checkProfilePerGame = (): Promise<void> => {
           strOKButtonText={Translator.translate('enable')}
           strCancelButtonText={Translator.translate('disable')}
           onCancel={() => {
-            Settings.setEntry(Constants.PROFILE_PER_GAME, 'false', true);
-            WhiteBoardUtils.setProfilePerGame(false);
+            PluginSettings.setProfilePerGame(false);
             Logger.info('Disabled profile per-game');
             resolve();
           }}
           onOK={() => {
-            Settings.setEntry(Constants.PROFILE_PER_GAME, 'true', true);
-            WhiteBoardUtils.setProfilePerGame(true);
+            PluginSettings.setProfilePerGame(true);
             Logger.info('Enabled profile per-game');
             resolve();
           }}
         />
       );
     } else {
-      WhiteBoardUtils.setProfilePerGame(Settings.getEntry(Constants.PROFILE_PER_GAME) == 'true');
       resolve();
     }
   });
@@ -194,86 +193,37 @@ const getSystemInfo = (): Promise<SystemInfoSchema> => {
 
 const migrateSchema = (): void => {
   Logger.info('Migrating settings file schema to v' + Constants.CFG_SCHEMA_VERS);
-
-  const batLimit = String(
-    Settings.getEntry(Constants.BATTERY_LIMIT, String(Constants.DEFAULT_BATTERY_LIMIT))
-  );
-  if (batLimit == 'true') {
-    Settings.setEntry(Constants.BATTERY_LIMIT, String(80), true);
-  } else if (batLimit == 'false') {
-    Settings.setEntry(Constants.BATTERY_LIMIT, String(100), true);
-  }
-
-  const { profiles } = Settings.getConfigurationStructured() as {
-    profiles: Record<string, Record<string, string | Profile>>;
-  };
-  Object.keys(profiles).forEach((appId) => {
-    Object.keys(profiles[appId]).forEach((pwr) => {
-      if (typeof profiles[appId][pwr] != 'string') {
-        const profile = profiles[appId][pwr] as Profile;
-        if (!profile.cpu?.governor) {
-          Settings.setEntry(
-            Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_CPU_GOVERNOR,
-            String(Governor.POWERSAVE),
-            true
-          );
-        } else {
-          const prevGov = String(
-            Settings.getEntry(
-              Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_CPU_GOVERNOR
-            )
-          );
-          if (isNaN(Number(prevGov))) {
-            Settings.setEntry(
-              Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_CPU_GOVERNOR,
-              String(Governor[prevGov.toUpperCase() as keyof typeof Governor]),
-              true
-            );
-          }
-        }
-        if (!profile.gpu?.frequency?.min) {
-          Settings.setEntry(
-            Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_GPU_FREQ_MIN,
-            '800',
-            true
-          );
-        }
-        if (!profile.gpu?.frequency?.max) {
-          Settings.setEntry(
-            Constants.PREFIX_PROFILES + appId + '.' + pwr + Constants.SUFIX_GPU_FREQ_MAX,
-            '2700',
-            true
-          );
-        }
-      }
-    });
-  });
-
   Logger.info('Migration finished');
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const debouncedBrightnessListener = debounce((event: any) => {
+  AsyncUtils.runMutexForProfile((release) => {
+    if (event.flBrightness != WhiteBoardUtils.getBrightness()) {
+      WhiteBoardUtils.setBrightness(event.flBrightness);
+      Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
+      release();
+    }
+  });
+}, 1000);
 
 export default definePlugin(() => {
   (async (): Promise<void> => {
     await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations);
+    PluginSettings.initialize();
 
-    const prevSchemaVers = Settings.getEntry(
-      Constants.CFG_SCHEMA_PROP,
-      String(Constants.CFG_SCHEMA_VERS)
-    );
-    Settings.setEntry(Constants.CFG_SCHEMA_PROP, String(Constants.CFG_SCHEMA_VERS), true);
-
-    if (prevSchemaVers != Constants.CFG_SCHEMA_VERS) {
+    const prevSchemaVers = PluginSettings.getSchemaVersion();
+    Logger.info(prevSchemaVers);
+    if (prevSchemaVers && prevSchemaVers != Constants.CFG_SCHEMA_VERS) {
       migrateSchema();
     }
+    PluginSettings.setSchemaVersion(Constants.CFG_SCHEMA_VERS);
 
     checkSdtdp().then(() => {
       checkProfilePerGame().then(() => {
         Logger.info(
-          'Profile per-game ' + (WhiteBoardUtils.getProfilePerGame() ? 'en' : 'dis') + 'abled'
+          'Profile per-game ' + (PluginSettings.getProfilePerGame() ? 'en' : 'dis') + 'abled'
         );
-
-        Profiles.getDefaultProfile();
-        Profiles.getDefaultACProfile();
 
         getSystemInfo().then((result) => {
           WhiteBoardUtils.setIsAlly(result.isAlly);
@@ -317,7 +267,7 @@ export default definePlugin(() => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (e: any) => {
                 Logger.info('New game event');
-                if (WhiteBoardUtils.getProfilePerGame()) {
+                if (PluginSettings.getProfilePerGame()) {
                   const prevId = WhiteBoardUtils.getRunningGameId();
                   const newId = e.bRunning
                     ? String(e.unAppID) +
@@ -348,6 +298,12 @@ export default definePlugin(() => {
                 }
               }
             );
+            onBrightnessUnregister = SteamClient.System.Display.RegisterForBrightnessChanges(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (event: any) => {
+                debouncedBrightnessListener(e);
+              }
+            ).unsubscribe;
 
             runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
               if ((e as WhiteBoardEventData).getId() == 'runningGameId') {
@@ -358,7 +314,7 @@ export default definePlugin(() => {
             onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
               AsyncUtils.runMutexForProfile((release) => {
                 Logger.info('Setting CPU profile for suspension');
-                BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
+                BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
                   release();
                 });
               });
@@ -368,7 +324,7 @@ export default definePlugin(() => {
               AsyncUtils.runMutexForProfile((release) => {
                 Logger.info('Waiting 10 seconds for restoring CPU profile');
                 sleep(10000).then(() => {
-                  BackendUtils.setPerformanceProfile(
+                  BackendUtils.applyProfile(
                     Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())
                   ).finally(() => {
                     release();
@@ -380,7 +336,7 @@ export default definePlugin(() => {
             onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
               AsyncUtils.runMutexForProfile((release) => {
                 Logger.info('Setting CPU profile for shutdown/restart');
-                BackendUtils.setPerformanceProfile(Profiles.getFullPowerProfile()).finally(() => {
+                BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
                   release();
                 });
               });
@@ -389,6 +345,8 @@ export default definePlugin(() => {
             BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
             if (WhiteBoardUtils.getIsAllyX()) {
               sleep(100).then(() => {
+                Profiles.getDefaultProfile();
+                Profiles.getDefaultACProfile();
                 Profiles.summary();
                 Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
               });
@@ -416,6 +374,7 @@ export default definePlugin(() => {
       if (pluginUpdateCheckTimer) clearInterval(pluginUpdateCheckTimer);
       if (biosUpdateCheckTimer) clearInterval(biosUpdateCheckTimer);
       if (runningGameIdUnregister) runningGameIdUnregister();
+      if (onBrightnessUnregister) onBrightnessUnregister();
 
       Framework.shutdown();
     }

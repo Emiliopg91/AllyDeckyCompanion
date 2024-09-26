@@ -1,3 +1,4 @@
+import { sleep } from '@decky/ui';
 import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
@@ -11,7 +12,7 @@ export class BackendUtils {
   /**
    * Private constructor to prevent instantiation
    */
-  private constructor() {}
+  private constructor() { }
 
   /**
    * Method to get the plugin log
@@ -29,41 +30,48 @@ export class BackendUtils {
     return Backend.backend_call<[], string>('get_plugin_name');
   }
 
-  public static async setPerformanceProfile(profile: Profile): Promise<void> {
+  public static async applyProfile(profile: Profile): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
-      const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
-      Logger.info(
-        'Setting ACPI Platform Profile to "' + acpi + '" and performance profile to:',
-        profile
-      );
+      sleep(50).then(() => {
+        Logger.info(
+          'Setting display brightness to: ' + Math.floor(profile.brightness! * 100) + '%'
+        );
+        SteamClient.System.Display.SetBrightness(profile.brightness);
+        WhiteBoardUtils.setBrightness(profile.brightness!);
 
-      Backend.backend_call<[enabled: boolean], number>('set_smt', true).then(() => {
-        Backend.backend_call<[prof: string], number>('set_platform_profile', acpi).then(() => {
-          Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
-            'set_tdp',
-            profile.cpu.tdp.spl,
-            profile.cpu.tdp.sppl,
-            profile.cpu.tdp.fppl
-          ).then(() => {
-            Backend.backend_call<[enabled: boolean], number>(
-              'set_cpu_boost',
-              profile.cpu.boost
+        const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
+        Logger.info(
+          'Setting ACPI Platform Profile to "' + acpi + '" and performance profile to:',
+          profile
+        );
+        Backend.backend_call<[enabled: boolean], number>('set_smt', true).then(() => {
+          Backend.backend_call<[prof: string], number>('set_platform_profile', acpi).then(() => {
+            Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
+              'set_tdp',
+              profile.cpu.tdp.spl,
+              profile.cpu.tdp.sppl,
+              profile.cpu.tdp.fppl
             ).then(() => {
-              Backend.backend_call<[governor: string], void>(
-                'set_governor',
-                Governor[profile.cpu.governor].toLowerCase()
+              Backend.backend_call<[enabled: boolean], number>(
+                'set_cpu_boost',
+                profile.cpu.boost
               ).then(() => {
-                Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt).then(
-                  () => {
-                    Backend.backend_call<[min: number, max: number], void>(
-                      'set_gpu_frequency_range',
-                      profile.gpu.frequency.min,
-                      profile.gpu.frequency.max
-                    ).then(() => {
-                      Logger.info('Performance profile setted');
-                    });
-                  }
-                );
+                Backend.backend_call<[governor: string], void>(
+                  'set_governor',
+                  Governor[profile.cpu.governor].toLowerCase()
+                ).then(() => {
+                  Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt).then(
+                    () => {
+                      Backend.backend_call<[min: number, max: number], void>(
+                        'set_gpu_frequency_range',
+                        profile.gpu.frequency.min,
+                        profile.gpu.frequency.max
+                      ).then(() => {
+                        Logger.info('Performance profile setted');
+                      });
+                    }
+                  );
+                });
               });
             });
           });
@@ -82,8 +90,8 @@ export class BackendUtils {
   public static async otaUpdate(): Promise<void> {
     Logger.info(
       'Download and installation of version ' +
-        WhiteBoardUtils.getPluginLatestVersion() +
-        ' in progress'
+      WhiteBoardUtils.getPluginLatestVersion() +
+      ' in progress'
     );
     Backend.backend_call<[], boolean>('ota_update').then(() => {
       SteamClient.System.RestartPC();

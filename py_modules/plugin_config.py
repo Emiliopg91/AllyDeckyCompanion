@@ -9,6 +9,23 @@ config_dir = Path(decky.DECKY_PLUGIN_SETTINGS_DIR)
 
 cfg_property_file = config_dir / "plugin.json"
 
+
+
+def convert_value(value):
+    if isinstance(value, str):
+        if value.lower() == "true":
+            return True
+        elif value.lower() == "false":
+            return False
+        try:
+            return int(value)
+        except ValueError:
+            try:
+                return float(value)
+            except ValueError:
+                return value
+    return value
+
 def flatten_json(nested_json, parent_key=''):
     """
     Aplana un JSON jerárquico.
@@ -60,7 +77,7 @@ def get_config():
 
     return flat_config
 
-def set_config(key: str, value: str):
+def set_config(key: str, value):
     """
     Sets a configuration key-value pair in the plugin configuration file.
 
@@ -68,6 +85,7 @@ def set_config(key: str, value: str):
     key (str): The key to set.
     value (str): The value to set for the key.
     """
+    value = convert_value(value)
     with open(cfg_property_file, "r+") as jsonFile:
         data = json.load(jsonFile)
         
@@ -111,6 +129,29 @@ def get_config_item(name: str, default: str = None):
         
         return d
 
+
+def correct_types(file_path: str) -> None:
+    # Leer el archivo JSON
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    def recursive_migrate(item):
+        """Recorre recursivamente el JSON y convierte valores según sea necesario."""
+        if isinstance(item, dict):
+            for key, value in item.items():
+                item[key] = recursive_migrate(convert_value(value))
+        elif isinstance(item, list):
+            for index, value in enumerate(item):
+                item[index] = recursive_migrate(convert_value(value))
+        
+        return item
+
+    corrected_data = recursive_migrate(data)
+
+    with open(file_path, 'w', encoding='utf-8') as file:
+        json.dump(corrected_data, file, indent=4, ensure_ascii=False)
+
+
 def migrate():
     """
     Performs migration tasks if necessary, like creating directories and files, and setting default configurations.
@@ -125,3 +166,4 @@ def migrate():
         json_object = json.dumps(dictionary, indent=4)
         with open(cfg_property_file, "w") as outfile:
             outfile.write(json_object)
+    correct_types(cfg_property_file)

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable @typescript-eslint/no-empty-function*/
-import { Router } from '@decky/ui';
+import { Router, SteamAppOverview } from '@decky/ui';
 import {
   EventBus,
   EventData,
@@ -18,7 +18,7 @@ import { CorsClient } from '../utils/cors';
 import { AppOverviewExt, Governor, Mode, Profile } from '../utils/models';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
-declare const appStore: typeof window.appStore;
+declare const appStore: any;
 
 interface PerformanceContextType {
   id: string;
@@ -75,7 +75,7 @@ const loadIcon = async (
           setIcon(icon);
         } else {
           try {
-            const iconUrl = appStore.GetIconURLForApp(app);
+            const iconUrl = appStore.GetIconURLForApp(app as SteamAppOverview);
             const response = await CorsClient.fetchUrl(iconUrl);
             if (response.ok) {
               const reader = new FileReader();

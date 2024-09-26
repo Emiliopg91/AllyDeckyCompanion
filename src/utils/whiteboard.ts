@@ -16,7 +16,7 @@ export class WhiteBoardUtils {
     return (
       WhiteBoard.get<string>('runningGameId') ||
       (Router.MainRunningApp
-        ? Router.MainRunningApp.appid + WhiteBoardUtils.getOnBattery()
+        ? String(Router.MainRunningApp.appid) + WhiteBoardUtils.getOnBattery()
           ? Constants.SUFIX_BAT
           : Constants.SUFIX_AC
         : WhiteBoardUtils.getOnBattery()
@@ -51,14 +51,6 @@ export class WhiteBoardUtils {
 
   public static setTab(value: string): void {
     WhiteBoard.set('tab', value);
-  }
-
-  public static getProfilePerGame(): boolean {
-    return WhiteBoard.get('profilePerGame') || false;
-  }
-
-  public static setProfilePerGame(value: boolean): void {
-    WhiteBoard.set('profilePerGame', value);
   }
 
   public static getSdtdpSettingsPresent(): boolean {
@@ -123,5 +115,13 @@ export class WhiteBoardUtils {
 
   public static setGpuMaxFreq(value: number): void {
     WhiteBoard.set('gpuMaxFreq', value);
+  }
+
+  public static getBrightness(): number | undefined {
+    return WhiteBoard.get('brightness') || undefined;
+  }
+
+  public static setBrightness(value: number): void {
+    WhiteBoard.set('brightness', value);
   }
 }
