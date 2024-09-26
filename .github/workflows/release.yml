@@ -72,13 +72,13 @@ jobs:
 
       - name: show files
         run: |
-          tar -tzvf AllyDeckyCompanion.tar.gz
+          tar -tzvf output/AllyDeckyCompanion.tar.gz
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: AllyDeckyCompanion
-          path: AllyDeckyCompanion.tar.gz
+          path: output/AllyDeckyCompanion.tar.gz
 
       - name: Create and push tag
         env:
