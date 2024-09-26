@@ -1,24 +1,17 @@
-name: Release
+name: Build and Publish Release
 
 permissions:
   contents: write
 
 on:
-  push:
+  push: 
     branches:
       - main
 
 jobs:
-  build_plugin:
+  CompileAndRelease:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:latest
     steps:
-      - name: set git global safe directory
-        run: |
-          pacman -Syu git npm jq --noconfirm
-          git config --global --add safe.directory $(realpath .)
-
       - uses: actions/checkout@v3
 
       - name: Get version from package.json
@@ -42,23 +35,50 @@ jobs:
           git commit -m "Bump to release version"
           git push origin HEAD:main
 
+      - name: Fix permissions
+        run: |
+          chmod 777 -R .
+          
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: docker build -t my_backend_image ./backend
+        working-directory: ${{ github.workspace }}
+
+      - name: Run Docker container
+        run: docker run -v ${{ github.workspace }}/backend:/backend my_backend_image
+        working-directory: ${{ github.workspace }}
+
       - name: build plugin
         run: |
-          npm i -g pnpm@8.5.1
+          npm i -g pnpm@8.5.1 shx@0.3.4
           pnpm install --no-frozen-lockfile
           pnpm run build
-          tar -czvf AllyDeckyCompanion.tar.gz --transform 's,^,AllyDeckyCompanion/,' dist py_modules bin ota_update.sh *.py *.json *.md *.js LICENSE
+
+      - name: Archive plugin
+        run: |
+          mkdir output
+          cp -r dist output/dist
+          cp LICENSE output/LICENSE
+          cp main.py output/main.py
+          cp package.json output/package.json
+          cp plugin.json output/plugin.json
+          cp README.md output/README.md
+          cp defaults/* output
+          cd output
+          tar -czvf AllyDeckyCompanion.tar.gz --transform 's,^,AllyDeckyCompanion/,' *
         continue-on-error: true
 
       - name: show files
         run: |
-          tar -tzvf AllyDeckyCompanion.tar.gz
+          tar -tzvf output/AllyDeckyCompanion.tar.gz
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: AllyDeckyCompanion
-          path: AllyDeckyCompanion.tar.gz
+          path: output/AllyDeckyCompanion.tar.gz
 
       - name: Create and push tag
         env:
@@ -69,6 +89,7 @@ jobs:
 
       - name: Checkout develop branch
         run: |
+          git restore .
           git fetch origin
           git checkout develop
           git pull origin develop
