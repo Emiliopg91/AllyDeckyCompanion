@@ -254,8 +254,10 @@ export default definePlugin(() => {
             });
 
             sleep(5000).then(() => {
-              pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-              checkPluginLatestVersion();
+              if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+                pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+                checkPluginLatestVersion();
+              }
               sleep(1000).then(() => {
                 biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000);
                 checkBiosLatestVersion();
