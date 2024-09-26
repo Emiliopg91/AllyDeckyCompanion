@@ -304,7 +304,9 @@ export default definePlugin(() => {
                 if (WhiteBoardUtils.getBrightness() == undefined) {
                   WhiteBoardUtils.setBrightness(event.flBrightness);
                 } else {
-                  debouncedBrightnessListener(event);
+                  if (!AsyncUtils.isDisplayLocked()) {
+                    debouncedBrightnessListener(event);
+                  }
                 }
               }
             ).unsubscribe;

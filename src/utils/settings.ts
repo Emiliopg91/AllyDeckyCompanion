@@ -72,7 +72,7 @@ export class PluginSettings {
       if (!profile.display) {
         PluginSettings.createParents(PluginSettings.settings, 'display');
       }
-      if (!profile.display.brightness) {
+      if (profile.display.brightness == undefined) {
         profile.display.brightness = WhiteBoardUtils.getBrightness();
       }
 

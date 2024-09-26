@@ -2,6 +2,7 @@ import { sleep } from '@decky/ui';
 import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
+import { AsyncUtils } from './async';
 import { Acpi, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
@@ -30,14 +31,34 @@ export class BackendUtils {
     return Backend.backend_call<[], string>('get_plugin_name');
   }
 
+  private static async fadeBrightness(): Promise<void> {
+    AsyncUtils.runMutexForDisplay(async (releaseDisplay) => {
+      const target = WhiteBoardUtils.getBrightness()!;
+      const source = WhiteBoardUtils.getPrevBrightness()!;
+      if (target != source) {
+        const timeLapse = 500;
+        const ticks = 100;
+        const nap = timeLapse / ticks;
+        const diff = target - source;
+        const inc = diff / ticks;
+
+        for (let i = 0; i < ticks; i++) {
+          SteamClient.System.Display.SetBrightness(source + (i + 1) * inc);
+          await sleep(nap);
+        }
+      }
+      releaseDisplay();
+    });
+  }
+
   public static async applyProfile(profile: Profile): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
       sleep(50).then(() => {
         Logger.info(
           'Setting display brightness to: ' + Math.floor(profile.display.brightness! * 100) + '%'
         );
-        SteamClient.System.Display.SetBrightness(profile.display.brightness);
         WhiteBoardUtils.setBrightness(profile.display.brightness!);
+        BackendUtils.fadeBrightness();
 
         const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
         Logger.info(

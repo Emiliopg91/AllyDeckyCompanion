@@ -117,11 +117,24 @@ export class WhiteBoardUtils {
     WhiteBoard.set('gpuMaxFreq', value);
   }
 
+  public static getPrevBrightness(): number | undefined {
+    const val = WhiteBoard.get<number>('prevBrightness');
+    if (val == undefined || val == null) {
+      return WhiteBoardUtils.getBrightness();
+    }
+    return val;
+  }
+
   public static getBrightness(): number | undefined {
-    return WhiteBoard.get('brightness') || undefined;
+    const val = WhiteBoard.get<number>('brightness');
+    if (val == undefined || val == null) {
+      return undefined;
+    }
+    return val;
   }
 
   public static setBrightness(value: number): void {
+    WhiteBoard.set('prevBrightness', WhiteBoardUtils.getBrightness());
     WhiteBoard.set('brightness', value);
   }
 }
