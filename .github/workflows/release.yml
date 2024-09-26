@@ -46,7 +46,7 @@ jobs:
           name: AllyDeckyCompanion
           path: AllyDeckyCompanion.tar.gz
 
-      - name: Bump version to prepatch
+      - name: Bump version to next DEV version
         run: |
           npm version --no-commit-hooks --no-git-tag-version prepatch --preid dev
           jq '.version |= sub("-dev\\.0$"; "-dev")' package.json > package.tmp.json
