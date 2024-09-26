@@ -24,7 +24,7 @@ jobs:
 
       - name: Set package version from tag
         run: |
-          VERSION="${{ github.ref_name#v }}"
+          VERSION="${GITHUB_REF#refs/tags/v}"
           echo "Updating package.json version to $VERSION"
           jq --arg version "$VERSION" '.version = $version' package.json > package.tmp.json
           mv package.tmp.json package.json
