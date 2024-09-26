@@ -22,6 +22,13 @@ jobs:
 
       - uses: actions/checkout@v3
 
+      - name: Set package version from tag
+        run: |
+          VERSION="${{ github.ref_name#v }}"
+          echo "Updating package.json version to $VERSION"
+          jq --arg version "$VERSION" '.version = $version' package.json > package.tmp.json
+          mv package.tmp.json package.json
+
       - name: build plugin
         run: |
           npm i -g pnpm@8.5.1
