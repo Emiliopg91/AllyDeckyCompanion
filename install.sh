@@ -23,3 +23,4 @@ rm  $HOME/AllyDeckyCompanion.tar.gz
 sudo systemctl restart plugin_loader.service
 
 echo "Installation complete"
+ 
