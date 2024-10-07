@@ -1,48 +1,52 @@
 import { NotchLabel, PanelSection, PanelSectionRow, SliderField } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
-import { FC, useState } from 'react';
+import { debounce } from 'lodash';
+import { FC, useCallback, useState } from 'react';
 
 import { SystemSettings } from '../../settings/system';
 
+const saveBatterySettings = debounce((newVal: number): void => {
+  SystemSettings.setLimitBattery(newVal);
+}, 500);
 export const HardwareBlock: FC = () => {
-  const batLimitIndexes: Array<number> = [100, 95, 90, 85, 80];
-  const batLimitTags: Array<string> = [];
+  const min = 60;
+  const max = 100;
+  const step = 5;
+
   const batLimitNotchLabels: NotchLabel[] = [];
 
   let notchIdx = 0;
-  batLimitIndexes.forEach((idx) => {
-    batLimitTags.push(String(idx) + '%');
+  for (let i = min; i <= max; i = i + step) {
+    const label = i == max || i == min ? String(i) + '%' : '';
     batLimitNotchLabels.push({
       notchIndex: notchIdx,
       value: notchIdx,
-      label: String(idx) + '%'
+      label
     });
     notchIdx++;
-  });
+  }
 
-  const [limitBattery, setLimitBattery] = useState(
-    batLimitIndexes.indexOf(SystemSettings.getLimitBattery())
-  );
-
-  const onLimitBatteryChange = (newVal: number): void => {
-    SystemSettings.setLimitBattery(batLimitIndexes[newVal]);
+  const [limitBattery, setLimitBattery] = useState(SystemSettings.getLimitBattery());
+  const onLimitBatteryChange = useCallback((newVal: number) => {
     setLimitBattery(newVal);
-  };
+    saveBatterySettings(newVal);
+  }, []);
 
   return (
     <PanelSection>
       <PanelSectionRow>
         <SliderField
           value={limitBattery}
-          min={0}
-          max={batLimitIndexes.length - 1}
-          step={1}
+          min={min}
+          max={max}
+          step={5}
           label={Translator.translate('limit.battery')}
           description={Translator.translate('limit.battery.desc')}
-          notchCount={batLimitTags.length}
+          notchCount={batLimitNotchLabels.length}
           notchLabels={batLimitNotchLabels}
           notchTicksVisible={true}
-          showValue={false}
+          showValue
+          valueSuffix="%"
           bottomSeparator={'none'}
           onChange={onLimitBatteryChange}
         />

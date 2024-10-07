@@ -1,10 +1,9 @@
 import { ButtonItem, Field, PanelSection, PanelSectionRow } from '@decky/ui';
-import { Translator } from 'decky-plugin-framework';
+import { Toast, Translator } from 'decky-plugin-framework';
 import { FC, useState } from 'react';
 
 import { BackendUtils } from '../../utils/backend';
 import { Constants } from '../../utils/constants';
-import { Toast } from '../../utils/toast';
 import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const PluginBlock: FC = () => {

@@ -1,12 +1,11 @@
 import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from '@decky/ui';
-import { Translator } from 'decky-plugin-framework';
+import { Toast, Translator } from 'decky-plugin-framework';
 import { FC, useContext, useState } from 'react';
 
 import { GlobalContext } from '../../contexts/globalContext';
 import { Profiles } from '../../settings/profiles';
 import { SystemSettings } from '../../settings/system';
 import { Constants } from '../../utils/constants';
-import { Toast } from '../../utils/toast';
 import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const ProfilesBlock: FC = () => {
