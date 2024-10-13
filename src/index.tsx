@@ -6,7 +6,9 @@ import {
   EventData,
   EventType,
   Framework,
+  FrameworkCfg,
   Logger,
+  Toast,
   Translator,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
@@ -24,7 +26,6 @@ import { Constants } from './utils/constants';
 import { CorsClient } from './utils/cors';
 import { SystemInfoSchema } from './utils/models';
 import { PluginSettings } from './utils/settings';
-import { Toast } from './utils/toast';
 import { WhiteBoardUtils } from './utils/whiteboard';
 
 let onSuspendUnregister: Function | undefined;
@@ -209,7 +210,29 @@ const debouncedBrightnessListener = debounce((event: any) => {
 
 export default definePlugin(() => {
   (async (): Promise<void> => {
-    await Framework.initialize(Constants.PLUGIN_NAME, Constants.PLUGIN_VERSION, translations);
+    const frameworkConfiguration: FrameworkCfg = {
+      game: {
+        lifeCycle: true
+      },
+      system: {
+        resume: true,
+        suspension: true
+      },
+      toast: {
+        logo: window.SP_REACT.createElement(RogIcon, {
+          width: 30,
+          height: 30
+        })
+      },
+      translator: {
+        translations
+      }
+    };
+    await Framework.initialize(
+      Constants.PLUGIN_NAME,
+      Constants.PLUGIN_VERSION,
+      frameworkConfiguration
+    );
     PluginSettings.initialize();
 
     const prevSchemaVers = PluginSettings.getSchemaVersion();
