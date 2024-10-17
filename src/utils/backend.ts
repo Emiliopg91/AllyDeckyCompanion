@@ -104,7 +104,7 @@ export class BackendUtils {
             const devs = ((await SteamClient.System.Audio.GetDevices()).vecDevices as any[])
               .filter(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (dev: any) => (dev.sName = WhiteBoardUtils.getAudioDevice)
+                (dev: any) => dev.sName == WhiteBoardUtils.getAudioDevice()
               )
               .map((item) => item.id);
 
@@ -125,15 +125,14 @@ export class BackendUtils {
                   profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
                 );
                 if (result.result == '1') {
+                  Logger.info('Volume setted');
                   ok = true;
                   break;
                 }
               }
 
               if (!ok) {
-                Logger.error(
-                  "Error while setting volume for '" + WhiteBoardUtils.getAudioDevice() + "'"
-                );
+                Logger.error("Could not set volume for '" + WhiteBoardUtils.getAudioDevice() + "'");
               }
             }
           }
