@@ -35,12 +35,12 @@ export class Listeners {
     });
   }, 1000);
 
-  private static debouncedVolumeListener = debounce(() => {
+  private static debouncedVolumeListener = debounce((id: number) => {
     AsyncUtils.runMutexForProfile((release) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       SteamClient.System.Audio.GetDevices().then((devs: any) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
+        const dev = devs.vecDevices.filter((dev: any) => dev.id == id)[0];
         const devName = dev.sName;
         const volume = dev.flOutputVolume;
         if (volume != WhiteBoardUtils.getVolume()) {
@@ -141,8 +141,8 @@ export class Listeners {
       }
     ).unsubscribe;
 
-    SteamClient.System.Audio.RegisterForVolumeButtonPressed(() => {
-      Listeners.debouncedVolumeListener();
+    SteamClient.System.Audio.RegisterForDeviceVolumeChanged((e: number) => {
+      Listeners.debouncedVolumeListener(e);
     });
 
     SteamClient.System.Audio.RegisterForDeviceAdded(() => {
