@@ -80,6 +80,8 @@ export class PluginSettings {
       }
       if (profile.audio.devices == undefined || Object.keys(profile.audio.devices).length == 0) {
         profile.audio.devices = {};
+      }
+      if (!profile.audio.devices[WhiteBoardUtils.getAudioDevice()]) {
         profile.audio.devices[WhiteBoardUtils.getAudioDevice()] = {
           volume: WhiteBoardUtils.getVolume()
         };

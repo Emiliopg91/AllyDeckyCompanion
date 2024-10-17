@@ -295,10 +295,19 @@ export class Profiles {
     Profiles.applyGameProfile(id);
   }
 
-  public static setVolumeForProfileId(id: string, device: string, volume: number): void {
+  public static setAudioForProfileId(id: string, device: string, volume: number): void {
     const profile = Profiles.getProfileForId(id);
     profile.audio.devices[device] = { volume };
     Profiles.saveProfileForId(id, profile);
+    Profiles.applyGameProfile(id);
+  }
+
+  public static setAudioDeviceForProfileId(id: string, device: string, volume: number): void {
+    const profile = Profiles.getProfileForId(id);
+    if (!profile.audio.devices[device]) {
+      profile.audio.devices[device] = { volume };
+      Profiles.saveProfileForId(id, profile);
+    }
     Profiles.applyGameProfile(id);
   }
 

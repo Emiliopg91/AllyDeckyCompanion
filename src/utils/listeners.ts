@@ -41,13 +41,38 @@ export class Listeners {
       SteamClient.System.Audio.GetDevices().then((devs: any) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
-        WhiteBoardUtils.setAudioDevice(dev.sName);
-        WhiteBoardUtils.setVolume(dev.flOutputVolume);
-        Profiles.setVolumeForProfileId(
-          WhiteBoardUtils.getRunningGameId(),
-          dev.sName,
-          dev.flOutputVolume
-        );
+        const devName = dev.sName;
+        const volume = dev.flOutputVolume;
+        if (volume != WhiteBoardUtils.getVolume()) {
+          WhiteBoardUtils.setAudioDevice(devName);
+          WhiteBoardUtils.setVolume(volume);
+          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
+        }
+        release();
+      });
+    });
+  }, 1000);
+
+  private static debouncedAudioDevListener = debounce(() => {
+    AsyncUtils.runMutexForProfile((release) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SteamClient.System.Audio.GetDevices().then((devs: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
+        const devName = dev.sName;
+        if (devName != WhiteBoardUtils.getAudioDevice()) {
+          Logger.info('Changed audio sink to ' + devName);
+          let volume = dev.flOutputVolume;
+
+          const profile = Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId());
+          if (profile.audio.devices[devName]) {
+            volume = profile.audio.devices[devName].volume;
+          }
+
+          WhiteBoardUtils.setAudioDevice(devName);
+          WhiteBoardUtils.setVolume(volume);
+          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
+        }
         release();
       });
     });
@@ -118,6 +143,14 @@ export class Listeners {
 
     SteamClient.System.Audio.RegisterForVolumeButtonPressed(() => {
       Listeners.debouncedVolumeListener();
+    });
+
+    SteamClient.System.Audio.RegisterForDeviceAdded(() => {
+      Listeners.debouncedAudioDevListener();
+    });
+
+    SteamClient.System.Audio.RegisterForDeviceRemoved(() => {
+      Listeners.debouncedAudioDevListener();
     });
 
     Listeners.unsubscribeBatteryChanges = SteamClient.System.RegisterForBatteryStateChanges(
