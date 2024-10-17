@@ -13,7 +13,7 @@ export class BackendUtils {
   /**
    * Private constructor to prevent instantiation
    */
-  private constructor() { }
+  private constructor() {}
 
   /**
    * Method to get the plugin log
@@ -111,8 +111,8 @@ export class BackendUtils {
   public static async otaUpdate(): Promise<void> {
     Logger.info(
       'Download and installation of version ' +
-      WhiteBoardUtils.getPluginLatestVersion() +
-      ' in progress'
+        WhiteBoardUtils.getPluginLatestVersion() +
+        ' in progress'
     );
     Backend.backend_call<[], boolean>('ota_update').then(() => {
       SteamClient.System.RestartPC();

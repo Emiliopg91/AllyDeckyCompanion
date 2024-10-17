@@ -1,18 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { definePlugin } from '@decky/api';
 import { ConfirmModal, showModal, sleep, staticClasses } from '@decky/ui';
-import {
-  EventBus,
-  EventData,
-  EventType,
-  Framework,
-  FrameworkCfg,
-  Logger,
-  Toast,
-  Translator,
-  WhiteBoardEventData
-} from 'decky-plugin-framework';
-import { debounce } from 'lodash';
+import { Framework, FrameworkCfg, Logger, Toast, Translator } from 'decky-plugin-framework';
 
 import translations from '../assets/translations.i18n.json';
 import { RogIcon } from './components/icons/rogIcon';
@@ -20,22 +9,16 @@ import { GlobalProvider } from './contexts/globalContext';
 import { MainMenu } from './pages/MainMenu';
 import { Profiles } from './settings/profiles';
 import { SystemSettings } from './settings/system';
-import { AsyncUtils } from './utils/async';
 import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { CorsClient } from './utils/cors';
+import { Listeners } from './utils/listeners';
 import { SystemInfoSchema } from './utils/models';
 import { PluginSettings } from './utils/settings';
 import { WhiteBoardUtils } from './utils/whiteboard';
 
-let onSuspendUnregister: Function | undefined;
-let onResumeUnregister: Function | undefined;
-let onGameUnregister: Function | undefined;
-let onShutdownUnregister: Function | undefined;
-let onBrightnessUnregister: Function | undefined;
 let pluginUpdateCheckTimer: NodeJS.Timeout | undefined;
 let biosUpdateCheckTimer: NodeJS.Timeout | undefined;
-let runningGameIdUnregister: Function | undefined;
 
 const checkProfilePerGame = (): Promise<void> => {
   return new Promise<void>((resolve) => {
@@ -197,17 +180,6 @@ const migrateSchema = (): void => {
   Logger.info('Migration finished');
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const debouncedBrightnessListener = debounce((event: any) => {
-  AsyncUtils.runMutexForProfile((release) => {
-    if (event.flBrightness != WhiteBoardUtils.getBrightness()) {
-      WhiteBoardUtils.setBrightness(event.flBrightness);
-      Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
-    }
-    release();
-  });
-}, 1000);
-
 export default definePlugin(() => {
   (async (): Promise<void> => {
     const frameworkConfiguration: FrameworkCfg = {
@@ -287,90 +259,7 @@ export default definePlugin(() => {
               });
             });
 
-            onGameUnregister = SteamClient.GameSessions.RegisterForAppLifetimeNotifications(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (e: any) => {
-                Logger.info('New game event');
-                if (PluginSettings.getProfilePerGame()) {
-                  const prevId = WhiteBoardUtils.getRunningGameId();
-                  const newId = e.bRunning
-                    ? String(e.unAppID) +
-                      (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-                    : WhiteBoardUtils.getOnBattery()
-                      ? Constants.DEFAULT_ID
-                      : Constants.DEFAULT_ID_AC;
-                  if (prevId != newId) {
-                    WhiteBoardUtils.setRunningGameId(newId);
-                  }
-                }
-              }
-            ).unregister;
-
-            SteamClient.System.RegisterForBatteryStateChanges(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (state: any) => {
-                const onBattery = state.eACState == 1;
-                if (WhiteBoardUtils.getOnBattery() != onBattery) {
-                  Logger.info('New AC state: ' + state.eACState);
-                  WhiteBoardUtils.setOnBattery(onBattery);
-                  const newId =
-                    WhiteBoardUtils.getRunningGameId().substring(
-                      0,
-                      WhiteBoardUtils.getRunningGameId().lastIndexOf('.')
-                    ) + (onBattery ? Constants.SUFIX_BAT : Constants.SUFIX_AC);
-                  WhiteBoardUtils.setRunningGameId(newId);
-                }
-              }
-            );
-            onBrightnessUnregister = SteamClient.System.Display.RegisterForBrightnessChanges(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (event: any) => {
-                if (WhiteBoardUtils.getBrightness() == undefined) {
-                  WhiteBoardUtils.setBrightness(event.flBrightness);
-                } else {
-                  if (!AsyncUtils.isDisplayLocked()) {
-                    debouncedBrightnessListener(event);
-                  }
-                }
-              }
-            ).unsubscribe;
-
-            runningGameIdUnregister = EventBus.subscribe(EventType.WHITEBOARD, (e: EventData) => {
-              if ((e as WhiteBoardEventData).getId() == 'runningGameId') {
-                Profiles.applyGameProfile((e as WhiteBoardEventData).getValue());
-              }
-            }).unsubscribe;
-
-            onSuspendUnregister = SteamClient.System.RegisterForOnSuspendRequest(() => {
-              AsyncUtils.runMutexForProfile((release) => {
-                Logger.info('Setting CPU profile for suspension');
-                BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
-                  release();
-                });
-              });
-            }).unregister;
-
-            onResumeUnregister = SteamClient.System.RegisterForOnResumeFromSuspend(() => {
-              AsyncUtils.runMutexForProfile((release) => {
-                Logger.info('Waiting 10 seconds for restoring CPU profile');
-                sleep(10000).then(() => {
-                  BackendUtils.applyProfile(
-                    Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())
-                  ).finally(() => {
-                    release();
-                  });
-                });
-              });
-            }).unregister;
-
-            onShutdownUnregister = SteamClient.User.RegisterForShutdownStart(() => {
-              AsyncUtils.runMutexForProfile((release) => {
-                Logger.info('Setting CPU profile for shutdown/restart');
-                BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
-                  release();
-                });
-              });
-            }).unregister;
+            Listeners.bind();
 
             BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
             if (WhiteBoardUtils.getIsAllyX()) {
@@ -397,14 +286,10 @@ export default definePlugin(() => {
     ),
     icon: <RogIcon width={20} height={20} />,
     onDismount(): void {
-      if (onGameUnregister) onGameUnregister();
-      if (onSuspendUnregister) onSuspendUnregister();
-      if (onResumeUnregister) onResumeUnregister();
-      if (onShutdownUnregister) onShutdownUnregister();
+      Listeners.unbind();
+
       if (pluginUpdateCheckTimer) clearInterval(pluginUpdateCheckTimer);
       if (biosUpdateCheckTimer) clearInterval(biosUpdateCheckTimer);
-      if (runningGameIdUnregister) runningGameIdUnregister();
-      if (onBrightnessUnregister) onBrightnessUnregister();
 
       Framework.shutdown();
     }
