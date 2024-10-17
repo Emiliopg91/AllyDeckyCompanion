@@ -12,16 +12,15 @@ class GpuPerformance:
 
   @staticmethod
   def get_gpu_frequency_range():
-    global GPU_FREQUENCY_RANGE
-    if GPU_FREQUENCY_RANGE:
-      return GPU_FREQUENCY_RANGE
+    if GpuPerformance.GPU_FREQUENCY_RANGE:
+      return GpuPerformance.GPU_FREQUENCY_RANGE
     try:
       freq_string = open(GpuPerformance.GPU_FREQUENCY_PATH,"r").read()
       od_sclk_matches = re.findall(r"OD_RANGE:\s*SCLK:\s*(\d+)Mhz\s*(\d+)Mhz", freq_string)
 
       if od_sclk_matches:
         frequency_range = [int(od_sclk_matches[0][0]), int(od_sclk_matches[0][1])]
-        GPU_FREQUENCY_RANGE = frequency_range
+        GpuPerformance.GPU_FREQUENCY_RANGE = frequency_range
         return frequency_range
     except Exception as e:
       decky.logger.error(e)

@@ -1,5 +1,5 @@
 import decky
-import plugin_config
+from plugin_config import PluginConfig
 import logging
 
 class PluginLogger:
@@ -46,7 +46,7 @@ class PluginLogger:
             fmt='[%(asctime)s,%(msecs)03d][%(levelname)s]%(message)s',
             datefmt='%Y-%m-%d %H:%M:%S'
         )
-        logger_level=plugin_config.get_config_item("log_level", "INFO")
+        logger_level=PluginConfig.get_config_item("log_level", "INFO")
         decky.logger.setLevel(logger_level)
         for h in decky.logger.handlers:
             h.setFormatter(formatter)
