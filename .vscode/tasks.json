@@ -6,7 +6,9 @@
       "detail": "Build plugin",
       "linux": {
         "command": "${workspaceFolder}/cli/decky.py",
-        "args": ["build"]
+        "args": [
+          "build"
+        ]
       },
       "problemMatcher": []
     },
@@ -15,7 +17,9 @@
       "detail": "Deploy plugin",
       "linux": {
         "command": "${workspaceFolder}/cli/decky.py",
-        "args": ["deploy"]
+        "args": [
+          "deploy"
+        ]
       },
       "problemMatcher": []
     },
@@ -24,15 +28,42 @@
       "detail": "Setup plugin deployment",
       "linux": {
         "command": "${workspaceFolder}/cli/decky.py",
-        "args": ["setup"]
-      }
+        "args": [
+          "setup"
+        ]
+      },
+      "problemMatcher": []
     },
     {
       "label": "logs",
       "detail": "Open remote plugin log",
       "linux": {
         "command": "${workspaceFolder}/cli/decky.py",
-        "args": ["logs"]
+        "args": [
+          "logs"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "debug",
+      "detail": "Open CEF debugger",
+      "linux": {
+        "command": "${workspaceFolder}/cli/decky.py",
+        "args": [
+          "debug"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "translations",
+      "detail": "Add missing translations",
+      "linux": {
+        "command": "${workspaceFolder}/cli/decky.py",
+        "args": [
+          "translations"
+        ]
       },
       "problemMatcher": []
     },
@@ -41,7 +72,10 @@
       "detail": "Build and deploy plugin",
       "linux": {
         "command": "${workspaceFolder}/cli/decky.py",
-        "args": ["build", "deploy"]
+        "args": [
+          "build",
+          "deploy"
+        ]
       },
       "problemMatcher": []
     }

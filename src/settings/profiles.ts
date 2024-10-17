@@ -117,7 +117,7 @@ export class Profiles {
   }
 
   public static getFullPowerProfile(): Profile {
-    return {
+    const result = {
       mode: Mode.TURBO,
       cpu: {
         boost: false,
@@ -135,14 +135,27 @@ export class Profiles {
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
       },
-      display: { brightness: WhiteBoardUtils.getBrightness() }
+      display: { brightness: WhiteBoardUtils.getBrightness() },
+      audio: {
+        devices: {}
+      }
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (result.audio.devices as any)[WhiteBoardUtils.getAudioDevice()] = {
+      volume: WhiteBoardUtils.getVolume()
+    };
+
+    return result;
   }
 
   public static applyGameProfile(id: string): void {
     let profile: Profile = Profiles.getProfileForId(id);
     if (profile.mode != Mode.CUSTOM) {
-      profile = { ...Profiles.getProfileForMode(profile.mode), display: profile.display };
+      profile = {
+        ...Profiles.getProfileForMode(profile.mode),
+        display: profile.display,
+        audio: profile.audio
+      };
     }
     AsyncUtils.runMutexForProfile((releaseProfile) => {
       Logger.info('Applying profile ' + id);
@@ -186,7 +199,7 @@ export class Profiles {
       return tmpProf;
     } else {
       const prof = PluginSettings.getProfileForId(id)!;
-      return {
+      const result = {
         mode: prof.mode,
         cpu: {
           tdp: {
@@ -206,8 +219,13 @@ export class Profiles {
         },
         display: {
           brightness: prof.display.brightness
+        },
+        audio: {
+          devices: prof.audio.devices
         }
       };
+
+      return result;
     }
   }
 
@@ -232,7 +250,15 @@ export class Profiles {
       },
       display: {
         brightness: WhiteBoardUtils.getBrightness()
+      },
+      audio: {
+        devices: {}
       }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (profile.audio.devices as any)[WhiteBoardUtils.getAudioDevice()] = {
+      volume: WhiteBoardUtils.getVolume()
     };
 
     switch (mode) {
@@ -266,6 +292,22 @@ export class Profiles {
     const profile = Profiles.getProfileForId(id);
     profile.display.brightness = flBrightness;
     Profiles.saveProfileForId(id, profile);
+    Profiles.applyGameProfile(id);
+  }
+
+  public static setAudioForProfileId(id: string, device: string, volume: number): void {
+    const profile = Profiles.getProfileForId(id);
+    profile.audio.devices[device] = { volume };
+    Profiles.saveProfileForId(id, profile);
+    Profiles.applyGameProfile(id);
+  }
+
+  public static setAudioDeviceForProfileId(id: string, device: string, volume: number): void {
+    const profile = Profiles.getProfileForId(id);
+    if (!profile.audio.devices[device]) {
+      profile.audio.devices[device] = { volume };
+      Profiles.saveProfileForId(id, profile);
+    }
     Profiles.applyGameProfile(id);
   }
 
@@ -307,7 +349,14 @@ export class Profiles {
           },
           display: {
             brightness: WhiteBoardUtils.getBrightness()
+          },
+          audio: {
+            devices: {}
           }
+        };
+
+        profile.audio.devices[WhiteBoardUtils.getAudioDevice()] = {
+          volume: WhiteBoardUtils.getVolume()
         };
 
         if (!Profiles.existsProfileForId(localId)) {

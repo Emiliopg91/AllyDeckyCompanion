@@ -24,7 +24,6 @@ export class Listeners {
   private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
   private static unsubscribeBatteryChanges: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static debouncedBrightnessListener = debounce((event: any) => {
     AsyncUtils.runMutexForProfile((release) => {
@@ -33,6 +32,49 @@ export class Listeners {
         Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
       }
       release();
+    });
+  }, 1000);
+
+  private static debouncedVolumeListener = debounce(() => {
+    AsyncUtils.runMutexForProfile((release) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SteamClient.System.Audio.GetDevices().then((devs: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
+        const devName = dev.sName;
+        const volume = dev.flOutputVolume;
+        if (volume != WhiteBoardUtils.getVolume()) {
+          WhiteBoardUtils.setAudioDevice(devName);
+          WhiteBoardUtils.setVolume(volume);
+          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
+        }
+        release();
+      });
+    });
+  }, 1000);
+
+  private static debouncedAudioDevListener = debounce(() => {
+    AsyncUtils.runMutexForProfile((release) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SteamClient.System.Audio.GetDevices().then((devs: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
+        const devName = dev.sName;
+        if (devName != WhiteBoardUtils.getAudioDevice()) {
+          Logger.info('Changed audio sink to ' + devName);
+          let volume = dev.flOutputVolume;
+
+          const profile = Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId());
+          if (profile.audio.devices[devName]) {
+            volume = profile.audio.devices[devName].volume;
+          }
+
+          WhiteBoardUtils.setAudioDevice(devName);
+          WhiteBoardUtils.setVolume(volume);
+          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
+        }
+        release();
+      });
     });
   }, 1000);
 
@@ -98,6 +140,18 @@ export class Listeners {
         }
       }
     ).unsubscribe;
+
+    SteamClient.System.Audio.RegisterForVolumeButtonPressed(() => {
+      Listeners.debouncedVolumeListener();
+    });
+
+    SteamClient.System.Audio.RegisterForDeviceAdded(() => {
+      Listeners.debouncedAudioDevListener();
+    });
+
+    SteamClient.System.Audio.RegisterForDeviceRemoved(() => {
+      Listeners.debouncedAudioDevListener();
+    });
 
     Listeners.unsubscribeBatteryChanges = SteamClient.System.RegisterForBatteryStateChanges(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -3,7 +3,7 @@ import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
-import { Acpi, Governor, Profile, SdtdpSettings } from './models';
+import { Acpi, AudioDevice, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -51,53 +51,132 @@ export class BackendUtils {
     });
   }
 
-  public static async applyProfile(profile: Profile): Promise<void> {
-    if (WhiteBoardUtils.getIsAlly()) {
-      sleep(50).then(() => {
-        Logger.info(
-          'Setting display brightness to: ' + Math.floor(profile.display.brightness! * 100) + '%'
-        );
-        WhiteBoardUtils.setBrightness(profile.display.brightness!);
-        BackendUtils.fadeBrightness();
+  private static currentProfile: Profile | undefined = undefined;
 
-        const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
-        Logger.info(
-          'Setting ACPI Platform Profile to "' + acpi + '" and performance profile to:',
-          profile
-        );
-        Backend.backend_call<[enabled: boolean], number>('set_smt', true).then(() => {
-          Backend.backend_call<[prof: string], number>('set_platform_profile', acpi).then(() => {
-            Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
+  public static async applyProfile(profileIn: Profile): Promise<void> {
+    const profile = JSON.parse(JSON.stringify(profileIn)) as Profile;
+    const newMap: Record<string, AudioDevice> = {};
+    Object.keys(profile.audio.devices).forEach((k) => {
+      if (k == WhiteBoardUtils.getAudioDevice()) {
+        newMap[k] = profile.audio.devices[k];
+      }
+    });
+    profile.audio.devices = newMap;
+
+    let cpuChanged = true;
+    let gpuChanged = true;
+    let dspChanged = true;
+    let audChanged = true;
+
+    if (BackendUtils.currentProfile) {
+      cpuChanged =
+        JSON.stringify(BackendUtils.currentProfile.cpu) != JSON.stringify(profile.cpu) ||
+        BackendUtils.currentProfile.mode != profile.mode;
+      gpuChanged = JSON.stringify(BackendUtils.currentProfile.gpu) != JSON.stringify(profile.gpu);
+      dspChanged =
+        JSON.stringify(BackendUtils.currentProfile.display) != JSON.stringify(profile.display);
+      audChanged =
+        JSON.stringify(BackendUtils.currentProfile.audio) != JSON.stringify(profile.audio);
+    }
+
+    if (WhiteBoardUtils.getIsAlly()) {
+      if (cpuChanged || gpuChanged || audChanged || dspChanged) {
+        sleep(50).then(async () => {
+          if (dspChanged) {
+            Logger.info(
+              'Setting display brightness to: ' +
+                Math.floor(profile.display.brightness! * 100) +
+                '%'
+            );
+            WhiteBoardUtils.setBrightness(profile.display.brightness!);
+            BackendUtils.fadeBrightness();
+          }
+
+          if (audChanged) {
+            Logger.info(
+              'Setting audio volume for ' +
+                WhiteBoardUtils.getAudioDevice() +
+                ' to: ' +
+                Math.floor(profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume! * 100) +
+                '%'
+            );
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const devs = ((await SteamClient.System.Audio.GetDevices()).vecDevices as any[])
+              .filter(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (dev: any) => (dev.sName = WhiteBoardUtils.getAudioDevice)
+              )
+              .map((item) => item.id);
+
+            if (devs.length == 0) {
+              Logger.error(
+                "No matching audio device available for '" + WhiteBoardUtils.getAudioDevice + "'"
+              );
+            } else {
+              WhiteBoardUtils.setVolume(
+                profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
+              );
+
+              let ok = false;
+              for (let i = 0; i < devs.length; i++) {
+                const result = await SteamClient.System.Audio.SetDeviceVolume(
+                  devs[i],
+                  1,
+                  profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
+                );
+                if (result.result == '1') {
+                  ok = true;
+                  break;
+                }
+              }
+
+              if (!ok) {
+                Logger.error(
+                  "Error while setting volume for '" + WhiteBoardUtils.getAudioDevice() + "'"
+                );
+              }
+            }
+          }
+
+          if (gpuChanged) {
+            Logger.info('Setting GPU profile', profile.gpu);
+            await Backend.backend_call<[min: number, max: number], void>(
+              'set_gpu_frequency_range',
+              profile.gpu.frequency.min,
+              profile.gpu.frequency.max
+            );
+          }
+
+          if (cpuChanged) {
+            const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
+            Logger.info('Setting CPU profile to "' + acpi + '" with:', {
+              mode: profile.mode,
+              cpu: profile.cpu
+            });
+            await Backend.backend_call<[enabled: boolean], number>('set_smt', true);
+            await Backend.backend_call<[prof: string], number>('set_platform_profile', acpi);
+            await Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
               'set_tdp',
               profile.cpu.tdp.spl,
               profile.cpu.tdp.sppl,
               profile.cpu.tdp.fppl
-            ).then(() => {
-              Backend.backend_call<[enabled: boolean], number>(
-                'set_cpu_boost',
-                profile.cpu.boost
-              ).then(() => {
-                Backend.backend_call<[governor: string], void>(
-                  'set_governor',
-                  Governor[profile.cpu.governor].toLowerCase()
-                ).then(() => {
-                  Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt).then(
-                    () => {
-                      Backend.backend_call<[min: number, max: number], void>(
-                        'set_gpu_frequency_range',
-                        profile.gpu.frequency.min,
-                        profile.gpu.frequency.max
-                      ).then(() => {
-                        Logger.info('Performance profile setted');
-                      });
-                    }
-                  );
-                });
-              });
-            });
-          });
+            );
+            await Backend.backend_call<[enabled: boolean], number>(
+              'set_cpu_boost',
+              profile.cpu.boost
+            );
+            await Backend.backend_call<[governor: string], void>(
+              'set_governor',
+              Governor[profile.cpu.governor].toLowerCase()
+            );
+            await Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt);
+          }
+          Logger.info('Profile applied');
+          BackendUtils.currentProfile = profile;
         });
-      });
+      } else {
+        Logger.info('No changes needed to be applied');
+      }
     }
   }
 

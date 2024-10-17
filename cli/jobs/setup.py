@@ -49,10 +49,19 @@ class Setup:
             else:
                 print("      Invalid user, try again")
 
+        while True:
+            cefPort = input("    Deck's CEF port (default 8081): ") or "8081"
+            if cefPort.isdigit() and self.is_valid_port(int(cefPort)):
+                break
+            else:
+                print("      Invalid port, try again")
+        
+
         config_data = {
             "deckip": ip,
             "deckport": port,
             "deckuser": user,
+            "deckcefport": cefPort,
         }
 
         with open(self.settings_path, 'w') as file:
