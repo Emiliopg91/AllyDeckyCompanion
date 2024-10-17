@@ -137,4 +137,20 @@ export class WhiteBoardUtils {
     WhiteBoard.set('prevBrightness', WhiteBoardUtils.getBrightness());
     WhiteBoard.set('brightness', value);
   }
+
+  public static setVolume(value: number): void {
+    WhiteBoard.set('volume', value);
+  }
+
+  public static getVolume(): number {
+    return WhiteBoard.get<number>('volume')!;
+  }
+
+  public static setAudioDevice(value: number): void {
+    WhiteBoard.set('audioDevice', value);
+  }
+
+  public static getAudioDevice(): string {
+    return WhiteBoard.get<string>('audioDevice')!;
+  }
 }

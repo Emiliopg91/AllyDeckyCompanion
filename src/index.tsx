@@ -259,17 +259,26 @@ export default definePlugin(() => {
               });
             });
 
-            Listeners.bind();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            SteamClient.System.Audio.GetDevices().then((devs: any) => {
+              const dev = devs.vecDevices.filter(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (dev: any) => dev.id == devs.activeOutputDeviceId
+              )[0];
+              WhiteBoardUtils.setAudioDevice(dev.sName);
+              WhiteBoardUtils.setVolume(dev.flOutputVolume);
+              Listeners.bind();
 
-            BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
-            if (WhiteBoardUtils.getIsAllyX()) {
-              sleep(100).then(() => {
-                Profiles.getDefaultProfile();
-                Profiles.getDefaultACProfile();
-                Profiles.summary();
-                Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
-              });
-            }
+              BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
+              if (WhiteBoardUtils.getIsAlly()) {
+                sleep(100).then(() => {
+                  Profiles.getDefaultProfile();
+                  Profiles.getDefaultACProfile();
+                  Profiles.summary();
+                  Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+                });
+              }
+            });
           });
         });
       });

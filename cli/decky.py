@@ -5,6 +5,7 @@ from jobs.deployer import Deployer
 import sys
 import os
 import shutil
+from jobs.debugger import Debugger
 from jobs.logger import LoggerOpener
 from jobs.utils import Utils
 from jobs.setup import Setup
@@ -38,6 +39,9 @@ class JobManager:
         
         if "logs" in options:
             LoggerOpener().open()
+        
+        if "debug" in options:
+            Debugger().open()
 
 if __name__ == "__main__":
     options = sys.argv[1:]

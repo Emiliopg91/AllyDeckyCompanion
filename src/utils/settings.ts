@@ -70,10 +70,19 @@ export class PluginSettings {
     } else {
       const profile = PluginSettings.settings.profiles[appId][pwr] as Profile;
       if (!profile.display) {
-        PluginSettings.createParents(PluginSettings.settings, 'display');
+        PluginSettings.createParents(profile, 'display');
       }
       if (profile.display.brightness == undefined) {
         profile.display.brightness = WhiteBoardUtils.getBrightness();
+      }
+      if (!profile.audio || !profile.audio.devices) {
+        PluginSettings.createParents(profile, 'audio.devices');
+      }
+      if (profile.audio.devices == undefined || Object.keys(profile.audio.devices).length == 0) {
+        profile.audio.devices = {};
+        profile.audio.devices[WhiteBoardUtils.getAudioDevice()] = {
+          volume: WhiteBoardUtils.getVolume()
+        };
       }
 
       return JSON.parse(JSON.stringify(profile));
@@ -100,6 +109,7 @@ export class PluginSettings {
         PluginSettings.settings,
         'profiles.' + id + '.display.brightness'
       );
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.audio.devices');
     }
 
     const gameEntry = PluginSettings.settings.profiles[appId];
@@ -116,5 +126,6 @@ export class PluginSettings {
     prof.gpu.frequency.min = profile.gpu.frequency.min;
     prof.gpu.frequency.max = profile.gpu.frequency.max;
     prof.display.brightness = profile.display.brightness;
+    prof.audio.devices = profile.audio.devices;
   }
 }

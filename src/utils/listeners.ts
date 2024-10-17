@@ -24,7 +24,6 @@ export class Listeners {
   private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
   private static unsubscribeBatteryChanges: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static debouncedBrightnessListener = debounce((event: any) => {
     AsyncUtils.runMutexForProfile((release) => {
@@ -33,6 +32,24 @@ export class Listeners {
         Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
       }
       release();
+    });
+  }, 1000);
+
+  private static debouncedVolumeListener = debounce(() => {
+    AsyncUtils.runMutexForProfile((release) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SteamClient.System.Audio.GetDevices().then((devs: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
+        WhiteBoardUtils.setAudioDevice(dev.sName);
+        WhiteBoardUtils.setVolume(dev.flOutputVolume);
+        Profiles.setVolumeForProfileId(
+          WhiteBoardUtils.getRunningGameId(),
+          dev.sName,
+          dev.flOutputVolume
+        );
+        release();
+      });
     });
   }, 1000);
 
@@ -98,6 +115,10 @@ export class Listeners {
         }
       }
     ).unsubscribe;
+
+    SteamClient.System.Audio.RegisterForVolumeButtonPressed(() => {
+      Listeners.debouncedVolumeListener();
+    });
 
     Listeners.unsubscribeBatteryChanges = SteamClient.System.RegisterForBatteryStateChanges(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -53,12 +53,56 @@ export class BackendUtils {
 
   public static async applyProfile(profile: Profile): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
-      sleep(50).then(() => {
+      sleep(50).then(async () => {
         Logger.info(
           'Setting display brightness to: ' + Math.floor(profile.display.brightness! * 100) + '%'
         );
         WhiteBoardUtils.setBrightness(profile.display.brightness!);
         BackendUtils.fadeBrightness();
+
+        Logger.info(
+          'Setting audio volume for ' +
+            WhiteBoardUtils.getAudioDevice() +
+            ' to: ' +
+            Math.floor(profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume! * 100) +
+            '%'
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const devs = ((await SteamClient.System.Audio.GetDevices()).vecDevices as any[])
+          .filter(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (dev: any) => (dev.sName = WhiteBoardUtils.getAudioDevice)
+          )
+          .map((item) => item.id);
+
+        if (devs.length == 0) {
+          Logger.error(
+            "No matching audio device available for '" + WhiteBoardUtils.getAudioDevice + "'"
+          );
+        } else {
+          WhiteBoardUtils.setVolume(
+            profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
+          );
+
+          let ok = false;
+          for (let i = 0; i < devs.length; i++) {
+            const result = await SteamClient.System.Audio.SetDeviceVolume(
+              devs[i],
+              1,
+              profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
+            );
+            if (result.result == '1') {
+              ok = true;
+              break;
+            }
+          }
+
+          if (!ok) {
+            Logger.error(
+              "Error while setting volume for '" + WhiteBoardUtils.getAudioDevice() + "'"
+            );
+          }
+        }
 
         const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
         Logger.info(
