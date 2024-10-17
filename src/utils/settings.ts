@@ -45,6 +45,17 @@ export class PluginSettings {
     PluginSettings.settings.settings!.limit_battery = value;
   }
 
+  public static setMcuPowersave(value: boolean): void {
+    if (!PluginSettings.settings.settings) {
+      PluginSettings.createParents(PluginSettings.settings, 'settings');
+    }
+    PluginSettings.settings.settings!.mcu_powersave = value;
+  }
+
+  public static getMcuPowersave(): boolean {
+    return PluginSettings.settings.settings?.mcu_powersave || false;
+  }
+
   public static getSchemaVersion(): string | undefined {
     return PluginSettings.settings.schema;
   }

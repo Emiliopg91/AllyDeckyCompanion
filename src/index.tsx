@@ -270,6 +270,7 @@ export default definePlugin(() => {
               Listeners.bind();
 
               BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
+              BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
               if (WhiteBoardUtils.getIsAlly()) {
                 sleep(100).then(() => {
                   Profiles.getDefaultProfile();

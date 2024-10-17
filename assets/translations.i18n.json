@@ -188,7 +188,15 @@
     "es": "Ahorro energía"
   },
   "governor.performance": {
-    "en": "Perfor mance",
-    "es": "Rendi miento"
+    "en": "Performance",
+    "es": "Rendimiento"
+  },
+  "mcu.powersave":{
+    "en":"Deep sleep mode",
+    "es": "Modo reposo extremo"
+  },
+  "mcu.powersave.desc":{
+    "en":"Enhance power save while sleeping but resume will last a bit more",
+    "es":"Reduce el consumo de bateria en reposo pero reanudar será más lento"
   }
 }

@@ -185,6 +185,12 @@ export class BackendUtils {
       Backend.backend_call<[limit: number], number>('set_charge_limit', limit);
     }
   }
+  public static async setMcuPowersave(enabled: boolean): Promise<void> {
+    if (WhiteBoardUtils.getIsAlly()) {
+      Logger.info('Setting MCU powersave to ' + enabled);
+      Backend.backend_call<[enabled: boolean], number>('set_mcu_powersave', enabled);
+    }
+  }
 
   public static async otaUpdate(): Promise<void> {
     Logger.info(
@@ -233,5 +239,17 @@ export class BackendUtils {
       appId,
       img
     );
+  }
+
+  public static bootBios(): Promise<null> {
+    return Backend.backend_call<[], null>('boot_bios');
+  }
+
+  public static bootWindows(): Promise<null> {
+    return Backend.backend_call<[], null>('boot_windows');
+  }
+
+  public static isWindowsPresent(): Promise<boolean> {
+    return Backend.backend_call<[], boolean>('windows_present');
   }
 }

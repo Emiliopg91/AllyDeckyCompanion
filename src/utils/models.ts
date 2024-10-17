@@ -40,6 +40,7 @@ export interface AudioDevice {
 export interface Settings {
   profile_per_game: boolean;
   limit_battery: number;
+  mcu_powersave?: boolean;
 }
 
 export interface GameEntry {
