@@ -31,7 +31,8 @@
         "args": [
           "setup"
         ]
-      }
+      },
+      "problemMatcher": []
     },
     {
       "label": "logs",
@@ -40,6 +41,28 @@
         "command": "${workspaceFolder}/cli/decky.py",
         "args": [
           "logs"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "debug",
+      "detail": "Open CEF debugger",
+      "linux": {
+        "command": "${workspaceFolder}/cli/decky.py",
+        "args": [
+          "debug"
+        ]
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "translations",
+      "detail": "Add missing translations",
+      "linux": {
+        "command": "${workspaceFolder}/cli/decky.py",
+        "args": [
+          "translations"
         ]
       },
       "problemMatcher": []

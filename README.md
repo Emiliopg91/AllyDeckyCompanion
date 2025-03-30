@@ -26,7 +26,7 @@
 ![plugin image](./img/system.png)
 
 ## Features
- 
+
 - [x] Per-game performance profiles when playing on AC or battery
 
 - [x] Custom TDP limit by settings SPL, SPPL and FPPL

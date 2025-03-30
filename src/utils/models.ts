@@ -21,22 +21,32 @@ export interface Configuration {
   settings: Settings;
 }
 
+export interface Profile {
+  mode: Mode;
+  cpu: CpuProfile;
+  gpu: GpuProfile;
+  display: Display;
+  audio: Audio;
+}
+
+export interface Audio {
+  devices: Record<string, AudioDevice>;
+}
+
+export interface AudioDevice {
+  volume: number | undefined;
+}
+
 export interface Settings {
   profile_per_game: boolean;
   limit_battery: number;
+  mcu_powersave?: boolean;
 }
 
 export interface GameEntry {
   name: string;
   battery: Profile;
   acpower: Profile;
-}
-
-export interface Profile {
-  mode: Mode;
-  cpu: CpuProfile;
-  gpu: GpuProfile;
-  display: Display;
 }
 
 export interface Display {

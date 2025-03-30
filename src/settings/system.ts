@@ -10,6 +10,16 @@ export class SystemSettings {
     PluginSettings.setBatteryLimit(limit);
     BackendUtils.setBatteryLimit(limit);
   }
+
+  public static getMcuPowersave(): boolean {
+    return PluginSettings.getMcuPowersave()!;
+  }
+
+  public static setMcuPowersave(enabled: boolean): void {
+    PluginSettings.setMcuPowersave(enabled);
+    BackendUtils.setMcuPowersave(enabled);
+  }
+
   public static getProfilePerGame(): boolean {
     return PluginSettings.getProfilePerGame()!;
   }

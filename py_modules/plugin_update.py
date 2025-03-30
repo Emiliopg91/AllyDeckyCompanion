@@ -25,7 +25,7 @@ class PluginUpdate:
     response = urllib.request.urlopen(url, context=gcontext)
     json_data = json.load(response)
 
-    download_url = json_data.get("assets")[0].get("browser_download_url")
+    download_url = json_data.get("name")
 
     file_path = '/tmp/AllyDeckyCompanion.tar.gz'
 

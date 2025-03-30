@@ -1,4 +1,4 @@
-import { NotchLabel, PanelSection, PanelSectionRow, SliderField } from '@decky/ui';
+import { NotchLabel, PanelSection, PanelSectionRow, SliderField, ToggleField } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
 import { FC, useCallback, useState } from 'react';
@@ -7,6 +7,9 @@ import { SystemSettings } from '../../settings/system';
 
 const saveBatterySettings = debounce((newVal: number): void => {
   SystemSettings.setLimitBattery(newVal);
+}, 500);
+const saveMcuPowersave = debounce((newVal: boolean): void => {
+  SystemSettings.setMcuPowersave(newVal);
 }, 500);
 export const HardwareBlock: FC = () => {
   const min = 60;
@@ -32,6 +35,12 @@ export const HardwareBlock: FC = () => {
     saveBatterySettings(newVal);
   }, []);
 
+  const [mcuPowersave, setMcuPowersave] = useState(SystemSettings.getMcuPowersave());
+  const onMcuPowersaveChange = useCallback((newVal: boolean) => {
+    setMcuPowersave(newVal);
+    saveMcuPowersave(newVal);
+  }, []);
+
   return (
     <PanelSection>
       <PanelSectionRow>
@@ -49,6 +58,15 @@ export const HardwareBlock: FC = () => {
           valueSuffix="%"
           bottomSeparator={'none'}
           onChange={onLimitBatteryChange}
+        />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ToggleField
+          label={Translator.translate('mcu.powersave')}
+          description={Translator.translate('mcu.powersave.desc')}
+          checked={mcuPowersave}
+          onChange={onMcuPowersaveChange}
+          highlightOnFocus
         />
       </PanelSectionRow>
     </PanelSection>
