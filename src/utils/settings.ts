@@ -35,7 +35,7 @@ export class PluginSettings {
   }
 
   public static getBatteryLimit(): number | undefined {
-    return PluginSettings.settings.settings?.limit_battery;
+    return PluginSettings.settings.settings?.limit_battery ?? 100;
   }
 
   public static setBatteryLimit(value: number): void {
