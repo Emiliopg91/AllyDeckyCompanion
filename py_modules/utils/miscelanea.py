@@ -1,28 +1,35 @@
+# pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught, too-few-public-methods , unspecified-encoding
+
 import base64
 import mimetypes
 import subprocess
-import decky
 import os
 import re
 
+import decky  # pylint: disable=import-error
+
 
 class Miscelanea:
+    """Class for multiple toggles and actions"""
+
     ICONS_PATH = decky.DECKY_PLUGIN_RUNTIME_DIR + "/icons"
 
     @staticmethod
-    def save_icon_for_app(appId, encoded_data):
+    def save_icon_for_app(app_id, encoded_data):
+        """Save icon for app"""
         if "base64," in encoded_data:
             encoded_data = encoded_data.split(",")[1]
 
         decoded = base64.b64decode(encoded_data)
 
-        file_name = Miscelanea.ICONS_PATH + "/" + appId + ".jpg"
+        file_name = Miscelanea.ICONS_PATH + "/" + app_id + ".jpg"
         with open(file_name, "wb") as file:
             file.write(decoded)
 
     @staticmethod
-    def get_icon_for_app(appId):
-        file_name = Miscelanea.ICONS_PATH + "/" + appId + ".jpg"
+    def get_icon_for_app(app_id):
+        """Get icon for app"""
+        file_name = Miscelanea.ICONS_PATH + "/" + app_id + ".jpg"
 
         if not os.path.isfile(file_name):
             return None
@@ -37,15 +44,18 @@ class Miscelanea:
 
     @staticmethod
     def boot_bios():
+        """Boot device into BIOS/UEFI"""
         subprocess.run("systemctl reboot --firmware-setup", shell=True, check=False)
 
     @staticmethod
     def boot_windows():
+        """Boot device into Windows"""
         entry = Miscelanea.get_windows_uefi_entry()
         subprocess.run(f"efibootmgr -n {entry} && reboot", shell=True, check=False)
 
     @staticmethod
     def get_windows_uefi_entry():
+        """Get Windows UEFI entry if available"""
         try:
             # Ejecutar el comando efibootmgr
             result = subprocess.run(
@@ -58,9 +68,9 @@ class Miscelanea:
 
             if match:
                 return match.group(1)  # Retorna solo el número de la entrada
-            else:
-                print("No se encontró la entrada de Windows Boot Manager.")
-                return None
+
+            print("No se encontró la entrada de Windows Boot Manager.")
+            return None
 
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar efibootmgr: {e}")
