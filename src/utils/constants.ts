@@ -28,7 +28,7 @@ export class Constants {
   public static PROFILE_CUSTOM = 'custom';
 
   public static AllySilentSPL = 13;
-  public static AllySilentSPPL = 14;
+  public static AllySilentSPPL = 15;
   public static AllySilentFPPL = 17;
   public static AllyPerformanceSPL = 17;
   public static AllyPerformanceSPPL = 20;

@@ -8,16 +8,12 @@ import { Governor } from '../../../utils/models';
 export const AdvancedBlock: FC = () => {
   const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
-  const governorIndexes: Array<number> = [];
-  const governorTags: Array<string> = [];
   const governorLabels: NotchLabel[] = [];
 
   let notchIdx = 0;
   Object.entries(Governor)
     .filter(([key]) => !isNaN(Number(key)))
     .map(([key, value]) => {
-      governorIndexes.push(Number(key));
-      governorTags.push(String(value));
 
       governorLabels.push({
         notchIndex: notchIdx,

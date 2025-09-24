@@ -147,7 +147,7 @@ export class BackendUtils {
           }
 
           if (cpuChanged) {
-            const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase();
+            const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase().replace("_","-");
             Logger.info('Setting CPU profile to "' + acpi + '" with:', {
               mode: profile.mode,
               cpu: profile.cpu
@@ -227,6 +227,10 @@ export class BackendUtils {
 
   public static async getGpuFrequencyRange(): Promise<[number, number]> {
     return Backend.backend_call<[], [number, number]>('get_gpu_frequency_range');
+  }
+
+  public static async getCpuTdpRange(): Promise<Record<string, number[]>> {
+    return Backend.backend_call<[], Record<string, number[]>>('get_tdp_ranges');
   }
 
   public static async getIconForApp(appId: string): Promise<string | null> {

@@ -1,15 +1,21 @@
 import { PanelSection, PanelSectionRow, SliderField } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
-import { FC, useContext } from 'react';
+import { FC, useContext, useEffect } from 'react';
 
 import { PerformanceContext } from '../../../contexts/performanceContext';
 
 export const TdpBlock: FC = () => {
-  const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
+  const { id, name, profile, setProfile, saveProfile, tdpRange } = useContext(PerformanceContext);
+
+  useEffect(() => {}, [id]);
 
   const onSplChange = (newVal: number): void => {
-    const newSppl = newVal > profile.cpu.tdp.sppl ? newVal : profile.cpu.tdp.sppl;
-    const newFppl = newVal > profile.cpu.tdp.fppl ? newVal : profile.cpu.tdp.fppl;
+    newVal = Math.min(Math.max(newVal, tdpRange['spl'][0]), tdpRange['spl'][1]);
+    const newSppl = Math.min(
+      Math.max(newVal, profile.cpu.tdp.sppl, tdpRange['sppt'][0]),
+      tdpRange['sppt'][1]
+    );
+    const newFppl = Math.min(Math.max(newVal, profile.cpu.tdp.fppl), tdpRange['fppt'][1]);
 
     const newProf = {
       ...profile,
@@ -23,8 +29,11 @@ export const TdpBlock: FC = () => {
   };
 
   const onSpplChange = (newVal: number): void => {
-    if (newVal < profile.cpu.tdp.spl) newVal = profile.cpu.tdp.spl;
-    const newFppl = newVal > profile.cpu.tdp.fppl ? newVal : profile.cpu.tdp.fppl;
+    newVal = Math.min(
+      Math.max(newVal, profile.cpu.tdp.spl, tdpRange['sppt'][0]),
+      tdpRange['sppt'][1]
+    );
+    const newFppl = Math.min(Math.max(newVal, profile.cpu.tdp.fppl), tdpRange['fppt'][1]);
 
     const newProf = {
       ...profile,
@@ -33,17 +42,21 @@ export const TdpBlock: FC = () => {
         tdp: { ...profile.cpu.tdp, sppl: newVal, fppl: newFppl }
       }
     };
+
     saveProfile(id, name, newProf);
     setProfile(newProf);
   };
 
   const onFpplChange = (newVal: number): void => {
-    if (newVal < profile.cpu.tdp.sppl) newVal = profile.cpu.tdp.sppl;
-
+    newVal = Math.min(
+      Math.max(newVal, profile.cpu.tdp.sppl, tdpRange['fppt'][0]),
+      tdpRange['fppt'][1]
+    );
     const newProf = {
       ...profile,
       cpu: { ...profile.cpu, tdp: { ...profile.cpu.tdp, fppl: newVal } }
     };
+
     saveProfile(id, name, newProf);
     setProfile(newProf);
   };
@@ -57,8 +70,8 @@ export const TdpBlock: FC = () => {
           showValue
           step={1}
           valueSuffix="W"
-          min={5}
-          max={30}
+          min={0}
+          max={tdpRange['fppt'][1]}
           validValues="range"
           bottomSeparator="none"
           onChange={onSplChange}
@@ -71,8 +84,8 @@ export const TdpBlock: FC = () => {
           showValue
           step={1}
           valueSuffix="W"
-          min={5}
-          max={30}
+          min={0}
+          max={tdpRange['fppt'][1]}
           validValues="range"
           bottomSeparator="none"
           onChange={onSpplChange}
@@ -85,8 +98,8 @@ export const TdpBlock: FC = () => {
           showValue
           step={1}
           valueSuffix="W"
-          min={5}
-          max={30}
+          min={0}
+          max={tdpRange['fppt'][1]}
           validValues="range"
           bottomSeparator="none"
           onChange={onFpplChange}

@@ -160,6 +160,20 @@ const getGpuRanges = (): Promise<void> => {
   });
 };
 
+const getCpuRanges = (): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    if (WhiteBoardUtils.getIsAlly()) {
+      BackendUtils.getCpuTdpRange().then((data) => {
+        WhiteBoardUtils.setTdpRange(data);
+        Logger.info('CPU TDP ranges: ' + JSON.stringify(data));
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
 const getSystemInfo = (): Promise<SystemInfoSchema> => {
   return new Promise((resolve) => {
     (async (): Promise<void> => {
@@ -237,48 +251,52 @@ export default definePlugin(() => {
             Logger.info('BIOS version: ' + result.biosVersion);
           }
 
-          getGpuRanges().then(() => {
-            WhiteBoardUtils.setOnlyGui(
-              !WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled()
-            );
-            Logger.info('Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled');
+          getCpuRanges().then(() => {
+            getGpuRanges().then(() => {
+              WhiteBoardUtils.setOnlyGui(
+                !WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled()
+              );
+              Logger.info(
+                'Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled'
+              );
 
-            BackendUtils.isSdtdpPresent().then((res) => {
-              Logger.info('SDTDP ' + (res ? '' : 'no ') + 'present');
-              WhiteBoardUtils.setSdtdpSettingsPresent(res);
-            });
-
-            sleep(5000).then(() => {
-              if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
-                pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-                checkPluginLatestVersion();
-              }
-              sleep(1000).then(() => {
-                biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000);
-                checkBiosLatestVersion();
+              BackendUtils.isSdtdpPresent().then((res) => {
+                Logger.info('SDTDP ' + (res ? '' : 'no ') + 'present');
+                WhiteBoardUtils.setSdtdpSettingsPresent(res);
               });
-            });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            SteamClient.System.Audio.GetDevices().then((devs: any) => {
-              const dev = devs.vecDevices.filter(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (dev: any) => dev.id == devs.activeOutputDeviceId
-              )[0];
-              WhiteBoardUtils.setAudioDevice(dev.sName);
-              WhiteBoardUtils.setVolume(dev.flOutputVolume);
-              Listeners.bind();
-
-              BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
-              BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
-              if (WhiteBoardUtils.getIsAlly()) {
-                sleep(100).then(() => {
-                  Profiles.getDefaultProfile();
-                  Profiles.getDefaultACProfile();
-                  Profiles.summary();
-                  Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+              sleep(5000).then(() => {
+                if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+                  pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
+                  checkPluginLatestVersion();
+                }
+                sleep(1000).then(() => {
+                  biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000);
+                  checkBiosLatestVersion();
                 });
-              }
+              });
+
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              SteamClient.System.Audio.GetDevices().then((devs: any) => {
+                const dev = devs.vecDevices.filter(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (dev: any) => dev.id == devs.activeOutputDeviceId
+                )[0];
+                WhiteBoardUtils.setAudioDevice(dev.sName);
+                WhiteBoardUtils.setVolume(dev.flOutputVolume);
+                Listeners.bind();
+
+                BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
+                BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
+                if (WhiteBoardUtils.getIsAlly()) {
+                  sleep(100).then(() => {
+                    Profiles.getDefaultProfile();
+                    Profiles.getDefaultACProfile();
+                    Profiles.summary();
+                    Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+                  });
+                }
+              });
             });
           });
         });

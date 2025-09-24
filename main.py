@@ -73,6 +73,13 @@ class Plugin:
         CpuPerformance.set_platform_profile(prof)
         sleep(0.1)
 
+    async def get_tdp_ranges(self):
+        """Get CPU TDP ranges"""
+        try:
+            return CpuPerformance.get_tdp_ranges()
+        except Exception as e:
+            decky.logger.error(e)
+
     async def set_tdp(self, spl: int, sppl: int, fppl: int):
         """Set CPU TDP"""
         try:

@@ -98,7 +98,7 @@ export interface SdtdpSettings {
 }
 
 export enum Acpi {
-  QUIET,
+  LOW_POWER,
   BALANCED,
   PERFORMANCE
 }

@@ -176,7 +176,7 @@ export class Profiles {
   public static getAcpiProfile(spl: number): Acpi {
     let epp = Acpi.PERFORMANCE;
     if (spl <= Constants.AllySilentSPL) {
-      epp = Acpi.QUIET;
+      epp = Acpi.LOW_POWER;
     } else if (spl <= Constants.AllyPerformanceSPL) {
       epp = Acpi.BALANCED;
     }

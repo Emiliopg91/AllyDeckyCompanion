@@ -42,7 +42,7 @@ class Deployer:
         Utils.run_command([
             "ssh", self.deck_user + "@" + self.deck_ip, "-p", str(self.deck_port),
             "-i", Utils.id_rsa_file,
-            "mkdir " + self.deck_dir + "/homebrew/plugins/" + self.plugin_name + "/"
+            "\"mkdir " + self.deck_dir + "/homebrew/plugins/" + self.plugin_name + "/\""
             ], False, self.log_clearing)
 
     def _chmod_folders(self):
@@ -50,7 +50,7 @@ class Deployer:
         Utils.run_command([
             "ssh", self.deck_user + "@" + self.deck_ip, "-p", str(self.deck_port),
             "-i", Utils.id_rsa_file,
-            "echo '" + self.deck_pass + "' | sudo -S chmod -R 777 " + self.deck_dir + "/homebrew/plugins"
+            "\"echo '" + self.deck_pass + "' | sudo -S chmod -R 777 " + self.deck_dir + "/homebrew/plugins\""
             ], True, self.log_permissions)
 
     def _deploy_plugin(self):
@@ -65,7 +65,7 @@ class Deployer:
         Utils.run_command([
             "ssh", self.deck_user + "@" + self.deck_ip, "-p", str(self.deck_port),
             "-i", Utils.id_rsa_file,
-            "echo '" + self.deck_pass + "' | sudo -S systemctl restart plugin_loader.service"
+            "\"echo '" + self.deck_pass + "' | sudo -S systemctl restart plugin_loader.service\""
             ], False, self.log_restart_decky)
 
     def deploy(self):

@@ -113,6 +113,38 @@ export class WhiteBoardUtils {
     return Number(WhiteBoard.get('gpuMaxFreq') || 2700);
   }
 
+  public static getTdpRange(): Record<string, number[]> {
+    return WhiteBoard.get('tdpRange') as Record<string, number[]>;
+  }
+
+  public static setTdpRange(value: Record<string, number[]>): void {
+    WhiteBoard.set('tdpRange', value);
+  }
+  /*
+  public static getSplMin(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['spl'][0] || 7);
+  }
+
+  public static getSplMax(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['spl'][1] || 25);
+  }
+
+  public static getSpptMin(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['sppt'][0] || 15);
+  }
+
+  public static getSpptMax(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['sppt'][1] || 30);
+  }
+
+  public static getFpptMin(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['fppt'][0] || 15);
+  }
+
+  public static getFpptMax(): number {
+    return Number(WhiteBoardUtils.getTdpRange()['fppt'][1] || 35);
+  }
+*/
   public static setGpuMaxFreq(value: number): void {
     WhiteBoard.set('gpuMaxFreq', value);
   }

@@ -12,14 +12,49 @@ class CpuPerformance:
     ASUS_ARMORY_WMI_BASE = "/sys/class/firmware-attributes/asus-armoury/attributes"
 
     ACPI_FN = "/sys/firmware/acpi/platform_profile"
+    
     FTDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/current_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/current_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/current_value"
+    FTDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/min_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/min_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/min_value"
+    FTDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/max_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/max_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/max_value"
+    
     STDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/current_value"
+    STDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/min_value"
+    STDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/max_value"
+
     CTDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/current_value"
+    CTDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/min_value"
+    CTDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/max_value"
     
     BOOST_FN = glob.glob("/sys/devices/system/cpu/cpufreq/policy*/boost")
 
     SMT_PATH = "/sys/devices/system/cpu/smt/control"
     GOV_FN = glob.glob('/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor')
+
+    @staticmethod
+    def get_tdp_ranges():
+        
+        with open(CpuPerformance.CTDP_MIN,"r") as f:
+            spl_min = int(f.read().strip())
+        with open(CpuPerformance.CTDP_MAX,"r") as f:
+            spl_max = int(f.read().strip())
+
+        with open(CpuPerformance.STDP_MIN,"r") as f:
+            sppt_min = int(f.read().strip())
+        with open(CpuPerformance.STDP_MAX,"r") as f:
+            sppt_max = int(f.read().strip())
+
+        with open(CpuPerformance.FTDP_MIN,"r") as f:
+            fppt_min = int(f.read().strip())
+        with open(CpuPerformance.FTDP_MAX,"r") as f:
+            fppt_max = int(f.read().strip())
+
+
+        return {
+            "spl":[spl_min,spl_max],
+            "sppt":[sppt_min,sppt_max],
+            "fppt":[fppt_min,fppt_max]
+        }
+
 
     @staticmethod
     def set_tdp(pretty: str, fn: str, val: int):

@@ -27,6 +27,7 @@ interface PerformanceContextType {
   icon: string | undefined;
   onBattery: boolean;
   profile: Profile;
+  tdpRange: Record<string, number[]>;
   setProfile: (profile: Profile) => void;
   saveProfile: (id: string, name: string, profile: Profile) => void;
 }
@@ -47,6 +48,7 @@ const defaultValue: PerformanceContextType = {
     },
     gpu: { frequency: { min: 800, max: 2700 } }
   },
+  tdpRange: WhiteBoardUtils.getTdpRange(),
   setProfile() {},
   saveProfile() {}
 };
@@ -113,12 +115,19 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
   const [name, setName] = useState(Profiles.getAppName(id));
   const [icon, setIcon] = useState<string | undefined>(undefined);
   const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(id));
+  const [tdpRange, setTdpRange] = useState<Record<string, number[]>>(WhiteBoardUtils.getTdpRange());
 
   const onBatteryEffect = (e: EventData): void => {
     const data = e as WhiteBoardEventData;
     if (data.getId() == 'onBattery') {
       setOnBattery(() => {
         return data.getValue() as boolean;
+      });
+      BackendUtils.getCpuTdpRange().then((data) => {
+        WhiteBoardUtils.setTdpRange(data);
+        setTdpRange(() => {
+          return data;
+        });
       });
     }
   };
@@ -159,7 +168,8 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
         onBattery,
         profile,
         setProfile,
-        saveProfile
+        saveProfile,
+        tdpRange
       }}
     >
       {children}
