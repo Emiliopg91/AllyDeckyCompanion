@@ -1,6 +1,6 @@
 {
   "name": "ally-decky-companion",
-  "version": "1.5.2",
+  "version": "1.5.3-dev",
   "description": "Rog Ally and Ally X Decky plugin companion",
   "type": "module",
   "scripts": {
