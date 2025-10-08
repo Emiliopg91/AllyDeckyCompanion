@@ -1,6 +1,6 @@
 {
   "deckip": "192.168.1.211",
   "deckport": "22",
-  "deckcefport": "8081",
+  "deckcefport": "9090",
   "deckuser": "emilio"
 }

@@ -1,18 +1,15 @@
-import { sleep } from '@decky/ui';
 import {
   EventBus,
   EventData,
   EventType,
   GameLifeEventData,
   Logger,
-  SuspendEventData,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
-import { BackendUtils } from './backend';
 import { Constants } from './constants';
 import { PluginSettings } from './settings';
 import { WhiteBoardUtils } from './whiteboard';
@@ -20,8 +17,6 @@ import { WhiteBoardUtils } from './whiteboard';
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
   private static unsubscribeBrightnessEvents: (() => void) | undefined = undefined;
-  private static unsubscribeSuspendEvents: (() => void) | undefined = undefined;
-  private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
   private static unsubscribeBatteryChanges: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,51 +91,6 @@ export class Listeners {
       }
     }).unsubscribe;
 
-    Listeners.unsubscribeSuspendEvents = EventBus.subscribe(EventType.SUSPEND, (e: EventData) => {
-      const event = e as SuspendEventData;
-      if (event.isSuspend()) {
-        AsyncUtils.runMutexForProfile((release) => {
-          Logger.info('Setting CPU profile for suspension');
-          BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
-            release();
-          });
-        });
-      } else {
-        AsyncUtils.runMutexForProfile((release) => {
-          Logger.info('Waiting 10 seconds for restoring CPU profile');
-          sleep(10000).then(() => {
-            BackendUtils.applyProfile(
-              Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())
-            ).finally(() => {
-              release();
-            });
-          });
-        });
-      }
-    }).unsubscribe;
-
-    Listeners.unsubscribeShutdownEvents = SteamClient.User.RegisterForShutdownStart(() => {
-      AsyncUtils.runMutexForProfile((release) => {
-        Logger.info('Setting CPU profile for shutdown/restart');
-        BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
-          release();
-        });
-      });
-    }).unregister;
-
-    Listeners.unsubscribeBrightnessEvents = SteamClient.System.Display.RegisterForBrightnessChanges(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (event: any) => {
-        if (WhiteBoardUtils.getBrightness() == undefined) {
-          WhiteBoardUtils.setBrightness(event.flBrightness);
-        } else {
-          if (!AsyncUtils.isDisplayLocked()) {
-            Listeners.debouncedBrightnessListener(event);
-          }
-        }
-      }
-    ).unsubscribe;
-
     SteamClient.System.Audio.RegisterForDeviceVolumeChanged((e: number) => {
       Listeners.debouncedVolumeListener(e);
     });
@@ -189,14 +139,6 @@ export class Listeners {
     }
     if (Listeners.unsubscribeBrightnessEvents) {
       Listeners.unsubscribeBrightnessEvents();
-    }
-
-    if (Listeners.unsubscribeSuspendEvents) {
-      Listeners.unsubscribeSuspendEvents();
-    }
-
-    if (Listeners.unsubscribeShutdownEvents) {
-      Listeners.unsubscribeShutdownEvents();
     }
   }
 }
