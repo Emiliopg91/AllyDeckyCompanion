@@ -1,15 +1,18 @@
+import { sleep } from '@decky/ui';
 import {
   EventBus,
   EventData,
   EventType,
   GameLifeEventData,
   Logger,
+  SuspendEventData,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
+import { BackendUtils } from './backend';
 import { Constants } from './constants';
 import { PluginSettings } from './settings';
 import { WhiteBoardUtils } from './whiteboard';
@@ -19,6 +22,9 @@ export class Listeners {
   private static unsubscribeBrightnessEvents: (() => void) | undefined = undefined;
   private static unsubscribeBatteryChanges: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
+  private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
+  private static unsubscribeSuspendEvents: (() => void) | undefined = undefined;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static debouncedBrightnessListener = debounce((event: any) => {
     AsyncUtils.runMutexForProfile((release) => {
@@ -74,6 +80,54 @@ export class Listeners {
   }, 1000);
 
   public static bind(): void {
+    Listeners.unsubscribeSuspendEvents = EventBus.subscribe(EventType.SUSPEND, (e: EventData) => {
+      const event = e as SuspendEventData;
+      if (event.isSuspend()) {
+        AsyncUtils.runMutexForProfile((release) => {
+          Logger.info('Setting CPU profile for suspension');
+          BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
+            release();
+          });
+        });
+      } else {
+        AsyncUtils.runMutexForProfile((release) => {
+          Logger.info('Setting CPU full power profile after suspension for 10 seconds');
+          BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
+            release();
+            sleep(10000).then(() => {
+              BackendUtils.applyProfile(
+                Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())
+              ).finally(() => {
+                release();
+              });
+            });
+          });
+        });
+      }
+    }).unsubscribe;
+
+    Listeners.unsubscribeShutdownEvents = SteamClient.User.RegisterForShutdownStart(() => {
+      AsyncUtils.runMutexForProfile((release) => {
+        Logger.info('Setting CPU profile for shutdown/restart');
+        BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
+          release();
+        });
+      });
+    }).unregister;
+
+    Listeners.unsubscribeBrightnessEvents = SteamClient.System.Display.RegisterForBrightnessChanges(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (event: any) => {
+        if (WhiteBoardUtils.getBrightness() == undefined) {
+          WhiteBoardUtils.setBrightness(event.flBrightness);
+        } else {
+          if (!AsyncUtils.isDisplayLocked()) {
+            Listeners.debouncedBrightnessListener(event);
+          }
+        }
+      }
+    ).unsubscribe;
+
     Listeners.unsubscribeGameEvents = EventBus.subscribe(EventType.GAME_LIFE, (e: EventData) => {
       const event = e as GameLifeEventData;
       Logger.info('New game event');
@@ -139,6 +193,12 @@ export class Listeners {
     }
     if (Listeners.unsubscribeBrightnessEvents) {
       Listeners.unsubscribeBrightnessEvents();
+    }
+    if (Listeners.unsubscribeShutdownEvents) {
+      Listeners.unsubscribeShutdownEvents();
+    }
+    if (Listeners.unsubscribeSuspendEvents) {
+      Listeners.unsubscribeSuspendEvents();
     }
   }
 }

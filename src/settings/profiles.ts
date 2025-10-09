@@ -123,9 +123,9 @@ export class Profiles {
         boost: false,
         smt: true,
         tdp: {
-          spl: Constants.AllyTurboFPPL,
-          sppl: Constants.AllyTurboFPPL,
-          fppl: Constants.AllyTurboFPPL
+          spl: WhiteBoardUtils.getTdpRange()['spl'][1],
+          sppl: WhiteBoardUtils.getTdpRange()['sppt'][1],
+          fppl: WhiteBoardUtils.getTdpRange()['fppt'][1]
         },
         governor: Governor.POWERSAVE
       },
