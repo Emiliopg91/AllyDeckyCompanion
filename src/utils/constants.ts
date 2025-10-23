@@ -41,8 +41,20 @@ export class Constants {
   public static AllyXPerformanceSPL = 15;
   public static AllyXTurboSPL = 25;
 
+  public static XboxAllyXSilentSPL = 13;
+  public static XboxAllyXPerformanceSPL = 17;
+  public static XboxAllyXTurboSPL = 25;
+
+  public static XboxAllySilentSPL = 6;
+  public static XboxAllyPerformanceSPL = 15;
+  public static XboxAllyTurboSPL = 20;
+
   public static ALLY_BIOS_URL =
     'https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-2023&pdid=0&m1id=23629&cpu=RC71L&LevelTagId=220680&systemCode=rog';
   public static ALLY_X_BIOS_URL =
     'https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-x-2024&pdid=0&m1id=26436&cpu=RC72LA&LevelTagId=230371&systemCode=rog';
+  public static XBOX_ALLY_X_BIOS_URL =
+    'https://rog.asus.com/support/webapi/ProductV2/GetPDBIOS?website=es&model=rog-xbox-ally-x-2025&pdid=0&m1id=32330&cpu=&LevelTagId=239839&systemCode=rog';
+  public static XBOX_ALLY_BIOS_URL =
+    'https://rog.asus.com/support/webapi/ProductV2/GetPDBIOS?website=es&model=rog-xbox-ally-2025&pdid=0&m1id=32331&cpu=&LevelTagId=239840&systemCode=rog';
 }

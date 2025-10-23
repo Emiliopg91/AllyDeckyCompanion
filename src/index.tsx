@@ -181,10 +181,12 @@ const getSystemInfo = (): Promise<SystemInfoSchema> => {
       const biosVersionStr = sBIOSVersion as string;
 
       const isAllyX = biosVersionStr.includes('RC72LA');
-      const isAlly = biosVersionStr.includes('RC71L') || isAllyX;
+      const isXboxAllyX = biosVersionStr.includes('RC73XA');
+      const isXboxAlly = biosVersionStr.includes('RC73YA');
+      const isAlly = biosVersionStr.includes('RC71L') || isAllyX || isXboxAllyX || isXboxAlly;
       const biosVersion = isAlly ? biosVersionStr.split('.')[1] : '';
 
-      resolve({ isAlly, isAllyX, biosVersion });
+      resolve({ isAlly, isAllyX, isXboxAllyX, isXboxAlly, biosVersion });
     })();
   });
 };
@@ -236,13 +238,20 @@ export default definePlugin(() => {
         getSystemInfo().then((result) => {
           WhiteBoardUtils.setIsAlly(result.isAlly);
           WhiteBoardUtils.setisAllyX(result.isAllyX);
+          WhiteBoardUtils.setisXboxAllyX(result.isXboxAllyX);
           WhiteBoardUtils.setBiosVersion(result.biosVersion);
 
           let prod = 'Unknown';
-          if (WhiteBoardUtils.getIsAllyX()) {
-            prod = 'ASUS ROG Ally ';
+          if (WhiteBoardUtils.getIsAlly()) {
+            prod = 'ASUS ROG';
             if (WhiteBoardUtils.getIsAllyX()) {
-              prod += 'X';
+              prod += ' Ally X';
+            } else if (WhiteBoardUtils.getIsXboxAlly()) {
+              prod += ' Xbox Ally';
+            } else if (WhiteBoardUtils.getIsXboxAllyX()) {
+              prod += ' Xbox Ally X';
+            } else {
+              prod += ' Ally';
             }
           }
           Logger.info('Product: ' + prod);

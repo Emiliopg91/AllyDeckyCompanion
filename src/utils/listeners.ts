@@ -90,18 +90,10 @@ export class Listeners {
           });
         });
       } else {
-        AsyncUtils.runMutexForProfile((release) => {
-          Logger.info('Setting CPU full power profile after suspension for 10 seconds');
-          BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
-            release();
-            sleep(10000).then(() => {
-              BackendUtils.applyProfile(
-                Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId())
-              ).finally(() => {
-                release();
-              });
-            });
-          });
+        Logger.info('Waiting for 10 seconds since resume to restore profile');
+        sleep(10000).then(() => {
+          Logger.info('Restoring profile');
+          BackendUtils.applyProfile(Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId()));
         });
       }
     }).unsubscribe;
