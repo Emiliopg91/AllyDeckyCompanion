@@ -107,4 +107,6 @@ export interface SystemInfoSchema {
   biosVersion: string;
   isAlly: boolean;
   isAllyX: boolean;
+  isXboxAlly: boolean;
+  isXboxAllyX: boolean;
 }

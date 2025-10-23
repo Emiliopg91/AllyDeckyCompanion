@@ -45,6 +45,22 @@ export class WhiteBoardUtils {
     WhiteBoard.set('isAllyX', value);
   }
 
+  public static getIsXboxAlly(): boolean {
+    return WhiteBoard.get('isXboxAlly') || false;
+  }
+
+  public static setisXboxAlly(value: boolean): void {
+    WhiteBoard.set('isXboxAlly', value);
+  }
+
+  public static getIsXboxAllyX(): boolean {
+    return WhiteBoard.get('isXboxAllyX') || false;
+  }
+
+  public static setisXboxAllyX(value: boolean): void {
+    WhiteBoard.set('isXboxAllyX', value);
+  }
+
   public static getTab(): string {
     return WhiteBoard.get('tab') || 'performance';
   }

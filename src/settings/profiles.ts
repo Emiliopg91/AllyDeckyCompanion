@@ -265,24 +265,48 @@ export class Profiles {
       case Mode.SILENT:
         profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
           ? Constants.AllyXSilentSPL
-          : Constants.AllySilentSPL;
-        profile.cpu.tdp.sppl = Constants.AllySilentSPPL;
-        profile.cpu.tdp.fppl = Constants.AllySilentFPPL;
+          : WhiteBoardUtils.getIsXboxAllyX()
+            ? Constants.XboxAllyXSilentSPL
+            : WhiteBoardUtils.getIsXboxAlly()
+              ? Constants.XboxAllySilentSPL
+              : Constants.AllySilentSPL;
+        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllySilentSPL
+          : Constants.AllySilentSPPL;
+        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllySilentSPL
+          : Constants.AllySilentFPPL;
         break;
       case Mode.PERFORMANCE:
       case Mode.CUSTOM:
         profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
           ? Constants.AllyXPerformanceSPL
-          : Constants.AllyPerformanceSPL;
-        profile.cpu.tdp.sppl = Constants.AllyPerformanceSPPL;
-        profile.cpu.tdp.fppl = Constants.AllyPerformanceFPPL;
+          : WhiteBoardUtils.getIsXboxAllyX()
+            ? Constants.XboxAllyXPerformanceSPL
+            : WhiteBoardUtils.getIsXboxAlly()
+              ? Constants.XboxAllyPerformanceSPL
+              : Constants.AllyPerformanceSPL;
+        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllyPerformanceSPL
+          : Constants.AllyPerformanceSPPL;
+        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllyPerformanceSPL
+          : Constants.AllyPerformanceFPPL;
         break;
       case Mode.TURBO:
         profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
           ? Constants.AllyXTurboSPL
-          : Constants.AllyTurboSPL;
-        profile.cpu.tdp.sppl = Constants.AllyTurboSPPL;
-        profile.cpu.tdp.fppl = Constants.AllyTurboFPPL;
+          : WhiteBoardUtils.getIsXboxAllyX()
+            ? Constants.XboxAllyXTurboSPL
+            : WhiteBoardUtils.getIsXboxAlly()
+              ? Constants.XboxAllyTurboSPL
+              : Constants.AllyTurboSPL;
+        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllyTurboSPL
+          : Constants.AllyTurboSPPL;
+        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllyTurboSPL
+          : Constants.AllyTurboFPPL;
     }
 
     return profile;
