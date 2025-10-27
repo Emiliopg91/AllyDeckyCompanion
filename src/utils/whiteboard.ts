@@ -4,8 +4,8 @@ import { WhiteBoard } from 'decky-plugin-framework';
 import { Constants } from './constants';
 
 export class WhiteBoardUtils {
-  public static getOnBattery(): boolean {
-    return WhiteBoard.get('onBattery') || false;
+  public static getOnBattery(): boolean | null {
+    return WhiteBoard.get('onBattery');
   }
 
   public static setOnBattery(value: boolean): void {

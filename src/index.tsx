@@ -82,24 +82,28 @@ const checkBiosLatestVersion = async (): Promise<void> => {
     Logger.info('Checking for BIOS update');
 
     const response = await CorsClient.fetchUrl(
-      WhiteBoardUtils.getIsAllyX() ? Constants.ALLY_X_BIOS_URL : Constants.ALLY_BIOS_URL
+      WhiteBoardUtils.getIsAllyX()
+        ? Constants.ALLY_X_BIOS_URL
+        : WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XBOX_ALLY_BIOS_URL
+          : WhiteBoardUtils.getIsXboxAllyX()
+            ? Constants.XBOX_ALLY_X_BIOS_URL
+            : Constants.ALLY_BIOS_URL
     );
 
     if (!response.ok) {
       throw new Error(response.statusText);
     }
 
-    const data = await response.text();
-    const versionRegex = /"Version":\s*"(\d+)"/g;
-    let match;
-    const versions: number[] = [];
-
-    while ((match = versionRegex.exec(data)) !== null) {
-      versions.push(Number(match[1]));
+    const data = JSON.parse(await response.text())['Result']['Obj'];
+    let vers: string | undefined = undefined;
+    for (let i = 0; vers == undefined && i < data.length; i++) {
+      if (data[i]['Name'] == 'BIOS') {
+        vers = data[i]['Files'][0]['Version'];
+      }
     }
 
-    if (versions.length > 0) {
-      const vers = String(Math.max(...versions));
+    if (vers != undefined) {
       Logger.info('Latest BIOS version: ' + vers);
       if (
         vers != WhiteBoardUtils.getBiosLatestVersion() &&
@@ -113,7 +117,7 @@ const checkBiosLatestVersion = async (): Promise<void> => {
       WhiteBoardUtils.setBiosLatestVersion(vers);
     }
   } catch (e) {
-    Logger.error('Error fetching latest BIOS version', e);
+    Logger.error('Error checking latest BIOS version', e);
   }
 };
 
@@ -263,7 +267,7 @@ export default definePlugin(() => {
           getCpuRanges().then(() => {
             getGpuRanges().then(() => {
               WhiteBoardUtils.setOnlyGui(
-                !WhiteBoardUtils.getIsAllyX() || WhiteBoardUtils.getSdtdpEnabled()
+                !WhiteBoardUtils.getIsAlly() || WhiteBoardUtils.getSdtdpEnabled()
               );
               Logger.info(
                 'Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled'

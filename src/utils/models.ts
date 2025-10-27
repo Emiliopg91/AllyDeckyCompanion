@@ -58,6 +58,7 @@ export interface CpuProfile {
   smt: boolean;
   tdp: TdpCpuProfile;
   governor: Governor;
+  epp: Epp;
 }
 
 export enum Mode {
@@ -69,6 +70,13 @@ export enum Mode {
 
 export enum Governor {
   POWERSAVE,
+  PERFORMANCE
+}
+
+export enum Epp {
+  POWER,
+  BALANCE_POWER,
+  BALANCE_PERFORMANCE,
   PERFORMANCE
 }
 

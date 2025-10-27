@@ -131,6 +131,7 @@ export class PluginSettings {
     gameEntry.name = name;
     prof.mode = profile.mode;
     prof.cpu.boost = profile.cpu.boost;
+    prof.cpu.epp = profile.cpu.epp;
     prof.cpu.governor = profile.cpu.governor;
     prof.cpu.smt = profile.cpu.smt;
     prof.cpu.tdp.spl = profile.cpu.tdp.spl;

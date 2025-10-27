@@ -3,7 +3,7 @@ import { Game, Logger, Settings, Translator } from 'decky-plugin-framework';
 import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { Acpi, Governor, Mode, Profile } from '../utils/models';
+import { Acpi, Epp, Governor, Mode, Profile } from '../utils/models';
 import { PluginSettings } from '../utils/settings';
 import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
@@ -47,9 +47,9 @@ export class Profiles {
     headers.push({ data: 'SPL*', align: 'center' });
     headers.push({ data: 'SPPL*', align: 'center' });
     headers.push({ data: 'FPPL*', align: 'center' });
-    headers.push({ data: 'SMT*', align: 'center' });
     headers.push({ data: 'BOOST*', align: 'center' });
     headers.push({ data: 'GOVERNOR*', align: 'center' });
+    headers.push({ data: 'EPP*', align: 'center' });
     headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
 
     const body: Array<Array<SpreadSheetCell>> = [];
@@ -75,10 +75,13 @@ export class Profiles {
           line.push({ data: profile.cpu.tdp.spl + ' W', align: 'right' });
           line.push({ data: profile.cpu.tdp.sppl + ' W', align: 'right' });
           line.push({ data: profile.cpu.tdp.fppl + ' W', align: 'right' });
-          line.push({ data: profile.cpu.smt, align: 'right' });
           line.push({ data: profile.cpu.boost, align: 'right' });
           line.push({
             data: Governor[profile.cpu.governor].toUpperCase(),
+            align: 'right'
+          });
+          line.push({
+            data: Epp[profile.cpu.epp ?? Constants.DEFAULT_EPP].toUpperCase(),
             align: 'right'
           });
           line.push({
@@ -127,7 +130,8 @@ export class Profiles {
           sppl: WhiteBoardUtils.getTdpRange()['sppt'][1],
           fppl: WhiteBoardUtils.getTdpRange()['fppt'][1]
         },
-        governor: Governor.POWERSAVE
+        governor: Governor.POWERSAVE,
+        epp: Constants.DEFAULT_EPP
       },
       gpu: {
         frequency: {
@@ -209,7 +213,8 @@ export class Profiles {
           },
           boost: prof.cpu.boost,
           smt: prof.cpu.smt,
-          governor: prof.cpu.governor
+          governor: prof.cpu.governor,
+          epp: prof.cpu.epp ?? Constants.DEFAULT_EPP
         },
         gpu: {
           frequency: {
@@ -240,7 +245,8 @@ export class Profiles {
         },
         boost: Constants.CPU_DEFAULT_BOOST,
         smt: Constants.CPU_DEFAULT_SMT,
-        governor: Governor.POWERSAVE
+        governor: Governor.POWERSAVE,
+        epp: Constants.DEFAULT_EPP
       },
       gpu: {
         frequency: {
@@ -363,7 +369,8 @@ export class Profiles {
             },
             boost: cfg.tdpProfiles[id].cpuBoost,
             smt: cfg.tdpProfiles[id].smt,
-            governor: Governor.POWERSAVE
+            governor: Governor.POWERSAVE,
+            epp: Constants.DEFAULT_EPP
           },
           gpu: {
             frequency: {

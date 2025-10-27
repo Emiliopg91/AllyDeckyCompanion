@@ -15,18 +15,18 @@ class SdtdpUtils:
         decky.DECKY_PLUGIN_SETTINGS_DIR + "/../SimpleDeckyTDP/settings.json"
     )
 
-    @staticmethod
-    def get_config():
+    def get_config(self):
         """Get SDTDP configuration"""
         with open(SdtdpUtils.cfg_property_file, "r") as json_file:
             return json.load(json_file)
 
-    @staticmethod
-    def is_config_present():
+    def is_config_present(self):
         """Check if SDTDP exists"""
         return os.path.exists(SdtdpUtils.cfg_property_file)
 
-    @staticmethod
-    def is_enabled():
+    def is_enabled(self):
         """Check if SDTDP is enabled"""
         return os.path.exists(SdtdpUtils.plugin_dir)
+
+
+SDTDP = SdtdpUtils()

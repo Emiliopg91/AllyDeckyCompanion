@@ -1,9 +1,9 @@
-import { sleep } from '@decky/ui';
+import { EResult, sleep } from '@decky/ui';
 import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
-import { Acpi, AudioDevice, Governor, Profile, SdtdpSettings } from './models';
+import { Acpi, AudioDevice, Epp, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -124,7 +124,7 @@ export class BackendUtils {
                   1,
                   profile.audio.devices[WhiteBoardUtils.getAudioDevice()].volume!
                 );
-                if (result.result == '1') {
+                if (result.result == EResult.OK) {
                   Logger.info('Volume setted');
                   ok = true;
                   break;
@@ -147,19 +147,14 @@ export class BackendUtils {
           }
 
           if (cpuChanged) {
-            const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)].toLowerCase().replace("_","-");
+            const acpi = Acpi[Profiles.getAcpiProfile(profile.cpu.tdp.spl)]
+              .toLowerCase()
+              .replace('_', '-');
             Logger.info('Setting CPU profile to "' + acpi + '" with:', {
               mode: profile.mode,
               cpu: profile.cpu
             });
-            await Backend.backend_call<[enabled: boolean], number>('set_smt', true);
-            await Backend.backend_call<[prof: string], number>('set_platform_profile', acpi);
-            await Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
-              'set_tdp',
-              profile.cpu.tdp.spl,
-              profile.cpu.tdp.sppl,
-              profile.cpu.tdp.fppl
-            );
+            //await Backend.backend_call<[enabled: boolean], number>('set_smt', true);
             await Backend.backend_call<[enabled: boolean], number>(
               'set_cpu_boost',
               profile.cpu.boost
@@ -168,7 +163,18 @@ export class BackendUtils {
               'set_governor',
               Governor[profile.cpu.governor].toLowerCase()
             );
-            await Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt);
+            await Backend.backend_call<[epp: string], void>(
+              'set_epp',
+              Epp[profile.cpu.epp].toLowerCase()
+            );
+            await Backend.backend_call<[prof: string], number>('set_platform_profile', acpi);
+            await Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
+              'set_tdp',
+              profile.cpu.tdp.spl,
+              profile.cpu.tdp.sppl,
+              profile.cpu.tdp.fppl
+            );
+            //await Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt);
           }
           Logger.info('Profile applied');
           BackendUtils.currentProfile = profile;

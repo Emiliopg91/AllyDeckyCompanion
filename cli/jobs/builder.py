@@ -60,7 +60,7 @@ class Builder:
         print("  Building backend")
         if os.path.exists(self.plugin_backend_dir) and os.path.exists(self.plugin_backend_dockerfile_dir):
             if os.path.exists(self.plugin_backend_output_dir):
-                Utils.run_command(["rm", "-r", self.plugin_backend_output_dir], True, self.log_backend_build_backend)
+                Utils.run_command(["rm", "-rf", self.plugin_backend_output_dir], True, self.log_backend_build_backend)
             Utils.run_command(["mkdir", "-p", self.plugin_backend_output_dir], False, self.log_backend_build_backend)
             Utils.run_command([self.plugin_cp, "build", "-f", self.plugin_backend_dockerfile_dir, "-t", self.plugin_backend_image, self.plugin_dir], True, self.log_backend_build_backend)
             Utils.run_command(["chmod", "-R", "777", self.plugin_dir], True, self.log_backend_build_backend)
@@ -68,7 +68,7 @@ class Builder:
                             "-v", self.plugin_backend_dir + ":/backend",
                             "-v", self.plugin_backend_output_dir + ":/backend/out",
                             "-v", self.plugin_dir + ":/plugin", self.plugin_backend_image], True, self.log_backend_build_backend)
-            Utils.run_command(["cp", "-r", self.plugin_backend_output_dir + "/.", self.build_out_dir], True, self.log_backend_build_backend)
+            Utils.run_command(["cp", "-r", self.plugin_backend_output_dir + "/.", self.build_out_dir+"/bin"], True, self.log_backend_build_backend)
 
     def _copy_additional_files(self):
         print("  Copying additional files")

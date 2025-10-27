@@ -14,8 +14,9 @@ import { createContext, useEffect, useState } from 'react';
 
 import { Profiles } from '../settings/profiles';
 import { BackendUtils } from '../utils/backend';
+import { Constants } from '../utils/constants';
 import { CorsClient } from '../utils/cors';
-import { AppOverviewExt, Governor, Mode, Profile } from '../utils/models';
+import { AppOverviewExt, Mode, Profile } from '../utils/models';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
 declare const appStore: any;
@@ -37,16 +38,21 @@ const defaultValue: PerformanceContextType = {
   appId: Profiles.getAppId(String(WhiteBoardUtils.getRunningGameId())),
   name: Profiles.getAppName(String(WhiteBoardUtils.getRunningGameId())),
   icon: undefined,
-  onBattery: WhiteBoardUtils.getOnBattery(),
+  onBattery: WhiteBoardUtils.getOnBattery() ?? false,
   profile: {
     mode: Mode.PERFORMANCE,
     cpu: {
       boost: false,
       smt: false,
-      governor: Governor.POWERSAVE,
+      epp: Constants.DEFAULT_EPP,
+      governor: Constants.DEFAULT_GOVERNOR,
       tdp: { fppl: 5, spl: 5, sppl: 5 }
     },
-    gpu: { frequency: { min: 800, max: 2700 } }
+    gpu: { frequency: { min: 800, max: 2700 } },
+    display: {},
+    audio: {
+      devices: {}
+    }
   },
   tdpRange: WhiteBoardUtils.getTdpRange(),
   setProfile() {},
@@ -165,7 +171,7 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
         appId,
         name,
         icon,
-        onBattery,
+        onBattery: onBattery ?? false,
         profile,
         setProfile,
         saveProfile,

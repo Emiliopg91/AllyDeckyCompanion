@@ -191,12 +191,32 @@
     "en": "Performance",
     "es": "Rendimiento"
   },
-  "mcu.powersave":{
-    "en":"Deep sleep mode",
+  "mcu.powersave": {
+    "en": "Deep sleep mode",
     "es": "Modo reposo extremo"
   },
-  "mcu.powersave.desc":{
-    "en":"Enhance power save while sleeping but resume will last a bit more",
-    "es":"Reduce el consumo de bateria en reposo pero reanudar será más lento"
+  "mcu.powersave.desc": {
+    "en": "Enhance power save while sleeping but resume will last a bit more",
+    "es": "Reduce el consumo de bateria en reposo pero reanudar será más lento"
+  },
+  "cpu.epp": {
+    "en": "Energy Performance Preference",
+    "es": "Preferencia de rendimiento energético"
+  },
+  "epp.power": {
+    "en": "GPU",
+    "es": "GPU"
+  },
+  "epp.balance_power": {
+    "en": "Prefer GPU",
+    "es": "Preferir GPU"
+  },
+  "epp.balance_performance": {
+    "en": "Prefer CPU",
+    "es": "Preferir CPU"
+  },
+  "epp.performance": {
+    "en": "CPU",
+    "es": "CPU"
   }
 }

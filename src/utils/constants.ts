@@ -1,6 +1,6 @@
 import pckage from '../../package.json';
 import plugin from '../../plugin.json';
-import { Mode } from './models';
+import { Epp, Governor, Mode } from './models';
 
 export class Constants {
   public static PLUGIN_NAME = plugin.name;
@@ -26,6 +26,9 @@ export class Constants {
   public static PROFILE_PERFORMANCE = 'performance';
   public static PROFILE_TURBO = 'turbo';
   public static PROFILE_CUSTOM = 'custom';
+
+  public static DEFAULT_EPP = Epp.BALANCE_POWER;
+  public static DEFAULT_GOVERNOR = Governor.POWERSAVE;
 
   public static AllySilentSPL = 13;
   public static AllySilentSPPL = 15;

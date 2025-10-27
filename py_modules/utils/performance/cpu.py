@@ -1,7 +1,6 @@
 # pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught, too-few-public-methods , unspecified-encoding
 
 import glob
-import os
 
 import decky  # pylint: disable=import-error
 
@@ -9,79 +8,57 @@ import decky  # pylint: disable=import-error
 class CpuPerformance:
     """Class for adjusting CPU performance"""
 
-    ASUS_ARMORY_WMI_BASE = "/sys/class/firmware-attributes/asus-armoury/attributes"
+    ASUS_NB_WMI = "/sys/devices/platform/asus-nb-wmi"
 
-    ACPI_FN = "/sys/firmware/acpi/platform_profile"
-    
-    FTDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/current_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/current_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/current_value"
-    FTDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/min_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/min_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/min_value"
-    FTDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/max_value" if os.path.exists(f"{ASUS_ARMORY_WMI_BASE}/ppt_pl3_fppt/max_value") else f"{ASUS_ARMORY_WMI_BASE}/ppt_fppt/max_value"
-    
-    STDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/current_value"
-    STDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/min_value"
-    STDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl2_sppt/max_value"
+    FPPT_FN = f"{ASUS_NB_WMI}/ppt_fppt"
+    SPPT_FN = f"{ASUS_NB_WMI}/ppt_pl2_sppt"
+    SPL_FN = f"{ASUS_NB_WMI}/ppt_pl1_spl"
 
-    CTDP_FN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/current_value"
-    CTDP_MIN = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/min_value"
-    CTDP_MAX = f"{ASUS_ARMORY_WMI_BASE}/ppt_pl1_spl/max_value"
-    
     BOOST_FN = glob.glob("/sys/devices/system/cpu/cpufreq/policy*/boost")
 
+    ACPI_FN = "/sys/firmware/acpi/platform_profile"
+
     SMT_PATH = "/sys/devices/system/cpu/smt/control"
-    GOV_FN = glob.glob('/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor')
+    GOV_FN = glob.glob("/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor")
+    EPP_FN = glob.glob(
+        "/sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference"
+    )
 
-    @staticmethod
-    def get_tdp_ranges():
-        
-        with open(CpuPerformance.CTDP_MIN,"r") as f:
-            spl_min = int(f.read().strip())
-        with open(CpuPerformance.CTDP_MAX,"r") as f:
-            spl_max = int(f.read().strip())
+    def get_tdp_ranges(self):
+        """Get tdp ranges"""
+        cpu_name = None
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if "model name" in line:
+                    cpu_name = line.split(":")[1].strip()
+                    break
 
-        with open(CpuPerformance.STDP_MIN,"r") as f:
-            sppt_min = int(f.read().strip())
-        with open(CpuPerformance.STDP_MAX,"r") as f:
-            sppt_max = int(f.read().strip())
+        if "extreme" in cpu_name.lower():
+            # Z1/2 Extreme
+            return {"spl": [5, 35], "sppt": [5, 43], "fppt": [5, 53]}
 
-        with open(CpuPerformance.FTDP_MIN,"r") as f:
-            fppt_min = int(f.read().strip())
-        with open(CpuPerformance.FTDP_MAX,"r") as f:
-            fppt_max = int(f.read().strip())
+        # Z2 A
+        return {"spl": [6, 20], "sppt": [6, 20], "fppt": [6, 20]}
 
-
-        return {
-            "spl":[spl_min,spl_max],
-            "sppt":[sppt_min,sppt_max],
-            "fppt":[fppt_min,fppt_max]
-        }
-
-
-    @staticmethod
-    def set_tdp(pretty: str, fn: str, val: int):
+    def set_tdp(self, pretty: str, fn: str, val: int):
         """Set CPU TDP"""
         decky.logger.debug(f"Setting tdp value '{pretty}' to {val} by writing to {fn}")
         with open(fn, "w") as f:
             f.write(f"{val}\n")
-            f.close()
         return True
 
-    @staticmethod
-    def set_cpu_boost(enabled=True):
+    def set_cpu_boost(self, enabled=True):
         """Set CPU Boost"""
         try:
             val = "1" if enabled else "0"
             for p in CpuPerformance.BOOST_FN:
-                decky.logger.debug(
-                    f"Setting CPU Boost to {val} by writing to '{p}'"
-                )
+                decky.logger.debug(f"Setting CPU Boost to {val} by writing to '{p}'")
                 with open(p, "w") as file:
                     file.write(val)
-                    file.close()
         except Exception as e:
             decky.logger.error(e)
 
-    @staticmethod
-    def set_smt(enabled=True):
+    def set_smt(self, enabled=True):
         """Set multi-threading"""
         try:
             val = "on" if enabled else "off"
@@ -90,27 +67,39 @@ class CpuPerformance:
             )
             with open(CpuPerformance.SMT_PATH, "w") as file:
                 file.write(val)
-                file.close()
         except Exception as e:
             decky.logger.error(e)
 
-    @staticmethod
-    def set_platform_profile(prof: str):
+    def set_platform_profile(self, prof: str):
         """Set platform profile"""
         decky.logger.debug(
             f"Setting platform profile to '{prof}' by writing to {CpuPerformance.ACPI_FN}"
         )
-        with open(CpuPerformance.ACPI_FN, "w") as f:
-            f.write(prof)
-            f.close()
+        try:
+            with open(CpuPerformance.ACPI_FN, "w") as f:
+                f.write(prof)
+        except Exception as e:
+            if prof == "low-power":
+                decky.logger.error(
+                    f"Error setting platform profile '{prof}', trying with 'quiet'"
+                )
+                self.set_platform_profile("quiet")
+            else:
+                raise e
 
-    @staticmethod
-    def set_governor(governor: str):
+    def set_governor(self, governor: str):
         """Set CPU governor"""
         for p in CpuPerformance.GOV_FN:
-            decky.logger.debug(
-                f"Setting governor to {governor} by writing to {p}"
-            )
+            decky.logger.debug(f"Setting governor to {governor} by writing to {p}")
             with open(p, "w") as f:
                 f.write(governor)
-                f.close()
+
+    def set_epp(self, epp: str):
+        """Set CPU epp"""
+        for p in CpuPerformance.EPP_FN:
+            decky.logger.debug(f"Setting EPP to {epp} by writing to {p}")
+            with open(p, "w") as f:
+                f.write(epp)
+
+
+CPU_PERFORMANCE = CpuPerformance()

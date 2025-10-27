@@ -14,8 +14,7 @@ class Miscelanea:
 
     ICONS_PATH = decky.DECKY_PLUGIN_RUNTIME_DIR + "/icons"
 
-    @staticmethod
-    def save_icon_for_app(app_id, encoded_data):
+    def save_icon_for_app(self, app_id, encoded_data):
         """Save icon for app"""
         if "base64," in encoded_data:
             encoded_data = encoded_data.split(",")[1]
@@ -26,8 +25,7 @@ class Miscelanea:
         with open(file_name, "wb") as file:
             file.write(decoded)
 
-    @staticmethod
-    def get_icon_for_app(app_id):
+    def get_icon_for_app(self, app_id):
         """Get icon for app"""
         file_name = Miscelanea.ICONS_PATH + "/" + app_id + ".jpg"
 
@@ -42,19 +40,16 @@ class Miscelanea:
 
         return f"data:{mime_type};base64,{image_base64}"
 
-    @staticmethod
-    def boot_bios():
+    def boot_bios(self):
         """Boot device into BIOS/UEFI"""
         subprocess.run("systemctl reboot --firmware-setup", shell=True, check=False)
 
-    @staticmethod
-    def boot_windows():
+    def boot_windows(self):
         """Boot device into Windows"""
-        entry = Miscelanea.get_windows_uefi_entry()
+        entry = self.get_windows_uefi_entry()
         subprocess.run(f"efibootmgr -n {entry} && reboot", shell=True, check=False)
 
-    @staticmethod
-    def get_windows_uefi_entry():
+    def get_windows_uefi_entry(self):
         """Get Windows UEFI entry if available"""
         try:
             # Ejecutar el comando efibootmgr
@@ -75,3 +70,6 @@ class Miscelanea:
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar efibootmgr: {e}")
             return None
+
+
+MISCELANEA = Miscelanea()

@@ -17,15 +17,15 @@ class GpuPerformance:
 
     GPU_FREQUENCY_RANGE = None
 
-    @staticmethod
-    def get_gpu_frequency_range():
+    def get_gpu_frequency_range(self):
         """Set GPU freq range"""
         if GpuPerformance.GPU_FREQUENCY_RANGE:
             return GpuPerformance.GPU_FREQUENCY_RANGE
+
         try:
-            freq_string = open(  # pylint: disable=consider-using-with
-                GpuPerformance.GPU_FREQUENCY_PATH, "r"
-            ).read()
+            with open(GpuPerformance.GPU_FREQUENCY_PATH, "r") as f:
+                freq_string = f.read()
+
             od_sclk_matches = re.findall(
                 r"OD_RANGE:\s*SCLK:\s*(\d+)Mhz\s*(\d+)Mhz", freq_string
             )
@@ -42,26 +42,27 @@ class GpuPerformance:
 
         return [0, 0]
 
-    @staticmethod
-    def execute_gpu_frequency_command(command):
+    def execute_gpu_frequency_command(self, command):
         """Execute GPU freq command"""
-        with open(GpuPerformance.GPU_FREQUENCY_PATH, 'w') as file:
+        with open(GpuPerformance.GPU_FREQUENCY_PATH, "w") as file:
             file.write(command)
-            file.close()
 
-    @staticmethod
-    def set_gpu_frequency_range(min_freq: int, max_freq: int):
+    def set_gpu_frequency_range(self, min_freq: int, max_freq: int):
         """Set GPU freq range"""
         with open(GpuPerformance.GPU_LEVEL_PATH, "w") as file:
             file.write("manual")
-            file.close()
+
         time.sleep(0.1)
+
         try:
-            GpuPerformance.execute_gpu_frequency_command(f"s 0 {min_freq}")
-            GpuPerformance.execute_gpu_frequency_command(f"s 1 {max_freq}")
-            GpuPerformance.execute_gpu_frequency_command("c")
+            self.execute_gpu_frequency_command(f"s 0 {min_freq}")
+            self.execute_gpu_frequency_command(f"s 1 {max_freq}")
+            self.execute_gpu_frequency_command("c")
         except Exception as e:
             decky.logger.error(
                 f"{__name__} error while trying to write frequency range"
             )
             decky.logger.error(e)
+
+
+GPU_PERFORMANCE = GpuPerformance()

@@ -10,12 +10,9 @@ class Hardware:
 
     BAT_LIM_FN = "/sys/class/power_supply/BAT0/charge_control_end_threshold"
     LEGACY_MCU_POWERSAVE_PATH = "/sys/devices/platform/asus-nb-wmi/mcu_powersave"
-    ASUS_ARMORY_MCU_POWERSAVE_PATH = (
-        "/sys/class/firmware-attributes/asus-armoury/attributes/mcu_powersave/current_value"
-    )
+    ASUS_ARMORY_MCU_POWERSAVE_PATH = "/sys/class/firmware-attributes/asus-armoury/attributes/mcu_powersave/current_value"
 
-    @staticmethod
-    def set_charge_limit(lim: int):
+    def set_charge_limit(self, lim: int):
         """Set battery charge limit"""
         decky.logger.debug(
             f"Setting charge limit to {lim}%  by writing to {Hardware.BAT_LIM_FN}"
@@ -24,8 +21,7 @@ class Hardware:
             f.write(str(lim))
             f.close()
 
-    @staticmethod
-    def set_mcu_powersave(enabled: bool):
+    def set_mcu_powersave(self, enabled: bool):
         """Set MCU powersave mode"""
         if os.path.exists(Hardware.LEGACY_MCU_POWERSAVE_PATH):
             with open(Hardware.LEGACY_MCU_POWERSAVE_PATH, "w") as file:
@@ -41,3 +37,6 @@ class Hardware:
                 )
                 file.write("1" if enabled else "0")
                 file.close()
+
+
+HARDWARE = Hardware()
