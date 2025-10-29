@@ -166,6 +166,14 @@ export class BackendUtils {
               'set_epp',
               Epp[profile.cpu.epp].toLowerCase()
             );
+            if (profile.cpu.scheduler != '') {
+              await Backend.backend_call<[scheduler: string], void>(
+                'set_scheduler',
+                profile.cpu.scheduler
+              );
+            } else {
+              await Backend.backend_call<[], void>('stop_scheduler');
+            }
             await Backend.backend_call<[prof: string], number>('set_platform_profile', acpi);
             await Backend.backend_call<[spl: number, sppl: number, fppl: number], number>(
               'set_tdp',
@@ -235,6 +243,10 @@ export class BackendUtils {
 
   public static async getCpuTdpRange(): Promise<Record<string, number[]>> {
     return Backend.backend_call<[], Record<string, number[]>>('get_tdp_ranges');
+  }
+
+  public static async getSchedulers(): Promise<Array<string>> {
+    return Backend.backend_call<[], Array<string>>('get_schedulers');
   }
 
   public static async getIconForApp(appId: string): Promise<string | null> {

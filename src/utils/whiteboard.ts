@@ -4,6 +4,22 @@ import { WhiteBoard } from 'decky-plugin-framework';
 import { Constants } from './constants';
 
 export class WhiteBoardUtils {
+  public static getScheduler(): string {
+    return WhiteBoard.get('scheduler')!;
+  }
+
+  public static setScheduler(scheds: string): void {
+    WhiteBoard.set('scheduler', scheds);
+  }
+
+  public static getSchedulers(): Array<string> {
+    return WhiteBoard.get('schedulers')!;
+  }
+
+  public static setSchedulers(scheds: Array<string>): void {
+    WhiteBoard.set('schedulers', scheds);
+  }
+
   public static getOnBattery(): boolean | null {
     return WhiteBoard.get('onBattery');
   }

@@ -214,5 +214,25 @@
   "epp.performance": {
     "en": "CPU",
     "es": "CPU"
+  },
+  "cpu.boost": {
+    "en": "CPU boost",
+    "es": "Mejora de CPU"
+  },
+  "boot": {
+    "en": "Boot",
+    "es": "Arranque"
+  },
+  "boot.bios": {
+    "en": "BIOS",
+    "es": "BIOS"
+  },
+  "boot.windows": {
+    "en": "Windows",
+    "es": "Windows"
+  },
+  "cpu.scheduler": {
+    "en": "Scheduler",
+    "es": "Planificador"
   }
 }

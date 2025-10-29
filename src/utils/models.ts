@@ -58,6 +58,7 @@ export interface CpuProfile {
   tdp: TdpCpuProfile;
   governor: Governor;
   epp: Epp;
+  scheduler: string;
 }
 
 export enum Mode {

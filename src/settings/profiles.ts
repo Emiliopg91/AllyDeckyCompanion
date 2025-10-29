@@ -49,6 +49,7 @@ export class Profiles {
     headers.push({ data: 'FPPL*', align: 'center' });
     headers.push({ data: 'BOOST*', align: 'center' });
     headers.push({ data: 'GOVERNOR*', align: 'center' });
+    headers.push({ data: 'SCHEDULER*', align: 'center' });
     headers.push({ data: 'EPP*', align: 'center' });
     headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
 
@@ -78,6 +79,10 @@ export class Profiles {
           line.push({ data: profile.cpu.boost, align: 'right' });
           line.push({
             data: Governor[profile.cpu.governor].toUpperCase(),
+            align: 'right'
+          });
+          line.push({
+            data: profile.cpu.scheduler == '' ? 'NONE' : profile.cpu.scheduler.toUpperCase(),
             align: 'right'
           });
           line.push({
@@ -130,7 +135,8 @@ export class Profiles {
           fppl: WhiteBoardUtils.getTdpRange()['fppt'][1]
         },
         governor: Governor.POWERSAVE,
-        epp: Constants.DEFAULT_EPP
+        epp: Constants.DEFAULT_EPP,
+        scheduler: ''
       },
       gpu: {
         frequency: {
@@ -212,7 +218,8 @@ export class Profiles {
           },
           boost: prof.cpu.boost,
           governor: prof.cpu.governor,
-          epp: prof.cpu.epp ?? Constants.DEFAULT_EPP
+          epp: prof.cpu.epp ?? Constants.DEFAULT_EPP,
+          scheduler: prof.cpu.scheduler ?? undefined
         },
         gpu: {
           frequency: {
@@ -243,7 +250,8 @@ export class Profiles {
         },
         boost: Constants.CPU_DEFAULT_BOOST,
         governor: Governor.POWERSAVE,
-        epp: Constants.DEFAULT_EPP
+        epp: Constants.DEFAULT_EPP,
+        scheduler: ''
       },
       gpu: {
         frequency: {
@@ -366,7 +374,8 @@ export class Profiles {
             },
             boost: cfg.tdpProfiles[id].cpuBoost,
             governor: Governor.POWERSAVE,
-            epp: Constants.DEFAULT_EPP
+            epp: Constants.DEFAULT_EPP,
+            scheduler: ''
           },
           gpu: {
             frequency: {

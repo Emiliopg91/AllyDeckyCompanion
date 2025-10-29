@@ -10,6 +10,7 @@ from utils.sdtdp import SDTDP
 from utils.hardware import HARDWARE
 from utils.performance.cpu import CPU_PERFORMANCE
 from utils.performance.gpu import GPU_PERFORMANCE
+from utils.performance.scx_sched import SCX_SCHED
 from utils.miscelanea import MISCELANEA
 
 import decky  # pylint: disable=import-error
@@ -100,6 +101,19 @@ class Plugin:
     async def set_cpu_boost(self, enabled: bool):
         """Set CPU boost"""
         CPU_PERFORMANCE.set_cpu_boost(enabled)
+
+    # Schedulers
+    async def get_schedulers(self):
+        """Get all available schedulers"""
+        return SCX_SCHED.available
+
+    async def set_scheduler(self, scheduler: str):
+        """Activate scheduler"""
+        SCX_SCHED.start(scheduler)
+
+    async def stop_scheduler(self):
+        """Stop scheduler if running"""
+        SCX_SCHED.stop()
 
     # GPU
     async def get_gpu_frequency_range(self):
