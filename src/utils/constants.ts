@@ -18,7 +18,6 @@ export class Constants {
 
   public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
   public static TDP_AC_DEFAULT_MODE = Mode.TURBO;
-  public static CPU_DEFAULT_SMT = true;
   public static CPU_DEFAULT_BOOST = false;
   public static DEFAULT_BATTERY_LIMIT = 100;
 

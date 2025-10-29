@@ -124,7 +124,6 @@ export class Profiles {
       mode: Mode.TURBO,
       cpu: {
         boost: false,
-        smt: true,
         tdp: {
           spl: WhiteBoardUtils.getTdpRange()['spl'][1],
           sppl: WhiteBoardUtils.getTdpRange()['sppt'][1],
@@ -212,7 +211,6 @@ export class Profiles {
             fppl: prof.cpu.tdp.fppl
           },
           boost: prof.cpu.boost,
-          smt: prof.cpu.smt,
           governor: prof.cpu.governor,
           epp: prof.cpu.epp ?? Constants.DEFAULT_EPP
         },
@@ -244,7 +242,6 @@ export class Profiles {
           fppl: 0
         },
         boost: Constants.CPU_DEFAULT_BOOST,
-        smt: Constants.CPU_DEFAULT_SMT,
         governor: Governor.POWERSAVE,
         epp: Constants.DEFAULT_EPP
       },
@@ -368,7 +365,6 @@ export class Profiles {
               fppl: tdp
             },
             boost: cfg.tdpProfiles[id].cpuBoost,
-            smt: cfg.tdpProfiles[id].smt,
             governor: Governor.POWERSAVE,
             epp: Constants.DEFAULT_EPP
           },

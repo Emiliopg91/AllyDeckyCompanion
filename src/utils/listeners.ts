@@ -20,7 +20,6 @@ export class Listeners {
   private static unsubscribeBrightnessEvents: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
   private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
-  private static unsubscribeSuspendEvents: (() => void) | undefined = undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static debouncedBrightnessListener = debounce((event: any) => {
@@ -167,9 +166,6 @@ export class Listeners {
     }
     if (Listeners.unsubscribeShutdownEvents) {
       Listeners.unsubscribeShutdownEvents();
-    }
-    if (Listeners.unsubscribeSuspendEvents) {
-      Listeners.unsubscribeSuspendEvents();
     }
   }
 }

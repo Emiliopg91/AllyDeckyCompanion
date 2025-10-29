@@ -18,7 +18,6 @@ class CpuPerformance:
 
     ACPI_FN = "/sys/firmware/acpi/platform_profile"
 
-    SMT_PATH = "/sys/devices/system/cpu/smt/control"
     GOV_FN = glob.glob("/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor")
     EPP_FN = glob.glob(
         "/sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference"
@@ -55,18 +54,6 @@ class CpuPerformance:
                 decky.logger.debug(f"Setting CPU Boost to {val} by writing to '{p}'")
                 with open(p, "w") as file:
                     file.write(val)
-        except Exception as e:
-            decky.logger.error(e)
-
-    def set_smt(self, enabled=True):
-        """Set multi-threading"""
-        try:
-            val = "on" if enabled else "off"
-            decky.logger.debug(
-                f"Setting SMT to {val} by writing to {CpuPerformance.SMT_PATH}"
-            )
-            with open(CpuPerformance.SMT_PATH, "w") as file:
-                file.write(val)
         except Exception as e:
             decky.logger.error(e)
 

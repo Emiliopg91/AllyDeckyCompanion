@@ -101,11 +101,6 @@ class Plugin:
         """Set CPU boost"""
         CPU_PERFORMANCE.set_cpu_boost(enabled)
 
-    async def set_smt(self, enabled: bool):
-        """Set CPU multithreading status"""
-        CPU_PERFORMANCE.set_smt(enabled)
-        sleep(0.1)
-
     # GPU
     async def get_gpu_frequency_range(self):
         """Get GPU freq range"""

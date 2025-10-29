@@ -67,12 +67,6 @@ export const AdvancedBlock: FC = () => {
     setProfile(newProf);
   };
 
-  const onSmtChange = (newVal: boolean): void => {
-    const newProf = { ...profile, cpu: { ...profile.cpu, smt: newVal } };
-    saveProfile(id, name, newProf);
-    setProfile(newProf);
-  };
-
   return (
     <PanelSection>
       <PanelSectionRow>
@@ -89,16 +83,6 @@ export const AdvancedBlock: FC = () => {
           onChange={onEppChange}
         />
       </PanelSectionRow>
-      {/*<PanelSectionRow>
-        <ToggleField
-          label="SMT"
-          description={Translator.translate('smt.description')}
-          checked={profile.cpu.smt}
-          onChange={onSmtChange}
-          highlightOnFocus
-        />
-      </PanelSectionRow>
-      */}
       <PanelSectionRow>
         <ToggleField
           label="CPU Boost"
@@ -109,21 +93,6 @@ export const AdvancedBlock: FC = () => {
           highlightOnFocus
         />
       </PanelSectionRow>
-      {/*<PanelSectionRow>
-        <SliderField
-          label={Translator.translate('cpu.governor')}
-          value={profile.cpu.governor}
-          min={0}
-          max={governorLabels.length - 1}
-          step={1}
-          notchCount={governorLabels.length}
-          notchLabels={governorLabels}
-          notchTicksVisible={true}
-          showValue={false}
-          onChange={onGovernorChange}
-        />
-      </PanelSectionRow>
-      */}
     </PanelSection>
   );
 };

@@ -207,8 +207,8 @@ export default definePlugin(() => {
         lifeCycle: true
       },
       system: {
-        resume: true,
-        suspension: true
+        resume: false,
+        suspension: false
       },
       toast: {
         logo: window.SP_REACT.createElement(RogIcon, {

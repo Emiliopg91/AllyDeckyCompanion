@@ -3,10 +3,6 @@
     "en": "Profile",
     "es": "Perfil"
   },
-  "smt.description": {
-    "en": "Enable multithreading. Best disabled for no CPU intensive software",
-    "es": "Habilitar multithreading. Desactivar para aplicaciones no intesivas"
-  },
   "cpu.boost.description": {
     "en": "Allow scale CPU clock speed. Produces huge impact on battery drain",
     "es": "Permitir subir reloj de CPU. Gran impacto en gasto de batería"

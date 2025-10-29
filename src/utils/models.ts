@@ -55,7 +55,6 @@ export interface Display {
 
 export interface CpuProfile {
   boost: boolean;
-  smt: boolean;
   tdp: TdpCpuProfile;
   governor: Governor;
   epp: Epp;

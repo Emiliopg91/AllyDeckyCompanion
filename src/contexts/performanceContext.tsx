@@ -43,7 +43,6 @@ const defaultValue: PerformanceContextType = {
     mode: Mode.PERFORMANCE,
     cpu: {
       boost: false,
-      smt: false,
       epp: Constants.DEFAULT_EPP,
       governor: Constants.DEFAULT_GOVERNOR,
       tdp: { fppl: 5, spl: 5, sppl: 5 }

@@ -31,7 +31,7 @@
 
 - [x] Custom TDP limit by settings SPL, SPPL and FPPL
 
-- [x] SMT control
+- [x] Energy performance preference
 
 - [x] CPU Boost control
 
@@ -49,7 +49,7 @@
 
 ## Compatibility
 
-Tested on Bazzite 3.7.0.
+Tested on Bazzite 42
 
 # Install
 
@@ -63,14 +63,8 @@ For early versions, secure boot must be disabled.
 
 Run the following in terminal, then reboot. Note that this works both for installing or updating the plugin
 
-```
-
-
-
+```bash
 curl -L https://github.com/Emiliopg91/AllyDeckyCompanion/raw/main/install.sh | sh
-
-
-
 ```
 
 ### Manual Install
@@ -81,14 +75,8 @@ Unzip the `tar.gz` file, and move the `AllyDeckyCompanion` folder to your `$HOME
 
 then run:
 
-```
-
-
-
+```bash
 sudo systemctl restart plugin_loader.service
-
-
-
 ```
 
 then reboot your machine.
@@ -98,17 +86,8 @@ then reboot your machine.
 In Desktop mode, run the following in terminal:
 
 ```bash
-
-
-
-sudo  rm  -rf  $HOME/homebrew/plugins/AllyDeckyCompanion
-
-
-
-sudo  systemctl  restart  plugin_loader.service
-
-
-
+sudo rm -rf $HOME/homebrew/plugins/AllyDeckyCompanion
+sudo systemctl restart plugin_loader.service
 ```
 
 # Attribution

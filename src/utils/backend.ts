@@ -154,7 +154,6 @@ export class BackendUtils {
               mode: profile.mode,
               cpu: profile.cpu
             });
-            //await Backend.backend_call<[enabled: boolean], number>('set_smt', true);
             await Backend.backend_call<[enabled: boolean], number>(
               'set_cpu_boost',
               profile.cpu.boost
@@ -174,7 +173,6 @@ export class BackendUtils {
               profile.cpu.tdp.sppl,
               profile.cpu.tdp.fppl
             );
-            //await Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt);
           }
           Logger.info('Profile applied');
           BackendUtils.currentProfile = profile;
