@@ -13,7 +13,7 @@ import { BackendUtils } from './utils/backend';
 import { Constants } from './utils/constants';
 import { CorsClient } from './utils/cors';
 import { Listeners } from './utils/listeners';
-import { SystemInfoSchema } from './utils/models';
+import { CpuImpl, SystemInfoSchema } from './utils/models';
 import { PluginSettings } from './utils/settings';
 import { WhiteBoardUtils } from './utils/whiteboard';
 
@@ -178,6 +178,16 @@ const getCpuRanges = (): Promise<void> => {
   });
 };
 
+const getCpuImpl = (): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    BackendUtils.getCpuImpl().then((data) => {
+      WhiteBoardUtils.setCpuImpl(data);
+      Logger.info('CPU Impl: ' + CpuImpl[data]);
+      resolve();
+    });
+  });
+};
+
 const getSchedulers = (): Promise<void> => {
   return new Promise<void>((resolve) => {
     BackendUtils.getSchedulers().then((data) => {
@@ -274,52 +284,57 @@ export default definePlugin(() => {
             Logger.info('BIOS version: ' + result.biosVersion);
           }
 
-          getCpuRanges().then(() => {
-            getGpuRanges().then(() => {
-              getSchedulers().then(() => {
-                WhiteBoardUtils.setOnlyGui(
-                  !WhiteBoardUtils.getIsAlly() || WhiteBoardUtils.getSdtdpEnabled()
-                );
-                Logger.info(
-                  'Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled'
-                );
+          getCpuImpl().then(() => {
+            getCpuRanges().then(() => {
+              getGpuRanges().then(() => {
+                getSchedulers().then(() => {
+                  WhiteBoardUtils.setOnlyGui(
+                    !WhiteBoardUtils.getIsAlly() || WhiteBoardUtils.getSdtdpEnabled()
+                  );
+                  Logger.info(
+                    'Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled'
+                  );
 
-                BackendUtils.isSdtdpPresent().then((res) => {
-                  Logger.info('SDTDP ' + (res ? '' : 'no ') + 'present');
-                  WhiteBoardUtils.setSdtdpSettingsPresent(res);
-                });
-
-                sleep(5000).then(() => {
-                  if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
-                    pluginUpdateCheckTimer = setInterval(checkPluginLatestVersion, 60 * 60 * 1000);
-                    checkPluginLatestVersion();
-                  }
-                  sleep(1000).then(() => {
-                    biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000);
-                    checkBiosLatestVersion();
+                  BackendUtils.isSdtdpPresent().then((res) => {
+                    Logger.info('SDTDP ' + (res ? '' : 'no ') + 'present');
+                    WhiteBoardUtils.setSdtdpSettingsPresent(res);
                   });
-                });
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                SteamClient.System.Audio.GetDevices().then((devs: any) => {
-                  const dev = devs.vecDevices.filter(
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (dev: any) => dev.id == devs.activeOutputDeviceId
-                  )[0];
-                  WhiteBoardUtils.setAudioDevice(dev.sName);
-                  WhiteBoardUtils.setVolume(dev.flOutputVolume);
-                  Listeners.bind();
-
-                  BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
-                  BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
-                  if (WhiteBoardUtils.getIsAlly()) {
-                    sleep(100).then(() => {
-                      Profiles.getDefaultProfile();
-                      Profiles.getDefaultACProfile();
-                      Profiles.summary();
-                      Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+                  sleep(5000).then(() => {
+                    if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
+                      pluginUpdateCheckTimer = setInterval(
+                        checkPluginLatestVersion,
+                        60 * 60 * 1000
+                      );
+                      checkPluginLatestVersion();
+                    }
+                    sleep(1000).then(() => {
+                      biosUpdateCheckTimer = setInterval(checkBiosLatestVersion, 60 * 60 * 1000);
+                      checkBiosLatestVersion();
                     });
-                  }
+                  });
+
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  SteamClient.System.Audio.GetDevices().then((devs: any) => {
+                    const dev = devs.vecDevices.filter(
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      (dev: any) => dev.id == devs.activeOutputDeviceId
+                    )[0];
+                    WhiteBoardUtils.setAudioDevice(dev.sName);
+                    WhiteBoardUtils.setVolume(dev.flOutputVolume);
+                    Listeners.bind();
+
+                    BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
+                    BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
+                    if (WhiteBoardUtils.getIsAlly()) {
+                      sleep(100).then(() => {
+                        Profiles.getDefaultProfile();
+                        Profiles.getDefaultACProfile();
+                        Profiles.summary();
+                        Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+                      });
+                    }
+                  });
                 });
               });
             });

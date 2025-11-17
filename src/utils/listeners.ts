@@ -101,6 +101,9 @@ export class Listeners {
     Listeners.unsubscribeGameEvents = EventBus.subscribe(EventType.GAME_LIFE, (e: EventData) => {
       const event = e as GameLifeEventData;
       Logger.info('New game event');
+      if (event.isRunning()) {
+        BackendUtils.renice(event.getPID());
+      }
       if (PluginSettings.getProfilePerGame()) {
         const prevId = WhiteBoardUtils.getRunningGameId();
         const newId = event.isRunning()

@@ -4,6 +4,7 @@ import { FC, useState } from 'react';
 
 import { BackendUtils } from '../../utils/backend';
 import { Constants } from '../../utils/constants';
+import { CpuImpl } from '../../utils/models';
 import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const PluginBlock: FC = () => {
@@ -11,6 +12,11 @@ export const PluginBlock: FC = () => {
 
   return (
     <PanelSection title={Translator.translate('plugin')}>
+      <PanelSectionRow>
+        <Field label={Translator.translate('implementation')} bottomSeparator="none">
+          {CpuImpl[WhiteBoardUtils.getCpuImpl()]}
+        </Field>
+      </PanelSectionRow>
       <PanelSectionRow>
         <Field label={Translator.translate('installed.version')} bottomSeparator="none">
           {Constants.PLUGIN_VERSION}

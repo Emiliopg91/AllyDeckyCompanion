@@ -1,7 +1,8 @@
 import { FC, useContext } from 'react';
 
 import { PerformanceContext } from '../../contexts/performanceContext';
-import { Mode } from '../../utils/models';
+import { CpuImpl, Mode } from '../../utils/models';
+import { WhiteBoardUtils } from '../../utils/whiteboard';
 import { CpuBlock } from './cpu/main';
 import { GpuBlock } from './gpuBlock';
 import { HeaderBlock } from './headerBlock';
@@ -14,7 +15,7 @@ export const PerformanceBlock: FC = () => {
     <>
       <HeaderBlock />
       <ModeBlock />
-      {profile.mode == Mode.CUSTOM && (
+      {(profile.mode == Mode.CUSTOM || WhiteBoardUtils.getCpuImpl() == CpuImpl.RYZENADJ) && (
         <>
           <CpuBlock />
           <GpuBlock />

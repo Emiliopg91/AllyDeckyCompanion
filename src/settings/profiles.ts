@@ -184,9 +184,24 @@ export class Profiles {
 
   public static getAcpiProfile(spl: number): Acpi {
     let epp = Acpi.PERFORMANCE;
-    if (spl <= Constants.AllySilentSPL) {
+    let silentSpl = WhiteBoardUtils.getIsAllyX()
+      ? Constants.AllyXSilentSPL
+      : WhiteBoardUtils.getIsXboxAllyX()
+        ? Constants.XboxAllyXSilentSPL
+        : WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllySilentSPL
+          : Constants.AllySilentSPL;
+    let performanceSpl = WhiteBoardUtils.getIsAllyX()
+      ? Constants.AllyXPerformanceSPL
+      : WhiteBoardUtils.getIsXboxAllyX()
+        ? Constants.XboxAllyXPerformanceSPL
+        : WhiteBoardUtils.getIsXboxAlly()
+          ? Constants.XboxAllyPerformanceSPL
+          : Constants.AllyPerformanceSPL;
+
+    if (spl <= silentSpl) {
       epp = Acpi.LOW_POWER;
-    } else if (spl <= Constants.AllyPerformanceSPL) {
+    } else if (spl <= performanceSpl) {
       epp = Acpi.BALANCED;
     }
     return epp;

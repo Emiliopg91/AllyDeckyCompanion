@@ -234,5 +234,9 @@
   "cpu.scheduler": {
     "en": "Scheduler",
     "es": "Planificador"
+  },
+  "implementation": {
+    "en": "Implementation",
+    "es": "Implementación"
   }
 }

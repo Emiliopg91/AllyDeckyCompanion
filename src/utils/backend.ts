@@ -3,7 +3,7 @@ import { Backend, Logger } from 'decky-plugin-framework';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
-import { Acpi, AudioDevice, Epp, Governor, Profile, SdtdpSettings } from './models';
+import { Acpi, AudioDevice, CpuImpl, Epp, Governor, Profile, SdtdpSettings } from './models';
 import { WhiteBoardUtils } from './whiteboard';
 
 /**
@@ -191,12 +191,22 @@ export class BackendUtils {
     }
   }
 
+  public static async renice(pid: number): Promise<void> {
+    Logger.info('Renicing process ' + pid + ' and its children');
+    return await Backend.backend_call<[number], void>('renice', pid);
+  }
+
+  public static async getCpuImpl(): Promise<CpuImpl> {
+    return (await Backend.backend_call<[], number>('get_cpu_impl')) as CpuImpl;
+  }
+
   public static async setBatteryLimit(limit: number): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
       Logger.info('Setting battery limit to ' + limit + '%');
       Backend.backend_call<[limit: number], number>('set_charge_limit', limit);
     }
   }
+
   public static async setMcuPowersave(enabled: boolean): Promise<void> {
     if (WhiteBoardUtils.getIsAlly()) {
       Logger.info('Setting MCU powersave to ' + enabled);
