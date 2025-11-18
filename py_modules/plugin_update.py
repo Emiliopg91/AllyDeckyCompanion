@@ -5,6 +5,7 @@ import stat
 import urllib.request
 import json
 import ssl
+import subprocess
 import shutil
 
 import decky  # pylint: disable=import-error
@@ -48,6 +49,16 @@ class PluginUpdate:
         return file_path
 
     @staticmethod
+    def chown_recursive(path: str, uid: int, gid: int):
+        os.chown(path, uid, gid)
+
+        for root, dirs, files in os.walk(path):
+            for d in dirs:
+                os.chown(os.path.join(root, d), uid, gid)
+            for f in files:
+                os.chown(os.path.join(root, f), uid, gid)
+
+    @staticmethod
     def ota_update():
         """Trigger OTA update"""
         downloaded_filepath = PluginUpdate.download_latest_build()
@@ -66,6 +77,10 @@ class PluginUpdate:
                     downloaded_filepath, f"{decky.DECKY_USER_HOME}/homebrew/plugins"
                 )
                 os.remove(downloaded_filepath)
+                decky.logger.debug("Adjusting user and group id")
+                PluginUpdate.chown_recursive(
+                    f"{decky.DECKY_USER_HOME}/homebrew/plugins/AllyDeckyCompanion", 0, 0
+                )
             except Exception as e:
                 decky.logger.error(f"Error during OTA install {e}")
 
