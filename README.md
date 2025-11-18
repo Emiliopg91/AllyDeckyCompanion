@@ -35,9 +35,9 @@
 
 - [x] CPU Boost control
 
-- [x] GPU frequency control
+- [X] CPU scheduler selector 
 
-- [x] CPU and TDP boost on suspend-resume events
+- [x] GPU frequency control
 
 - [x] Battery charge limit to 80% to expand battery lifespan
 
@@ -47,9 +47,11 @@
 
 - [x] Check for BIOS updates
 
+- [x] Remember audio and brightness level by profile 
+
 ## Compatibility
 
-Tested on Bazzite 42
+Tested on Bazzite and CachyOS
 
 # Install
 
