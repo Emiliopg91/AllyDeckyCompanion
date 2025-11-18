@@ -2,6 +2,7 @@ import { Router } from '@decky/ui';
 import { WhiteBoard } from 'decky-plugin-framework';
 
 import { Constants } from './constants';
+import { CpuImpl } from './models';
 
 export class WhiteBoardUtils {
   public static getScheduler(): string {
@@ -151,6 +152,14 @@ export class WhiteBoardUtils {
 
   public static setTdpRange(value: Record<string, number[]>): void {
     WhiteBoard.set('tdpRange', value);
+  }
+
+  public static getCpuImpl(): CpuImpl {
+    return WhiteBoard.get('cpuImpl') as CpuImpl;
+  }
+
+  public static setCpuImpl(value: CpuImpl): void {
+    WhiteBoard.set('cpuImpl', value);
   }
   /*
   public static getSplMin(): number {

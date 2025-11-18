@@ -3,7 +3,8 @@ import { Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 
 import { PerformanceContext } from '../../contexts/performanceContext';
-import { Mode } from '../../utils/models';
+import { CpuImpl, Mode } from '../../utils/models';
+import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const ModeBlock: FC = () => {
   const modeIndexes: Array<number> = [];
@@ -14,15 +15,20 @@ export const ModeBlock: FC = () => {
   Object.entries(Mode)
     .filter(([key]) => !isNaN(Number(key))) // Filtra los valores numéricos
     .map(([key, value]) => {
-      modeIndexes.push(Number(key));
-      modeTags.push(String(value));
+      if (
+        notchIdx != Object.entries(Mode).filter(([key]) => !isNaN(Number(key))).length - 1 ||
+        WhiteBoardUtils.getCpuImpl() != CpuImpl.RYZENADJ
+      ) {
+        modeIndexes.push(Number(key));
+        modeTags.push(String(value));
 
-      notchLabels.push({
-        notchIndex: notchIdx,
-        value: notchIdx,
-        label: Translator.translate('mode.' + String(value))
-      });
-      notchIdx++;
+        notchLabels.push({
+          notchIndex: notchIdx,
+          value: notchIdx,
+          label: Translator.translate('mode.' + String(value))
+        });
+        notchIdx++;
+      }
     });
 
   const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);

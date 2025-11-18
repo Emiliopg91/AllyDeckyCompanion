@@ -78,6 +78,10 @@ class Plugin:
         CPU_PERFORMANCE.set_platform_profile(prof)
         sleep(0.1)
 
+    async def get_cpu_impl(self):
+        """Set CPU manager id"""
+        return CPU_PERFORMANCE.get_impl_id()
+
     async def get_tdp_ranges(self):
         """Get CPU TDP ranges"""
         try:
@@ -88,19 +92,17 @@ class Plugin:
     async def set_tdp(self, spl: int, sppl: int, fppl: int):
         """Set CPU TDP"""
         try:
-            sleep(0.1)
-            CPU_PERFORMANCE.set_tdp("FAST", CPU_PERFORMANCE.FPPT_FN, fppl)
-            sleep(0.1)
-            CPU_PERFORMANCE.set_tdp("SLOW", CPU_PERFORMANCE.SPPT_FN, sppl)
-            sleep(0.1)
-            CPU_PERFORMANCE.set_tdp("STEADY", CPU_PERFORMANCE.SPL_FN, spl)
-            sleep(0.1)
+            CPU_PERFORMANCE.set_tdp(spl, sppl, fppl)
         except Exception as e:
             decky.logger.error(e)
 
     async def set_cpu_boost(self, enabled: bool):
         """Set CPU boost"""
         CPU_PERFORMANCE.set_cpu_boost(enabled)
+
+    async def renice(self, pid: int):
+        """Renice processes"""
+        CPU_PERFORMANCE.renice(pid)
 
     # Schedulers
     async def get_schedulers(self):

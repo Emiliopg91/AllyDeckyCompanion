@@ -73,6 +73,12 @@ export enum Governor {
   PERFORMANCE
 }
 
+export enum CpuImpl {
+  ARMOURY,
+  RYZENADJ,
+  WMI
+}
+
 export enum Epp {
   POWER,
   BALANCE_POWER,
