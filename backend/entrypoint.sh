@@ -10,6 +10,7 @@ git clone https://github.com/FlyGoat/RyzenAdj /tmp/ryzenadj
 cd /tmp/ryzenadj
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release .. || exit 1
+tree
 make || exit 1
 mv ryzenadj /backend/out/ryzenadj || exit 1
 chmod +x /backend/out/ryzenadj || exit 1
