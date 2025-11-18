@@ -24,8 +24,7 @@ class PluginUpdate:
 
     @staticmethod
     def download_latest_build():
-        """Download latest build"""
-        # ssl._create_default_https_context = ssl._create_unverified_context
+        """Download latest version"""
         url = (
             "http://api.github.com/repos/Emiliopg91/AllyDeckyCompanion/releases/latest"
         )
@@ -35,9 +34,9 @@ class PluginUpdate:
         response = urllib.request.urlopen(url, context=gcontext)
         json_data = json.load(response)
 
-        download_url = json_data.get("name")
+        download_url = json_data.get("assets")[0].get("browser_download_url")
 
-        file_path = "/tmp/AllyDeckyCompanion.tar.gz"
+        file_path = f"/tmp/{decky.DECKY_PLUGIN_NAME}.tar.gz"
 
         with urllib.request.urlopen(download_url, context=gcontext) as response, open(
             file_path, "wb"
