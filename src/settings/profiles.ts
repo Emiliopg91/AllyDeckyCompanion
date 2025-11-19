@@ -50,6 +50,7 @@ export class Profiles {
     headers.push({ data: 'BOOST*', align: 'center' });
     headers.push({ data: 'GOVERNOR*', align: 'center' });
     headers.push({ data: 'SCHEDULER*', align: 'center' });
+    headers.push({ data: 'SMT*', align: 'center' });
     headers.push({ data: 'EPP*', align: 'center' });
     headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
 
@@ -83,6 +84,10 @@ export class Profiles {
           });
           line.push({
             data: profile.cpu.scheduler == '' ? 'NONE' : profile.cpu.scheduler.toUpperCase(),
+            align: 'right'
+          });
+          line.push({
+            data: profile.cpu.smt ?? Constants.DEFAULT_SMT,
             align: 'right'
           });
           line.push({
@@ -129,6 +134,7 @@ export class Profiles {
       mode: Mode.TURBO,
       cpu: {
         boost: false,
+        smt: true,
         tdp: {
           spl: WhiteBoardUtils.getTdpRange()['spl'][1],
           sppl: WhiteBoardUtils.getTdpRange()['sppt'][1],
@@ -232,6 +238,7 @@ export class Profiles {
             fppl: prof.cpu.tdp.fppl
           },
           boost: prof.cpu.boost,
+          smt: prof.cpu.smt ?? Constants.DEFAULT_SMT,
           governor: prof.cpu.governor,
           epp: prof.cpu.epp ?? Constants.DEFAULT_EPP,
           scheduler: prof.cpu.scheduler ?? undefined
@@ -265,6 +272,7 @@ export class Profiles {
         },
         boost: Constants.CPU_DEFAULT_BOOST,
         governor: Governor.POWERSAVE,
+        smt: Constants.DEFAULT_SMT,
         epp: Constants.DEFAULT_EPP,
         scheduler: ''
       },
@@ -387,6 +395,7 @@ export class Profiles {
               sppl: tdp,
               fppl: tdp
             },
+            smt: cfg.tdpProfiles[id].smt,
             boost: cfg.tdpProfiles[id].cpuBoost,
             governor: Governor.POWERSAVE,
             epp: Constants.DEFAULT_EPP,

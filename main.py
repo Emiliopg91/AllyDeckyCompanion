@@ -100,6 +100,11 @@ class Plugin:
         """Set CPU boost"""
         CPU_PERFORMANCE.set_cpu_boost(enabled)
 
+    async def set_smt(self, enabled: bool):
+        """Set CPU multithreading status"""
+        CPU_PERFORMANCE.set_smt(enabled)
+        sleep(0.1)
+
     async def renice(self, pid: int):
         """Renice processes"""
         CPU_PERFORMANCE.renice(pid)

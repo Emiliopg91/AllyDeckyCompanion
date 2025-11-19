@@ -71,6 +71,12 @@ export const AdvancedBlock: FC = () => {
     setProfile(newProf);
   };
 
+  const onSmtChange = (newVal: boolean): void => {
+    const newProf = { ...profile, cpu: { ...profile.cpu, smt: newVal } };
+    saveProfile(id, name, newProf);
+    setProfile(newProf);
+  };
+
   return (
     <PanelSection>
       <PanelSectionRow>
@@ -103,6 +109,15 @@ export const AdvancedBlock: FC = () => {
           />
         </PanelSectionRow>
       )}
+      <PanelSectionRow>
+        <ToggleField
+          label="SMT"
+          description={Translator.translate('smt.description')}
+          checked={profile.cpu.smt}
+          onChange={onSmtChange}
+          highlightOnFocus
+        />
+      </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
           label={Translator.translate('cpu.boost')}

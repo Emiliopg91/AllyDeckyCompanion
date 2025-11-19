@@ -26,6 +26,7 @@ export class Constants {
   public static PROFILE_TURBO = 'turbo';
   public static PROFILE_CUSTOM = 'custom';
 
+  public static DEFAULT_SMT = true;
   public static DEFAULT_EPP = Epp.BALANCE_POWER;
   public static DEFAULT_GOVERNOR = Governor.POWERSAVE;
 

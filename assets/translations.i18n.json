@@ -238,5 +238,9 @@
   "implementation": {
     "en": "Implementation",
     "es": "Implementación"
+  },
+  "smt.description": {
+    "en": "Enable multithreading. Best disabled for no CPU intensive software",
+    "es": "Habilitar multihilo. Desactivar para aplicaciones no intesivas"
   }
 }

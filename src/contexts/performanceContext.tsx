@@ -45,7 +45,9 @@ const defaultValue: PerformanceContextType = {
       boost: false,
       epp: Constants.DEFAULT_EPP,
       governor: Constants.DEFAULT_GOVERNOR,
-      tdp: { fppl: 5, spl: 5, sppl: 5 }
+      tdp: { fppl: 5, spl: 5, sppl: 5 },
+      smt: Constants.DEFAULT_SMT,
+      scheduler: ''
     },
     gpu: { frequency: { min: 800, max: 2700 } },
     display: {},
