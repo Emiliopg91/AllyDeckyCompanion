@@ -4,6 +4,7 @@ import {
   EventType,
   GameLifeEventData,
   Logger,
+  SuspendEventData,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
 import { debounce } from 'lodash';
@@ -14,12 +15,14 @@ import { BackendUtils } from './backend';
 import { Constants } from './constants';
 import { PluginSettings } from './settings';
 import { WhiteBoardUtils } from './whiteboard';
+import { sleep } from '@decky/ui';
 
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
   private static unsubscribeBrightnessEvents: (() => void) | undefined = undefined;
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
   private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
+  private static unsubscribeSuspendEvents: (() => void) | undefined = undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static debouncedBrightnessListener = debounce((event: any) => {
@@ -76,6 +79,23 @@ export class Listeners {
   }, 1000);
 
   public static bind(): void {
+    Listeners.unsubscribeSuspendEvents = EventBus.subscribe(EventType.SUSPEND, (e: EventData) => {
+      const event = e as SuspendEventData;
+      if (event.isSuspend()) {
+        AsyncUtils.runMutexForProfile((release) => {
+          Logger.info('Setting CPU profile for suspension');
+          BackendUtils.applyProfile(Profiles.getFullPowerProfile()).finally(() => {
+            release();
+          });
+        });
+      } else {
+        Logger.info('Waiting for 10 seconds since resume to restore profile');
+        sleep(10000).then(() => {
+          Logger.info('Restoring profile');
+          BackendUtils.applyProfile(Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId()));
+        });
+      }
+    }).unsubscribe;
     Listeners.unsubscribeShutdownEvents = SteamClient.User.RegisterForShutdownStart(() => {
       AsyncUtils.runMutexForProfile((release) => {
         Logger.info('Setting CPU profile for shutdown/restart');
@@ -169,6 +189,9 @@ export class Listeners {
     }
     if (Listeners.unsubscribeShutdownEvents) {
       Listeners.unsubscribeShutdownEvents();
+    }
+    if (Listeners.unsubscribeSuspendEvents) {
+      Listeners.unsubscribeSuspendEvents();
     }
   }
 }

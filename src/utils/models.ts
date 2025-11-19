@@ -59,6 +59,7 @@ export interface CpuProfile {
   governor: Governor;
   epp: Epp;
   scheduler: string;
+  smt: boolean;
 }
 
 export enum Mode {
