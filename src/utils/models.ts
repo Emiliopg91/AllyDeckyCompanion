@@ -60,6 +60,8 @@ export interface CpuProfile {
   epp: Epp;
   scheduler: string;
   smt: boolean;
+  pcores: number;
+  ecores: number;
 }
 
 export enum Mode {

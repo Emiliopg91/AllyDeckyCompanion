@@ -135,6 +135,8 @@ export class PluginSettings {
     prof.cpu.governor = profile.cpu.governor;
     prof.cpu.scheduler = profile.cpu.scheduler;
     prof.cpu.smt = profile.cpu.smt;
+    prof.cpu.ecores = profile.cpu.ecores;
+    prof.cpu.pcores = profile.cpu.pcores;
     prof.cpu.tdp.spl = profile.cpu.tdp.spl;
     prof.cpu.tdp.sppl = profile.cpu.tdp.sppl;
     prof.cpu.tdp.fppl = profile.cpu.tdp.fppl;

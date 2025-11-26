@@ -9,6 +9,24 @@ import { WhiteBoardUtils } from '../../../utils/whiteboard';
 export const AdvancedBlock: FC = () => {
   const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
+  const eCoresLabels: NotchLabel[] = [];
+  for (let i = 0; i <= WhiteBoardUtils.getECores(); i++) {
+    eCoresLabels.push({
+      notchIndex: i,
+      value: i,
+      label: String(i)
+    });
+  }
+
+  const pCoresLabels: NotchLabel[] = [];
+  for (let i = 0; i < WhiteBoardUtils.getPCores(); i++) {
+    pCoresLabels.push({
+      notchIndex: i,
+      value: i,
+      label: String(i + 1)
+    });
+  }
+
   const scxLabels: NotchLabel[] = [];
   let scxNotchIdx = 0;
   scxLabels.push({
@@ -65,6 +83,30 @@ export const AdvancedBlock: FC = () => {
     setProfile(newProf);
   };
 
+  const onPCoreChange = (newVal: number): void => {
+    const newProf = {
+      ...profile,
+      cpu: {
+        ...profile.cpu,
+        pcores: newVal
+      }
+    };
+    saveProfile(id, name, newProf);
+    setProfile(newProf);
+  };
+
+  const onECoreChange = (newVal: number): void => {
+    const newProf = {
+      ...profile,
+      cpu: {
+        ...profile.cpu,
+        ecores: newVal
+      }
+    };
+    saveProfile(id, name, newProf);
+    setProfile(newProf);
+  };
+
   const onCpuBoostChange = (newVal: boolean): void => {
     const newProf = { ...profile, cpu: { ...profile.cpu, boost: newVal } };
     saveProfile(id, name, newProf);
@@ -106,6 +148,36 @@ export const AdvancedBlock: FC = () => {
             notchTicksVisible={true}
             showValue={false}
             onChange={onScxChange}
+          />
+        </PanelSectionRow>
+      )}
+      <PanelSectionRow>
+        <SliderField
+          label="P-Cores"
+          value={profile.cpu.pcores}
+          min={1}
+          max={WhiteBoardUtils.getPCores()}
+          step={1}
+          notchCount={pCoresLabels.length}
+          notchLabels={pCoresLabels}
+          notchTicksVisible={true}
+          showValue={false}
+          onChange={onPCoreChange}
+        />
+      </PanelSectionRow>
+      {WhiteBoardUtils.getECores() > 0 && (
+        <PanelSectionRow>
+          <SliderField
+            label="E-Cores"
+            value={profile.cpu.ecores}
+            min={0}
+            max={WhiteBoardUtils.getECores()}
+            step={1}
+            notchCount={eCoresLabels.length}
+            notchLabels={eCoresLabels}
+            notchTicksVisible={true}
+            showValue={false}
+            onChange={onECoreChange}
           />
         </PanelSectionRow>
       )}

@@ -109,6 +109,14 @@ class Plugin:
         """Renice processes"""
         CPU_PERFORMANCE.renice(pid)
 
+    async def get_cores_count(self):
+        """Get CPU cores count"""
+        return CPU_PERFORMANCE.get_cores_count()
+
+    async def enable_cores(self, p_cores, e_cores, smt):
+        """Enable CPU Cores"""
+        return CPU_PERFORMANCE.enable_cores(p_cores, e_cores, smt)
+
     # Schedulers
     async def get_schedulers(self):
         """Get all available schedulers"""

@@ -146,6 +146,22 @@ export class WhiteBoardUtils {
     return Number(WhiteBoard.get('gpuMaxFreq') || 2700);
   }
 
+  public static setPCores(value: number): void {
+    WhiteBoard.set('pCores', value);
+  }
+
+  public static getPCores(): number {
+    return Number(WhiteBoard.get('pCores') || 0);
+  }
+
+  public static setECores(value: number): void {
+    WhiteBoard.set('eCores', value);
+  }
+
+  public static getECores(): number {
+    return Number(WhiteBoard.get('eCores') || 0);
+  }
+
   public static getTdpRange(): Record<string, number[]> {
     return WhiteBoard.get('tdpRange') as Record<string, number[]>;
   }

@@ -154,7 +154,13 @@ export class BackendUtils {
               mode: profile.mode,
               cpu: profile.cpu
             });
-            await Backend.backend_call<[enabled: boolean], number>('set_smt', true);
+
+            await Backend.backend_call<[number, number, boolean], void>(
+              'enable_cores',
+              WhiteBoardUtils.getPCores(),
+              WhiteBoardUtils.getECores(),
+              true
+            );
             await Backend.backend_call<[enabled: boolean], number>(
               'set_cpu_boost',
               profile.cpu.boost
@@ -182,7 +188,12 @@ export class BackendUtils {
               profile.cpu.tdp.sppl,
               profile.cpu.tdp.fppl
             );
-            await Backend.backend_call<[enabled: boolean], number>('set_smt', profile.cpu.smt);
+            await Backend.backend_call<[number, number, boolean], void>(
+              'enable_cores',
+              profile.cpu.pcores,
+              profile.cpu.ecores,
+              profile.cpu.smt
+            );
           }
           Logger.info('Profile applied');
           BackendUtils.currentProfile = profile;
@@ -283,5 +294,9 @@ export class BackendUtils {
 
   public static isWindowsPresent(): Promise<boolean> {
     return Backend.backend_call<[], boolean>('windows_present');
+  }
+
+  public static getCoresCount(): Promise<[number, number]> {
+    return Backend.backend_call<[], [number, number]>('get_cores_count');
   }
 }

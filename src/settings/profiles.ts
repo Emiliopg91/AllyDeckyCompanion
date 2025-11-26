@@ -50,6 +50,8 @@ export class Profiles {
     headers.push({ data: 'BOOST*', align: 'center' });
     headers.push({ data: 'GOVERNOR*', align: 'center' });
     headers.push({ data: 'SCHEDULER*', align: 'center' });
+    headers.push({ data: 'PCORES*', align: 'center' });
+    headers.push({ data: 'ECORES*', align: 'center' });
     headers.push({ data: 'SMT*', align: 'center' });
     headers.push({ data: 'EPP*', align: 'center' });
     headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
@@ -84,6 +86,14 @@ export class Profiles {
           });
           line.push({
             data: profile.cpu.scheduler == '' ? 'NONE' : profile.cpu.scheduler.toUpperCase(),
+            align: 'right'
+          });
+          line.push({
+            data: profile.cpu.pcores ?? WhiteBoardUtils.getPCores(),
+            align: 'right'
+          });
+          line.push({
+            data: profile.cpu.ecores ?? WhiteBoardUtils.getECores(),
             align: 'right'
           });
           line.push({
@@ -142,7 +152,9 @@ export class Profiles {
         },
         governor: Governor.POWERSAVE,
         epp: Constants.DEFAULT_EPP,
-        scheduler: ''
+        scheduler: '',
+        pcores: WhiteBoardUtils.getPCores(),
+        ecores: WhiteBoardUtils.getECores()
       },
       gpu: {
         frequency: {
@@ -241,7 +253,9 @@ export class Profiles {
           smt: prof.cpu.smt ?? Constants.DEFAULT_SMT,
           governor: prof.cpu.governor,
           epp: prof.cpu.epp ?? Constants.DEFAULT_EPP,
-          scheduler: prof.cpu.scheduler ?? undefined
+          scheduler: prof.cpu.scheduler ?? undefined,
+          pcores: prof.cpu.pcores ?? WhiteBoardUtils.getPCores(),
+          ecores: prof.cpu.ecores ?? WhiteBoardUtils.getECores()
         },
         gpu: {
           frequency: {
@@ -274,7 +288,9 @@ export class Profiles {
         governor: Governor.POWERSAVE,
         smt: Constants.DEFAULT_SMT,
         epp: Constants.DEFAULT_EPP,
-        scheduler: ''
+        scheduler: '',
+        pcores: WhiteBoardUtils.getPCores(),
+        ecores: WhiteBoardUtils.getECores()
       },
       gpu: {
         frequency: {
@@ -399,7 +415,9 @@ export class Profiles {
             boost: cfg.tdpProfiles[id].cpuBoost,
             governor: Governor.POWERSAVE,
             epp: Constants.DEFAULT_EPP,
-            scheduler: ''
+            scheduler: '',
+            pcores: WhiteBoardUtils.getPCores(),
+            ecores: WhiteBoardUtils.getECores()
           },
           gpu: {
             frequency: {
