@@ -39,22 +39,21 @@ class BaseCpuPerformance(ABC):
             print(e)
 
         self.smt_map = BaseCpuPerformance.__get_smt_map()
-        decky.logger.info("CPU-SMT map:", self.smt_map)
-
         cpu_cache_ids = BaseCpuPerformance.__build_cache_groups()
         p_cores, c_cores = BaseCpuPerformance.__detect_p_and_c_cores(cpu_cache_ids)
         p_phys, c_phys = BaseCpuPerformance.__detect_physical_cores_only(
             p_cores, c_cores, self.smt_map
         )
-
-        self.cores = p_phys + c_phys
-        decky.logger.info(f"Cores: {self.cores}")
-
+        self.cores = sorted(p_phys + c_phys)
         self.p_cores = p_phys
-        decky.logger.info(f"P-cores: {p_phys}")
-
         self.c_cores = c_phys
-        decky.logger.info(f"C-cores: {c_phys}")
+
+        decky.logger.info(f"Cores: {', '.join(str(c) for c in self.cores)}")
+        decky.logger.info(f"P-cores: {', '.join(str(c) for c in p_phys)}")
+        decky.logger.info(f"C-cores: {', '.join(str(c) for c in c_phys)}")
+        decky.logger.info("CPU-SMT map:")
+        for core, smts in self.smt_map.items():
+            decky.logger.info(f"  {core}: {','.join(str(c) for c in smts)}")
 
     @staticmethod
     def __build_cache_groups():
@@ -277,48 +276,58 @@ class BaseCpuPerformance(ABC):
 
         return res
 
-    def __set_core_state(self, core, p_core, state, is_smt):
+    def __set_core_state(self, core, p_core, state):
         path = f"/sys/devices/system/cpu/cpu{core}/online"
         try:
             core_type = "p-core" if p_core else "e-core"
             action = "Enabling" if state else "Disabling"
-            smt_flag = "(SMT)" if is_smt else ""
             value = "1" if state else "0"
 
-            decky.logger.error(
-                f"{action} {core_type} {core} {smt_flag} by writing {value} to {path}"
+            decky.logger.debug(
+                f"{action} {core_type} {core} by writing {value} to {path}"
             )
-            with open(path, "w") as f:
-                f.write(value)
+            if core != 0:
+                with open(path, "w") as f:
+                    f.write(value)
         except Exception as e:
             decky.logger.error(f"Cannot enable core {core}: {e}")
+
+    def __get_cores_status(
+        self,
+        core_list: list[int],
+        enabled_cores: int,
+        smt: bool,
+        cores_status: dict[int, bool],
+    ):
+        for idx in range(len(core_list)):  # pylint: disable=C0200
+            core = core_list[idx]
+            enabled = idx < enabled_cores
+
+            cores_status[core] = enabled
+
+            if core in self.smt_map and len(self.smt_map[core]) > 0:
+                for subcore in self.smt_map[core]:
+                    cores_status[subcore] = enabled and smt
 
     def enable_cores(self, p_cores, e_cores, smt):
         """Enable CPU cores"""
         p_cores = min(max(p_cores, 1), len(self.p_cores))
         e_cores = min(max(e_cores, 0), len(self.c_cores))
 
-        for idx in range(len(self.p_cores)):  # pylint: disable=C0200
-            core = self.p_cores[idx]
-            enabled = idx < p_cores
+        core_status = {}
 
-            if core != 0:
-                self.__set_core_state(core, True, enabled, False)
+        self.__get_cores_status(self.p_cores, p_cores, smt, core_status)
+        self.__get_cores_status(self.c_cores, e_cores, smt, core_status)
 
-            if core in self.smt_map and len(self.smt_map[core]) > 0:
-                for subcore in self.smt_map[core]:
-                    self.__set_core_state(subcore, True, enabled and smt, True)
-
-        for idx in range(len(self.c_cores)):  # pylint: disable=C0200
-            core = self.c_cores[idx]
-            enabled = idx < e_cores
-
-            if core != 0:
-                self.__set_core_state(core, False, enabled, False)
-
-            if core in self.smt_map and len(self.smt_map[core]) > 0:
-                for subcore in self.smt_map[core]:
-                    self.__set_core_state(subcore, False, enabled and smt, True)
+        decky.logger.info("Setting cores status:")
+        decky.logger.info(
+            f"  Enabled:  {', '.join([str(c) for c in sorted(core_status.keys()) if core_status[c]])}"
+        )
+        decky.logger.info(
+            f"  Disabled: {', '.join([str(c) for c in sorted(core_status.keys()) if not core_status[c]])}"
+        )
+        for core in sorted(core_status.keys()):
+            self.__set_core_state(core, core in self.p_cores, core_status[core])
 
     @abstractmethod
     def get_tdp_ranges(self):
