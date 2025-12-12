@@ -1,6 +1,6 @@
 import { PanelSection, PanelSectionRow, Router, ToggleField } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext } from 'react';
 
 import { GlobalContext } from '../../contexts/globalContext';
 import { SystemSettings } from '../../settings/system';
@@ -9,7 +9,6 @@ import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const ProfilesBlock: FC = () => {
   const { profilePerGame, setProfilePerGame } = useContext(GlobalContext);
-  const [isDoingThings, setIsDoingThings] = useState(false);
 
   const onProfilePerGameChange = (newVal: boolean): void => {
     SystemSettings.setProfilePerGame(newVal);

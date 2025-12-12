@@ -1,6 +1,6 @@
 import { Settings } from 'decky-plugin-framework';
 
-import { Configuration, GameEntry, Profile } from './models';
+import { Configuration, Profile } from './models';
 
 export class PluginSettings {
   public static settings: Configuration;
@@ -69,22 +69,32 @@ export class PluginSettings {
 
   public static getProfileForId(id: string): Profile | undefined {
     const appId = id.split('.')[0];
-    const pwr = id.split('.')[1] as keyof GameEntry;
 
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
     }
 
-    if (!PluginSettings.settings.profiles[appId] || !PluginSettings.settings.profiles[appId][pwr]) {
+    if (!PluginSettings.settings.profiles[appId] || !PluginSettings.settings.profiles[appId]) {
       return undefined;
     } else {
-      return JSON.parse(JSON.stringify(PluginSettings.settings.profiles[appId][pwr] as Profile));
+      return JSON.parse(JSON.stringify(PluginSettings.settings.profiles[appId] as Profile));
     }
+  }
+
+  public static getAppIdForName(name: string): number | undefined {
+    if (PluginSettings.settings.appids[name]) {
+      return PluginSettings.settings.appids[name];
+    }
+
+    return undefined;
+  }
+
+  public static setAppIdForName(name: string, appid: number) {
+    PluginSettings.settings.appids[name] = appid;
   }
 
   public static setProfileForId(id: string, profile: Profile): void {
     const appName = id.split('.')[0];
-    const pwr = id.split('.')[1] as keyof GameEntry;
 
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
@@ -94,15 +104,16 @@ export class PluginSettings {
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName);
     }
 
-    if (!PluginSettings.settings.profiles[appName][pwr]) {
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id);
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.cpu.tdp');
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.gpu.frequency');
+    if (!PluginSettings.settings.profiles[appName]) {
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName);
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName + '.cpu.tdp');
+      PluginSettings.createParents(
+        PluginSettings.settings,
+        'profiles.' + appName + '.gpu.frequency'
+      );
     }
 
-    const gameEntry = PluginSettings.settings.profiles[appName];
-    const prof = gameEntry[pwr as keyof GameEntry] as Profile;
-
+    const prof = PluginSettings.settings.profiles[appName];
     prof.mode = profile.mode;
     prof.cpu.boost = profile.cpu.boost;
     prof.cpu.epp = profile.cpu.epp;

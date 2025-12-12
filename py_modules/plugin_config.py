@@ -143,6 +143,13 @@ class PluginConfig:
             with open(PluginConfig.cfg_property_file, "r", encoding="utf-8") as infile:
                 data = json.load(infile)
 
+            if "appids" not in data:
+                data["appids"] = {}
+
+            for prof in data["profiles"]:
+                if "battery" in data["profiles"][prof]:
+                    data["profiles"][prof] = data["profiles"][prof]["battery"]
+
         with open(PluginConfig.cfg_property_file, "w", encoding="utf-8") as outfile:
             json.dump(data, outfile, indent=4)
 

@@ -21,13 +21,13 @@ class Miscelanea:
 
         decoded = base64.b64decode(encoded_data)
 
-        file_name = Miscelanea.ICONS_PATH + "/" + app_id + ".jpg"
+        file_name = Miscelanea.ICONS_PATH + f"/{app_id}.jpg"
         with open(file_name, "wb") as file:
             file.write(decoded)
 
     def get_icon_for_app(self, app_id):
         """Get icon for app"""
-        file_name = Miscelanea.ICONS_PATH + "/" + app_id + ".jpg"
+        file_name = Miscelanea.ICONS_PATH + f"/{app_id}.jpg"
 
         if not os.path.isfile(file_name):
             return None

@@ -17,8 +17,9 @@ export interface AppOverviewExt extends AppOverview {
 
 export interface Configuration {
   schema: string;
-  profiles: Record<string, GameEntry>;
+  profiles: Record<string, Profile>;
   settings: Settings;
+  appids: Record<string, number>;
 }
 
 export interface Profile {
@@ -31,11 +32,6 @@ export interface Settings {
   profile_per_game: boolean;
   limit_battery: number;
   mcu_powersave?: boolean;
-}
-
-export interface GameEntry {
-  name: string;
-  battery: Profile;
 }
 
 export interface CpuProfile {

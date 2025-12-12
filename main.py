@@ -151,11 +151,11 @@ class Plugin:
             return False
 
     # Miscelanea
-    async def get_icon_for_app(self, app_id: str):
+    async def get_icon_for_app(self, app_id: int):
         """Get icon for app"""
         return MISCELANEA.get_icon_for_app(app_id)
 
-    async def save_icon_for_app(self, app_id: str, img: str):
+    async def save_icon_for_app(self, app_id: int, img: str):
         """Save icon for app"""
         return MISCELANEA.save_icon_for_app(app_id, img)
 

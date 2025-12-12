@@ -1,139 +1,140 @@
-import { Logger, Settings, Translator } from 'decky-plugin-framework';
+import { Logger } from 'decky-plugin-framework';
 
 import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { Acpi, Epp, Mode, Profile, TdpPresets } from '../utils/models';
+import { Acpi, Mode, Profile, TdpPresets } from '../utils/models';
 import { PluginSettings } from '../utils/settings';
-import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
 export class Profiles {
   public static summary(): void {
-    const profiles = Settings.getConfigurationStructured()['profiles'];
+    /*
+      const profiles = Settings.getConfigurationStructured()['profiles'];
 
-    let profCount = 0;
-    let sortedAppIds: Array<{ appId: string; name: string }> = [];
-    Object.keys(profiles).forEach((appId) => {
-      sortedAppIds.push({ appId, name: profiles[appId].name });
-      Object.keys(profiles[appId]).forEach((pwr) => {
-        if (pwr != 'name') {
-          profCount++;
-        }
+      let profCount = 0;
+      let sortedAppIds: Array<{ appId: string; name: string }> = [];
+      Object.keys(profiles).forEach((appId) => {
+        sortedAppIds.push({ appId, name: profiles[appId].name });
+        Object.keys(profiles[appId]).forEach((pwr) => {
+          if (pwr != 'name') {
+            profCount++;
+          }
+        });
       });
-    });
-    sortedAppIds = sortedAppIds.sort((n1, n2) => {
-      if (n1.appId == 'default') {
-        return -1;
-      } else if (n2.appId == 'default') {
-        return 1;
-      } else if (n1.name > n2.name) {
-        return 1;
-      } else if (n1.name < n2.name) {
-        return -1;
-      } else return 0;
-    });
-
-    Logger.info('');
-    Logger.info(
-      'Loaded profiles ' + profCount + ' for ' + Object.keys(profiles).length + ' games: '
-    );
-
-    const headers: Array<SpreadSheetCell> = [];
-    headers.push({ data: 'NAME', align: 'center' });
-    headers.push({ data: 'APPID', align: 'center' });
-    headers.push({ data: 'POWER', align: 'center' });
-    headers.push({ data: 'MODE', align: 'center' });
-    headers.push({ data: 'SPL*', align: 'center' });
-    headers.push({ data: 'SPPL*', align: 'center' });
-    headers.push({ data: 'FPPL*', align: 'center' });
-    headers.push({ data: 'BOOST*', align: 'center' });
-    headers.push({ data: 'SCHEDULER*', align: 'center' });
-    headers.push({ data: 'PCORES*', align: 'center' });
-    headers.push({ data: 'ECORES*', align: 'center' });
-    headers.push({ data: 'SMT*', align: 'center' });
-    headers.push({ data: 'EPP*', align: 'center' });
-    headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
-
-    const body: Array<Array<SpreadSheetCell>> = [];
-    sortedAppIds.forEach((entry) => {
-      let isFirst = true;
-      Object.keys(profiles[entry.appId]).forEach((pwr) => {
-        if (pwr != 'name') {
-          const profile = profiles[entry.appId][pwr] as Profile;
-
-          const line: Array<SpreadSheetCell> = [];
-          line.push({
-            data: isFirst ? profiles[entry.appId].name : '',
-            align: 'right',
-            rowspan: !isFirst
-          });
-          line.push({
-            data: isFirst ? entry.appId : '',
-            align: 'right',
-            rowspan: !isFirst
-          });
-          line.push({ data: pwr.toUpperCase(), align: 'right' });
-          line.push({ data: Mode[profile.mode].toUpperCase(), align: 'right' });
-          line.push({ data: profile.cpu.tdp.spl + ' W', align: 'right' });
-          line.push({ data: profile.cpu.tdp.sppl + ' W', align: 'right' });
-          line.push({ data: profile.cpu.tdp.fppl + ' W', align: 'right' });
-          line.push({ data: profile.cpu.boost, align: 'right' });
-          line.push({
-            data:
-              profile.cpu.scheduler == '' || profile.cpu.scheduler == undefined
-                ? 'NONE'
-                : profile.cpu.scheduler.toUpperCase(),
-            align: 'right'
-          });
-          line.push({
-            data: profile.cpu.pcores ?? WhiteBoardUtils.getPCores(),
-            align: 'right'
-          });
-          line.push({
-            data: profile.cpu.ecores ?? WhiteBoardUtils.getECores(),
-            align: 'right'
-          });
-          line.push({
-            data: profile.cpu.smt ?? Constants.DEFAULT_SMT,
-            align: 'right'
-          });
-          line.push({
-            data: Epp[profile.cpu.epp ?? Constants.DEFAULT_EPP].toUpperCase(),
-            align: 'right'
-          });
-          line.push({
-            data:
-              (profile.gpu.frequency.min || WhiteBoardUtils.getGpuMinFreq()) +
-              '-' +
-              (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) +
-              ' MHz',
-            align: 'right'
-          });
-
-          body.push(line);
-
-          isFirst = false;
-        }
+      sortedAppIds = sortedAppIds.sort((n1, n2) => {
+        if (n1.appId == 'default') {
+          return -1;
+        } else if (n2.appId == 'default') {
+          return 1;
+        } else if (n1.name > n2.name) {
+          return 1;
+        } else if (n1.name < n2.name) {
+          return -1;
+        } else return 0;
       });
-    });
 
-    SpreadSheet.printSpreadSheet(headers, body);
-    Logger.info('');
-    Logger.info('* Only is used on CUSTOM mode');
-    Logger.info('');
+      Logger.info('');
+      Logger.info(
+        'Loaded profiles ' + profCount + ' for ' + Object.keys(profiles).length + ' games: '
+      );
+
+      const headers: Array<SpreadSheetCell> = [];
+      headers.push({ data: 'NAME', align: 'center' });
+      headers.push({ data: 'APPID', align: 'center' });
+      headers.push({ data: 'POWER', align: 'center' });
+      headers.push({ data: 'MODE', align: 'center' });
+      headers.push({ data: 'SPL*', align: 'center' });
+      headers.push({ data: 'SPPL*', align: 'center' });
+      headers.push({ data: 'FPPL*', align: 'center' });
+      headers.push({ data: 'BOOST*', align: 'center' });
+      headers.push({ data: 'SCHEDULER*', align: 'center' });
+      headers.push({ data: 'PCORES*', align: 'center' });
+      headers.push({ data: 'ECORES*', align: 'center' });
+      headers.push({ data: 'SMT*', align: 'center' });
+      headers.push({ data: 'EPP*', align: 'center' });
+      headers.push({ data: 'GPU FREQUENCY*', align: 'center' });
+
+      const body: Array<Array<SpreadSheetCell>> = [];
+      sortedAppIds.forEach((entry) => {
+        let isFirst = true;
+        Object.keys(profiles[entry.appId]).forEach((pwr) => {
+          if (pwr != 'name') {
+            const profile = profiles[entry.appId][pwr] as Profile;
+
+            const line: Array<SpreadSheetCell> = [];
+            line.push({
+              data: isFirst ? profiles[entry.appId].name : '',
+              align: 'right',
+              rowspan: !isFirst
+            });
+            line.push({
+              data: isFirst ? entry.appId : '',
+              align: 'right',
+              rowspan: !isFirst
+            });
+            line.push({ data: pwr.toUpperCase(), align: 'right' });
+            line.push({ data: Mode[profile.mode].toUpperCase(), align: 'right' });
+            line.push({ data: profile.cpu.tdp.spl + ' W', align: 'right' });
+            line.push({ data: profile.cpu.tdp.sppl + ' W', align: 'right' });
+            line.push({ data: profile.cpu.tdp.fppl + ' W', align: 'right' });
+            line.push({ data: profile.cpu.boost, align: 'right' });
+            line.push({
+              data:
+                profile.cpu.scheduler == '' || profile.cpu.scheduler == undefined
+                  ? 'NONE'
+                  : profile.cpu.scheduler.toUpperCase(),
+              align: 'right'
+            });
+            line.push({
+              data: profile.cpu.pcores ?? WhiteBoardUtils.getPCores(),
+              align: 'right'
+            });
+            line.push({
+              data: profile.cpu.ecores ?? WhiteBoardUtils.getECores(),
+              align: 'right'
+            });
+            line.push({
+              data: profile.cpu.smt ?? Constants.DEFAULT_SMT,
+              align: 'right'
+            });
+            line.push({
+              data: Epp[profile.cpu.epp ?? Constants.DEFAULT_EPP].toUpperCase(),
+              align: 'right'
+            });
+            line.push({
+              data:
+                (profile.gpu.frequency.min || WhiteBoardUtils.getGpuMinFreq()) +
+                '-' +
+                (profile.gpu.frequency.max || WhiteBoardUtils.getGpuMaxFreq()) +
+                ' MHz',
+              align: 'right'
+            });
+
+            body.push(line);
+
+            isFirst = false;
+          }
+        });
+      });
+
+      SpreadSheet.printSpreadSheet(headers, body);
+      Logger.info('');
+      Logger.info('* Only is used on CUSTOM mode');
+      Logger.info('');*/
   }
 
-  public static getAppId(id: string): string {
-    return id.substring(0, id.lastIndexOf('.'));
+  public static getAppId(id: string): number {
+    const name = Profiles.getAppName(id);
+    return name == Constants.DEFAULT_DEFAULT ? -1 : (PluginSettings.getAppIdForName(name) ?? -1);
   }
 
   public static getAppName(id: string): string {
-    const appId = Profiles.getAppId(id);
-    if (appId == Constants.DEFAULT_DEFAULT) {
-      return Translator.translate('main.menu');
+    const name = id.substring(0, id.lastIndexOf('.'));
+    if (name == Constants.DEFAULT_DEFAULT) {
+      return Constants.DEFAULT_DEFAULT;
     } else {
-      return appId;
+      return name;
     }
   }
 
@@ -220,6 +221,8 @@ export class Profiles {
   }
 
   public static getProfileForId(id: string): Profile {
+    id = Profiles.getAppName(id);
+
     if (id.endsWith(Constants.SUFIX_AC)) {
       Logger.info('AC connected, turbo mode');
       return Profiles.getProfileForMode(Constants.TDP_AC_DEFAULT_MODE);
