@@ -198,12 +198,8 @@ const getACOnline = (): Promise<void> => {
   return new Promise((resolve) => {
     (async (): Promise<void> => {
       const online = await BackendUtils.isAcOnline();
+      console.error('Online? ' + online);
       WhiteBoardUtils.setOnBattery(!online);
-      if (online) {
-        WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_ID_AC);
-      } else {
-        WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_ID);
-      }
       resolve();
     })();
   });
@@ -300,9 +296,8 @@ export default definePlugin(() => {
                     BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
                     sleep(100).then(() => {
                       Profiles.getDefaultProfile();
-                      Profiles.getDefaultACProfile();
                       Profiles.summary();
-                      Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
+                      WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_DEFAULT);
                     });
                   });
                 });

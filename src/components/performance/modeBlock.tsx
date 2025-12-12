@@ -25,11 +25,11 @@ export const ModeBlock: FC = () => {
       notchIdx++;
     });
 
-  const { onBattery, id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
+  const { onBattery, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
   const onModeChange = (newVal: number): void => {
     const newProf = { ...profile, mode: newVal };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 

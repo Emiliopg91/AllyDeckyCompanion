@@ -8,7 +8,7 @@ import { PerformanceContext } from '../../contexts/performanceContext';
 import { Constants } from '../../utils/constants';
 
 export const HeaderBlock: FC = () => {
-  const { onBattery, id, name, icon } = useContext(PerformanceContext);
+  const { onBattery, name, icon } = useContext(PerformanceContext);
 
   return (
     <PanelSection>
@@ -16,7 +16,7 @@ export const HeaderBlock: FC = () => {
         <Field label={Translator.translate('profile.for')} bottomSeparator="standard">
           {onBattery && <FaBatteryFull />}
           {!onBattery && <PiPlugFill />}
-          {id != Constants.DEFAULT_ID && id != Constants.DEFAULT_ID_AC && icon && (
+          {name != Constants.DEFAULT_DEFAULT && icon && (
             <>
               <span> </span>
               <img
@@ -29,7 +29,7 @@ export const HeaderBlock: FC = () => {
               />
             </>
           )}
-          {(id == Constants.DEFAULT_ID || id == Constants.DEFAULT_ID_AC) && <FaSteamSquare />}
+          {name == Constants.DEFAULT_DEFAULT && <FaSteamSquare />}
           <span> </span>
           {name}
         </Field>

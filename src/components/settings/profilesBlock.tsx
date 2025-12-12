@@ -1,31 +1,15 @@
-import { PanelSection, PanelSectionRow, Router, ToggleField } from '@decky/ui';
+import { PanelSection, PanelSectionRow, ToggleField } from '@decky/ui';
 import { Translator } from 'decky-plugin-framework';
 import { FC, useContext } from 'react';
 
 import { GlobalContext } from '../../contexts/globalContext';
 import { SystemSettings } from '../../settings/system';
-import { Constants } from '../../utils/constants';
-import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const ProfilesBlock: FC = () => {
   const { profilePerGame, setProfilePerGame } = useContext(GlobalContext);
 
   const onProfilePerGameChange = (newVal: boolean): void => {
     SystemSettings.setProfilePerGame(newVal);
-
-    if (newVal) {
-      WhiteBoardUtils.getRunningGameId() == Router.MainRunningApp?.appid
-        ? Router.MainRunningApp?.appid +
-          (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-        : WhiteBoardUtils.getOnBattery()
-          ? Constants.DEFAULT_ID
-          : Constants.DEFAULT_ID_AC;
-    } else {
-      WhiteBoardUtils.setRunningGameId(
-        WhiteBoardUtils.getOnBattery() ? Constants.DEFAULT_ID : Constants.DEFAULT_ID_AC
-      );
-    }
-
     setProfilePerGame(newVal);
   };
 

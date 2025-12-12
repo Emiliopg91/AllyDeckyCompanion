@@ -5,9 +5,9 @@ import { FC, useContext, useEffect } from 'react';
 import { PerformanceContext } from '../../../contexts/performanceContext';
 
 export const TdpBlock: FC = () => {
-  const { id, name, profile, setProfile, saveProfile, tdpRange } = useContext(PerformanceContext);
+  const { name, profile, setProfile, saveProfile, tdpRange } = useContext(PerformanceContext);
 
-  useEffect(() => {}, [id]);
+  useEffect(() => {}, [name]);
 
   const onSplChange = (newVal: number): void => {
     newVal = Math.min(Math.max(newVal, tdpRange['spl'][0]), tdpRange['spl'][1]);
@@ -24,7 +24,7 @@ export const TdpBlock: FC = () => {
         tdp: { spl: newVal, sppl: newSppl, fppl: newFppl }
       }
     };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
@@ -43,7 +43,7 @@ export const TdpBlock: FC = () => {
       }
     };
 
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
@@ -57,7 +57,7 @@ export const TdpBlock: FC = () => {
       cpu: { ...profile.cpu, tdp: { ...profile.cpu.tdp, fppl: newVal } }
     };
 
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 

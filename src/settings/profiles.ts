@@ -181,11 +181,7 @@ export class Profiles {
   }
 
   public static getDefaultProfile(): Profile {
-    return Profiles.getProfileForId(Constants.DEFAULT_ID);
-  }
-
-  public static getDefaultACProfile(): Profile {
-    return Profiles.getProfileForId(Constants.DEFAULT_ID_AC);
+    return Profiles.getProfileForId(Constants.DEFAULT_DEFAULT);
   }
 
   private static tdpCache: TdpPresets | null = null;
@@ -221,9 +217,7 @@ export class Profiles {
   }
 
   public static getProfileForId(id: string): Profile {
-    id = Profiles.getAppName(id);
-
-    if (id.endsWith(Constants.SUFIX_AC)) {
+    if (!WhiteBoardUtils.getOnBattery()) {
       Logger.info('AC connected, turbo mode');
       return Profiles.getProfileForMode(Constants.TDP_AC_DEFAULT_MODE);
     }

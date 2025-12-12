@@ -9,12 +9,7 @@ export class Constants {
   public static CFG_SCHEMA_VERS = Constants.PLUGIN_VERSION;
   public static CFG_SCHEMA_PROP = 'schema';
 
-  public static SUFIX_AC = '.acpower';
-  public static SUFIX_BAT = '.battery';
-
   public static DEFAULT_DEFAULT = 'SteamOS';
-  public static DEFAULT_ID = Constants.DEFAULT_DEFAULT + Constants.SUFIX_BAT;
-  public static DEFAULT_ID_AC = Constants.DEFAULT_DEFAULT + Constants.SUFIX_AC;
 
   public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
   public static TDP_AC_DEFAULT_MODE = Mode.TURBO;

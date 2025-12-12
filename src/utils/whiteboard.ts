@@ -1,7 +1,5 @@
-import { Router } from '@decky/ui';
 import { WhiteBoard } from 'decky-plugin-framework';
 
-import { Constants } from './constants';
 import { CpuImpl } from './models';
 
 export class WhiteBoardUtils {
@@ -37,16 +35,7 @@ export class WhiteBoardUtils {
   }
 
   public static getRunningGameId(): string {
-    return (
-      WhiteBoard.get<string>('runningGameId') ||
-      (Router.MainRunningApp
-        ? String(Router.MainRunningApp.appid) + WhiteBoardUtils.getOnBattery()
-          ? Constants.SUFIX_BAT
-          : Constants.SUFIX_AC
-        : WhiteBoardUtils.getOnBattery()
-          ? Constants.DEFAULT_ID
-          : Constants.DEFAULT_ID_AC)
-    );
+    return WhiteBoard.get<string>('runningGameId')!;
   }
 
   public static setRunningGameId(value: string): void {

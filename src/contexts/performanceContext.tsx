@@ -22,21 +22,19 @@ import { WhiteBoardUtils } from '../utils/whiteboard';
 declare const appStore: any;
 
 interface PerformanceContextType {
-  id: string;
-  appId: string;
+  appId: number;
   name: string;
   icon: string | undefined;
   onBattery: boolean;
   profile: Profile;
   tdpRange: Record<string, number[]>;
   setProfile: (profile: Profile) => void;
-  saveProfile: (id: string, name: string, profile: Profile) => void;
+  saveProfile: (name: string, profile: Profile) => void;
 }
 
 const defaultValue: PerformanceContextType = {
-  id: WhiteBoardUtils.getRunningGameId(),
-  appId: Profiles.getAppId(String(WhiteBoardUtils.getRunningGameId())),
-  name: Profiles.getAppName(String(WhiteBoardUtils.getRunningGameId())),
+  appId: -1,
+  name: Constants.DEFAULT_DEFAULT,
   icon: undefined,
   onBattery: WhiteBoardUtils.getOnBattery() ?? false,
   profile: {
@@ -60,12 +58,12 @@ const defaultValue: PerformanceContextType = {
 export const PerformanceContext = createContext(defaultValue);
 
 const loadIcon = async (
-  appId: string,
+  appId: number,
   setIcon: (icon: string | undefined) => void
 ): Promise<void> => {
   let appDetail: AppOverviewExt | undefined = undefined;
   (Router.RunningApps as AppOverviewExt[]).forEach((app: AppOverviewExt) => {
-    if (String(app.appid) == appId) {
+    if (app.appid == appId) {
       appDetail = app;
     }
   });
@@ -76,7 +74,7 @@ const loadIcon = async (
       setIcon('data:image/' + app.icon_data_format + ';base64,' + app.icon_data);
     } else {
       if (app.icon_hash) {
-        const icon = await BackendUtils.getIconForApp(appId);
+        const icon = await BackendUtils.getIconForApp(String(appId));
         if (icon) {
           setIcon(icon);
         } else {
@@ -87,7 +85,7 @@ const loadIcon = async (
               const reader = new FileReader();
               reader.onload = (): void => {
                 const newIconSrc = reader.result as string;
-                BackendUtils.setIconForApp(appId, newIconSrc);
+                BackendUtils.setIconForApp(String(appId), newIconSrc);
                 setIcon(newIconSrc);
               };
               reader.readAsDataURL(await response.blob());
@@ -106,19 +104,18 @@ const loadIcon = async (
   }
 };
 
-const saveProfile = debounce((id: string, name: string, profile: Profile) => {
-  Logger.info('Saving profile ' + id + ' (' + name + ')');
-  Profiles.saveProfileForId(id, profile);
-  Profiles.applyGameProfile(id);
+const saveProfile = debounce((name: string, profile: Profile) => {
+  Logger.info('Saving profile ' + name);
+  Profiles.saveProfileForId(name, profile);
+  Profiles.applyGameProfile(name);
 }, 500);
 
 export function PerformanceProvider({ children }: { children: JSX.Element }): JSX.Element {
   const [onBattery, setOnBattery] = useState(WhiteBoardUtils.getOnBattery());
-  const [id, setId] = useState(WhiteBoardUtils.getRunningGameId());
-  const [appId, setAppId] = useState(Profiles.getAppId(id));
-  const [name, setName] = useState(Profiles.getAppName(id));
+  const [name, setName] = useState(WhiteBoardUtils.getRunningGameId());
+  const [appId, setAppId] = useState(Profiles.getAppId(name));
   const [icon, setIcon] = useState<string | undefined>(undefined);
-  const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(id));
+  const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(name));
   const [tdpRange, setTdpRange] = useState<Record<string, number[]>>(WhiteBoardUtils.getTdpRange());
 
   const onBatteryEffect = (e: EventData): void => {
@@ -139,7 +136,7 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
   const onIdEffect = (e: EventData): void => {
     const data = e as WhiteBoardEventData;
     if (data.getId() == 'runningGameId') {
-      setId((id) => {
+      setName((id) => {
         if (id != (data.getValue() as string)) {
           setProfile(Profiles.getProfileForId(data.getValue()));
           setAppId(Profiles.getAppId(data.getValue()));
@@ -165,7 +162,6 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
   return (
     <PerformanceContext.Provider
       value={{
-        id,
         appId,
         name,
         icon,

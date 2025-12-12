@@ -60,11 +60,8 @@ export class Listeners {
         event.getDetails().then((data) => {
           const prevId = WhiteBoardUtils.getRunningGameId();
           const newId = event.isRunning()
-            ? String(data.getDisplayName()) +
-              (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-            : WhiteBoardUtils.getOnBattery()
-              ? Constants.DEFAULT_ID
-              : Constants.DEFAULT_ID_AC;
+            ? String(data.getDisplayName())
+            : Constants.DEFAULT_DEFAULT;
           if (prevId != newId) {
             WhiteBoardUtils.setRunningGameId(newId);
           }
@@ -82,12 +79,7 @@ export class Listeners {
         } else if (WhiteBoardUtils.getOnBattery() != onBattery) {
           Logger.info('New AC state: ' + state.eACState);
           WhiteBoardUtils.setOnBattery(onBattery);
-          const newId =
-            WhiteBoardUtils.getRunningGameId().substring(
-              0,
-              WhiteBoardUtils.getRunningGameId().lastIndexOf('.')
-            ) + (onBattery ? Constants.SUFIX_BAT : Constants.SUFIX_AC);
-          WhiteBoardUtils.setRunningGameId(newId);
+          WhiteBoardUtils.setRunningGameId(WhiteBoardUtils.getRunningGameId());
         }
       }
     );

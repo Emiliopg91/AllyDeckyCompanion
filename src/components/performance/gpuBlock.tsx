@@ -7,7 +7,7 @@ import { Profile } from '../../utils/models';
 import { WhiteBoardUtils } from '../../utils/whiteboard';
 
 export const GpuBlock: FC = () => {
-  const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
+  const { name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
   const onMinFreqChange = (newVal: number): void => {
     if (newVal <= profile.gpu.frequency.max) {
@@ -18,7 +18,7 @@ export const GpuBlock: FC = () => {
           frequency: { ...profile.gpu.frequency, min: newVal }
         }
       };
-      saveProfile(id, name, newProf);
+      saveProfile(name, newProf);
       setProfile(newProf);
     }
   };
@@ -32,7 +32,7 @@ export const GpuBlock: FC = () => {
           frequency: { ...profile.gpu.frequency, max: newVal }
         }
       };
-      saveProfile(id, name, newProf);
+      saveProfile(name, newProf);
       setProfile(newProf);
     }
   };

@@ -7,7 +7,7 @@ import { Epp } from '../../../utils/models';
 import { WhiteBoardUtils } from '../../../utils/whiteboard';
 
 export const AdvancedBlock: FC = () => {
-  const { id, name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
+  const { name, profile, setProfile, saveProfile } = useContext(PerformanceContext);
 
   const eCoresLabels: NotchLabel[] = [];
   for (let i = 0; i <= WhiteBoardUtils.getECores(); i++) {
@@ -67,7 +67,7 @@ export const AdvancedBlock: FC = () => {
         epp: newVal
       }
     };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
@@ -79,7 +79,7 @@ export const AdvancedBlock: FC = () => {
         scheduler: newVal == 0 ? '' : WhiteBoardUtils.getSchedulers()[newVal - 1]
       }
     };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
@@ -91,7 +91,7 @@ export const AdvancedBlock: FC = () => {
         pcores: newVal
       }
     };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
@@ -103,19 +103,19 @@ export const AdvancedBlock: FC = () => {
         ecores: newVal
       }
     };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
   const onCpuBoostChange = (newVal: boolean): void => {
     const newProf = { ...profile, cpu: { ...profile.cpu, boost: newVal } };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
   const onSmtChange = (newVal: boolean): void => {
     const newProf = { ...profile, cpu: { ...profile.cpu, smt: newVal } };
-    saveProfile(id, name, newProf);
+    saveProfile(name, newProf);
     setProfile(newProf);
   };
 
