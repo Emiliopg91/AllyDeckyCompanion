@@ -1,9 +1,9 @@
-import { Game, Logger, Settings, Translator } from 'decky-plugin-framework';
+import { Logger, Settings, Translator } from 'decky-plugin-framework';
 
 import { AsyncUtils } from '../utils/async';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { Acpi, Epp, Governor, Mode, Profile } from '../utils/models';
+import { Acpi, Epp, Mode, Profile, TdpPresets } from '../utils/models';
 import { PluginSettings } from '../utils/settings';
 import { SpreadSheet, SpreadSheetCell } from '../utils/spreadsheet';
 import { WhiteBoardUtils } from '../utils/whiteboard';
@@ -48,7 +48,6 @@ export class Profiles {
     headers.push({ data: 'SPPL*', align: 'center' });
     headers.push({ data: 'FPPL*', align: 'center' });
     headers.push({ data: 'BOOST*', align: 'center' });
-    headers.push({ data: 'GOVERNOR*', align: 'center' });
     headers.push({ data: 'SCHEDULER*', align: 'center' });
     headers.push({ data: 'PCORES*', align: 'center' });
     headers.push({ data: 'ECORES*', align: 'center' });
@@ -81,11 +80,10 @@ export class Profiles {
           line.push({ data: profile.cpu.tdp.fppl + ' W', align: 'right' });
           line.push({ data: profile.cpu.boost, align: 'right' });
           line.push({
-            data: Governor[profile.cpu.governor].toUpperCase(),
-            align: 'right'
-          });
-          line.push({
-            data: profile.cpu.scheduler == '' ? 'NONE' : profile.cpu.scheduler.toUpperCase(),
+            data:
+              profile.cpu.scheduler == '' || profile.cpu.scheduler == undefined
+                ? 'NONE'
+                : profile.cpu.scheduler.toUpperCase(),
             align: 'right'
           });
           line.push({
@@ -135,7 +133,7 @@ export class Profiles {
     if (appId == Constants.DEFAULT_DEFAULT) {
       return Translator.translate('main.menu');
     } else {
-      return Game.getGameDetails(Number(appId)).getDisplayName();
+      return appId;
     }
   }
 
@@ -150,7 +148,6 @@ export class Profiles {
           sppl: WhiteBoardUtils.getTdpRange()['sppt'][1],
           fppl: WhiteBoardUtils.getTdpRange()['fppt'][1]
         },
-        governor: Governor.POWERSAVE,
         epp: Constants.DEFAULT_EPP,
         scheduler: '',
         pcores: WhiteBoardUtils.getPCores(),
@@ -161,15 +158,7 @@ export class Profiles {
           min: WhiteBoardUtils.getGpuMinFreq(),
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
-      },
-      display: { brightness: WhiteBoardUtils.getBrightness() },
-      audio: {
-        devices: {}
       }
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (result.audio.devices as any)[WhiteBoardUtils.getAudioDevice()] = {
-      volume: WhiteBoardUtils.getVolume()
     };
 
     return result;
@@ -179,9 +168,7 @@ export class Profiles {
     let profile: Profile = Profiles.getProfileForId(id);
     if (profile.mode != Mode.CUSTOM) {
       profile = {
-        ...Profiles.getProfileForMode(profile.mode),
-        display: profile.display,
-        audio: profile.audio
+        ...Profiles.getProfileForMode(profile.mode)
       };
     }
     AsyncUtils.runMutexForProfile((releaseProfile) => {
@@ -200,26 +187,29 @@ export class Profiles {
     return Profiles.getProfileForId(Constants.DEFAULT_ID_AC);
   }
 
+  private static tdpCache: TdpPresets | null = null;
+  private static getTdpMap(): TdpPresets {
+    if (Profiles.tdpCache === null) {
+      if (WhiteBoardUtils.getIsAlly()) {
+        Profiles.tdpCache = Constants.AllyTdpPresets;
+      } else if (WhiteBoardUtils.getIsAllyX()) {
+        Profiles.tdpCache = Constants.AllyXTdpPresets;
+      } else if (WhiteBoardUtils.getIsXboxAlly()) {
+        Profiles.tdpCache = Constants.XboxAllyTdpPresets;
+      } else if (WhiteBoardUtils.getIsXboxAllyX()) {
+        Profiles.tdpCache = Constants.XboxAllyXTdpPresets;
+      }
+    }
+
+    return Profiles.tdpCache!;
+  }
+
   public static getAcpiProfile(spl: number): Acpi {
     let epp = Acpi.PERFORMANCE;
-    let silentSpl = WhiteBoardUtils.getIsAllyX()
-      ? Constants.AllyXSilentSPL
-      : WhiteBoardUtils.getIsXboxAllyX()
-        ? Constants.XboxAllyXSilentSPL
-        : WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllySilentSPL
-          : Constants.AllySilentSPL;
-    let performanceSpl = WhiteBoardUtils.getIsAllyX()
-      ? Constants.AllyXPerformanceSPL
-      : WhiteBoardUtils.getIsXboxAllyX()
-        ? Constants.XboxAllyXPerformanceSPL
-        : WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllyPerformanceSPL
-          : Constants.AllyPerformanceSPL;
-
-    if (spl <= silentSpl) {
+    const map = Profiles.getTdpMap();
+    if (spl <= map[Mode.SILENT].spl) {
       epp = Acpi.LOW_POWER;
-    } else if (spl <= performanceSpl) {
+    } else if (spl <= map[Mode.PERFORMANCE].spl) {
       epp = Acpi.BALANCED;
     }
     return epp;
@@ -230,62 +220,57 @@ export class Profiles {
   }
 
   public static getProfileForId(id: string): Profile {
+    if (id.endsWith(Constants.SUFIX_AC)) {
+      Logger.info('AC connected, turbo mode');
+      return Profiles.getProfileForMode(Constants.TDP_AC_DEFAULT_MODE);
+    }
+
     if (!PluginSettings.existsProfile(id)) {
       Logger.info('No profile found for ' + id + ', creating');
 
-      const mode = id.endsWith(Constants.SUFIX_AC)
-        ? Constants.TDP_AC_DEFAULT_MODE
-        : Constants.TDP_DEFAULT_MODE;
-      const tmpProf = Profiles.getProfileForMode(mode);
+      const tmpProf = Profiles.getProfileForMode(Constants.TDP_DEFAULT_MODE);
       Profiles.saveProfileForId(id, tmpProf);
       return tmpProf;
-    } else {
-      const prof = PluginSettings.getProfileForId(id)!;
-      const result = {
-        mode: prof.mode,
-        cpu: {
-          tdp: {
-            spl: prof.cpu.tdp.spl,
-            sppl: prof.cpu.tdp.sppl,
-            fppl: prof.cpu.tdp.fppl
-          },
-          boost: prof.cpu.boost,
-          smt: prof.cpu.smt ?? Constants.DEFAULT_SMT,
-          governor: prof.cpu.governor,
-          epp: prof.cpu.epp ?? Constants.DEFAULT_EPP,
-          scheduler: prof.cpu.scheduler ?? undefined,
-          pcores: prof.cpu.pcores ?? WhiteBoardUtils.getPCores(),
-          ecores: prof.cpu.ecores ?? WhiteBoardUtils.getECores()
-        },
-        gpu: {
-          frequency: {
-            min: Math.max(WhiteBoardUtils.getGpuMinFreq(), prof.gpu.frequency.min),
-            max: Math.min(WhiteBoardUtils.getGpuMaxFreq(), prof.gpu.frequency.max)
-          }
-        },
-        display: {
-          brightness: prof.display.brightness
-        },
-        audio: {
-          devices: prof.audio.devices
-        }
-      };
-
-      return result;
     }
+
+    const prof = PluginSettings.getProfileForId(id)!;
+    const result = {
+      mode: prof.mode,
+      cpu: {
+        tdp: {
+          spl: prof.cpu.tdp.spl,
+          sppl: prof.cpu.tdp.sppl,
+          fppl: prof.cpu.tdp.fppl
+        },
+        boost: prof.cpu.boost,
+        smt: prof.cpu.smt ?? Constants.DEFAULT_SMT,
+        epp: prof.cpu.epp ?? Constants.DEFAULT_EPP,
+        scheduler: prof.cpu.scheduler ?? undefined,
+        pcores: prof.cpu.pcores ?? WhiteBoardUtils.getPCores(),
+        ecores: prof.cpu.ecores ?? WhiteBoardUtils.getECores()
+      },
+      gpu: {
+        frequency: {
+          min: Math.max(WhiteBoardUtils.getGpuMinFreq(), prof.gpu.frequency.min),
+          max: Math.min(WhiteBoardUtils.getGpuMaxFreq(), prof.gpu.frequency.max)
+        }
+      }
+    };
+
+    return result;
   }
 
   public static getProfileForMode(mode: Mode): Profile {
+    const map = Profiles.getTdpMap();
     const profile: Profile = {
       mode: mode,
       cpu: {
         tdp: {
-          spl: 0,
-          sppl: 0,
-          fppl: 0
+          spl: map[mode].spl,
+          sppl: map[mode].sppl,
+          fppl: map[mode].fppl
         },
         boost: Constants.CPU_DEFAULT_BOOST,
-        governor: Governor.POWERSAVE,
         smt: Constants.DEFAULT_SMT,
         epp: Constants.DEFAULT_EPP,
         scheduler: '',
@@ -297,153 +282,13 @@ export class Profiles {
           min: WhiteBoardUtils.getGpuMinFreq(),
           max: WhiteBoardUtils.getGpuMaxFreq()
         }
-      },
-      display: {
-        brightness: WhiteBoardUtils.getBrightness()
-      },
-      audio: {
-        devices: {}
       }
     };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (profile.audio.devices as any)[WhiteBoardUtils.getAudioDevice()] = {
-      volume: WhiteBoardUtils.getVolume()
-    };
-
-    switch (mode) {
-      case Mode.SILENT:
-        profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
-          ? Constants.AllyXSilentSPL
-          : WhiteBoardUtils.getIsXboxAllyX()
-            ? Constants.XboxAllyXSilentSPL
-            : WhiteBoardUtils.getIsXboxAlly()
-              ? Constants.XboxAllySilentSPL
-              : Constants.AllySilentSPL;
-        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllySilentSPL
-          : Constants.AllySilentSPPL;
-        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllySilentSPL
-          : Constants.AllySilentFPPL;
-        break;
-      case Mode.PERFORMANCE:
-      case Mode.CUSTOM:
-        profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
-          ? Constants.AllyXPerformanceSPL
-          : WhiteBoardUtils.getIsXboxAllyX()
-            ? Constants.XboxAllyXPerformanceSPL
-            : WhiteBoardUtils.getIsXboxAlly()
-              ? Constants.XboxAllyPerformanceSPL
-              : Constants.AllyPerformanceSPL;
-        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllyPerformanceSPL
-          : Constants.AllyPerformanceSPPL;
-        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllyPerformanceSPL
-          : Constants.AllyPerformanceFPPL;
-        break;
-      case Mode.TURBO:
-        profile.cpu.tdp.spl = WhiteBoardUtils.getIsAllyX()
-          ? Constants.AllyXTurboSPL
-          : WhiteBoardUtils.getIsXboxAllyX()
-            ? Constants.XboxAllyXTurboSPL
-            : WhiteBoardUtils.getIsXboxAlly()
-              ? Constants.XboxAllyTurboSPL
-              : Constants.AllyTurboSPL;
-        profile.cpu.tdp.sppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllyTurboSPL
-          : Constants.AllyTurboSPPL;
-        profile.cpu.tdp.fppl = WhiteBoardUtils.getIsXboxAlly()
-          ? Constants.XboxAllyTurboSPL
-          : Constants.AllyTurboFPPL;
-    }
 
     return profile;
   }
 
-  public static setBrightnessForProfileId(id: string, flBrightness: number): void {
-    const profile = Profiles.getProfileForId(id);
-    profile.display.brightness = flBrightness;
-    Profiles.saveProfileForId(id, profile);
-    Profiles.applyGameProfile(id);
-  }
-
-  public static setAudioForProfileId(id: string, device: string, volume: number): void {
-    const profile = Profiles.getProfileForId(id);
-    profile.audio.devices[device] = { volume };
-    Profiles.saveProfileForId(id, profile);
-    Profiles.applyGameProfile(id);
-  }
-
-  public static setAudioDeviceForProfileId(id: string, device: string, volume: number): void {
-    const profile = Profiles.getProfileForId(id);
-    if (!profile.audio.devices[device]) {
-      profile.audio.devices[device] = { volume };
-      Profiles.saveProfileForId(id, profile);
-    }
-    Profiles.applyGameProfile(id);
-  }
-
   public static saveProfileForId(id: string, profile: Profile): void {
-    PluginSettings.setProfileForId(id, Profiles.getAppName(id), profile);
-  }
-
-  public static async importFromSDTDP(): Promise<void> {
-    const cfg = await BackendUtils.getSdtdpCfg();
-    if (cfg && cfg.tdpProfiles) {
-      Object.keys(cfg.tdpProfiles).forEach((srcId) => {
-        const id = srcId.replace('-ac-power', '');
-        const ac = srcId.includes('-ac-power');
-        const localId = id + (ac ? Constants.SUFIX_AC : Constants.SUFIX_BAT);
-        let tdp = cfg.tdpProfiles[id].tdp;
-        if (tdp < 5) {
-          tdp = 5;
-        } else if (tdp > Constants.AllyTurboFPPL) {
-          tdp = Constants.AllyTurboFPPL;
-        }
-
-        const profile: Profile = {
-          mode: Mode.CUSTOM,
-          cpu: {
-            tdp: {
-              spl: tdp,
-              sppl: tdp,
-              fppl: tdp
-            },
-            smt: cfg.tdpProfiles[id].smt,
-            boost: cfg.tdpProfiles[id].cpuBoost,
-            governor: Governor.POWERSAVE,
-            epp: Constants.DEFAULT_EPP,
-            scheduler: '',
-            pcores: WhiteBoardUtils.getPCores(),
-            ecores: WhiteBoardUtils.getECores()
-          },
-          gpu: {
-            frequency: {
-              min: WhiteBoardUtils.getGpuMinFreq(),
-              max: WhiteBoardUtils.getGpuMaxFreq()
-            }
-          },
-          display: {
-            brightness: WhiteBoardUtils.getBrightness()
-          },
-          audio: {
-            devices: {}
-          }
-        };
-
-        profile.audio.devices[WhiteBoardUtils.getAudioDevice()] = {
-          volume: WhiteBoardUtils.getVolume()
-        };
-
-        if (!Profiles.existsProfileForId(localId)) {
-          Logger.info('Importing profile ' + srcId + ' as ' + localId);
-          Profiles.saveProfileForId(localId, profile);
-        } else {
-          Logger.info('Profile ' + srcId + ' already exists as ' + localId);
-        }
-      });
-    }
+    PluginSettings.setProfileForId(id, profile);
   }
 }

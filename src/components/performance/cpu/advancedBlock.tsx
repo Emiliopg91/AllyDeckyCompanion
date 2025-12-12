@@ -32,7 +32,7 @@ export const AdvancedBlock: FC = () => {
   scxLabels.push({
     notchIndex: scxNotchIdx,
     value: scxNotchIdx,
-    label: Translator.translate('none')
+    label: WhiteBoardUtils.getDefaultScheduler()
   });
   scxNotchIdx++;
   let scxSelected = 0;

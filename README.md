@@ -47,8 +47,6 @@
 
 - [x] Check for BIOS updates
 
-- [x] Remember audio and brightness level by profile 
-
 ## Compatibility
 
 Tested on Bazzite and CachyOS

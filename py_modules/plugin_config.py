@@ -132,18 +132,19 @@ class PluginConfig:
     @staticmethod
     def migrate():
         """Migrate configuration between version"""
+        data = {}
         if not PluginConfig.config_dir.is_dir():
             os.makedirs(PluginConfig.config_dir, exist_ok=True)
+
         if not PluginConfig.cfg_property_file.is_file():
             PluginConfig.cfg_property_file.touch()
-            dictionary = {
-                "log_level": "INFO",
-                "entries": {},
-                "settings": {"remote": {}},
-            }
-            json_object = json.dumps(dictionary, indent=4)
-            with open(PluginConfig.cfg_property_file, "w", encoding="utf-8") as outfile:
-                outfile.write(json_object)
+            data = {"log_level": "INFO", "settings": {"remote": {}}, "profiles": {}}
+        else:
+            with open(PluginConfig.cfg_property_file, "r", encoding="utf-8") as infile:
+                data = json.load(infile)
+
+        with open(PluginConfig.cfg_property_file, "w", encoding="utf-8") as outfile:
+            json.dump(data, outfile, indent=4)
 
     @staticmethod
     def get_git_data():

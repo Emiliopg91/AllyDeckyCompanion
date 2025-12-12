@@ -1,12 +1,10 @@
 # pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught, too-few-public-methods, disable=consider-using-with
 
 import os
-import shutil
 from time import sleep
 from plugin_config import PluginConfig
 from plugin_logger import PluginLogger
 from plugin_update import PluginUpdate
-from utils.sdtdp import SDTDP
 from utils.hardware import HARDWARE
 from utils.performance.cpu import CPU_PERFORMANCE
 from utils.performance.gpu import GPU_PERFORMANCE
@@ -64,11 +62,11 @@ class Plugin:
         """Set MCU power save mode"""
         HARDWARE.set_mcu_powersave(enabled)
 
-    # CPU
-    async def set_governor(self, governor: str):
-        """Set CPU governor"""
-        return CPU_PERFORMANCE.set_governor(governor)
+    async def is_ac_connected(self):
+        """Check if AC is online"""
+        return HARDWARE.is_ac_connected()
 
+    # CPU
     async def set_epp(self, epp: str):
         """Set CPU epp"""
         return CPU_PERFORMANCE.set_epp(epp)
@@ -130,6 +128,10 @@ class Plugin:
         """Stop scheduler if running"""
         SCX_SCHED.stop()
 
+    async def get_default_sched_name(self):
+        """Get default sched name"""
+        return SCX_SCHED.default_name
+
     # GPU
     async def get_gpu_frequency_range(self):
         """Get GPU freq range"""
@@ -147,27 +149,6 @@ class Plugin:
         except Exception as e:
             decky.logger.error(e)
             return False
-
-    # SDTDP
-    async def get_sdtdp_cfg(self):
-        """Get SDTDP config"""
-        return SDTDP.get_config()
-
-    async def is_sdtdp_cfg_present(self):
-        """Check if SDTDP config is present"""
-        return SDTDP.is_config_present()
-
-    async def is_sdtdp_enabled(self):
-        """Check if SDTDP is enabled"""
-        return SDTDP.is_enabled()
-
-    async def disable_sdtdp(self):
-        """Disable SDTDP"""
-        src = SDTDP.plugin_dir
-        dst = decky.DECKY_PLUGIN_DIR + "/SimpleDeckyTDP"
-        shutil.move(src, dst)
-        decky.logger.info(f"Moved '{src}' to '{dst}'")
-        return True
 
     # Miscelanea
     async def get_icon_for_app(self, app_id: str):

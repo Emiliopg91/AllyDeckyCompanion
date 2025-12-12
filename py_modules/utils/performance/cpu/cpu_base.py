@@ -12,15 +12,11 @@ import decky  # pylint: disable=import-error
 class BaseCpuPerformance(ABC):
     """Base Class for adjusting CPU performance"""
 
-    BOOST_FN = glob.glob("/sys/devices/system/cpu/cpufreq/policy*/boost")
+    BOOST_FN = "/sys/devices/system/cpu/cpufreq/boost"
 
     ACPI_FN = "/sys/firmware/acpi/platform_profile"
 
     SMT_PATH = "/sys/devices/system/cpu/smt/control"
-    GOV_FN = glob.glob("/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor")
-    EPP_FN = glob.glob(
-        "/sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference"
-    )
 
     CPU_PRIORITY = -17
     IO_PRIORITY = int((CPU_PRIORITY + 20) / 5)
@@ -144,10 +140,11 @@ class BaseCpuPerformance(ABC):
         """Set CPU Boost"""
         try:
             val = "1" if enabled else "0"
-            for p in BaseCpuPerformance.BOOST_FN:
-                decky.logger.debug(f"Setting CPU Boost to {val} by writing to '{p}'")
-                with open(p, "w") as file:
-                    file.write(val)
+            decky.logger.debug(
+                f"Setting CPU Boost to {val} by writing to '{BaseCpuPerformance.BOOST_FN}'"
+            )
+            with open(BaseCpuPerformance.BOOST_FN, "w") as file:
+                file.write(val)
         except Exception as e:
             decky.logger.error(e)
 
@@ -190,19 +187,38 @@ class BaseCpuPerformance(ABC):
             else:
                 raise e
 
-    def set_governor(self, governor: str):
-        """Set CPU governor"""
-        for p in BaseCpuPerformance.GOV_FN:
-            decky.logger.debug(f"Setting governor to {governor} by writing to {p}")
-            with open(p, "w") as f:
-                f.write(governor)
-
     def set_epp(self, epp: str):
         """Set CPU epp"""
-        for p in BaseCpuPerformance.EPP_FN:
-            decky.logger.debug(f"Setting EPP to {epp} by writing to {p}")
-            with open(p, "w") as f:
-                f.write(epp)
+        cores = []
+        for core, siblings in self.smt_map.items():
+            cores.append(core)
+            for sc in siblings:
+                cores.append(sc)
+
+        cores = sorted(cores)
+
+        governor = "powersave"
+
+        for c in cores:
+            p_e = (
+                f"/sys/devices/system/cpu/cpu{c}/cpufreq/energy_performance_preference"
+            )
+            p_g = f"/sys/devices/system/cpu/cpu{c}/cpufreq/scaling_governor"
+
+            prev_gov = self.__read(p_g)
+            prev_epp = self.__read(p_e)
+
+            if prev_gov != governor or prev_epp != epp:
+                if prev_gov != governor:
+                    decky.logger.debug(
+                        f"Setting governor to {governor} by writing to {p_g}"
+                    )
+                    with open(p_g, "w") as f:
+                        f.write(governor)
+                if prev_epp != epp:
+                    decky.logger.debug(f"Setting EPP to {epp} by writing to {p_e}")
+                    with open(p_e, "w") as f:
+                        f.write(epp)
 
     def _get_process_tree(self, pid):
         """Retrieves the process tree of a given process ID."""
@@ -279,16 +295,20 @@ class BaseCpuPerformance(ABC):
     def __set_core_state(self, core, p_core, state):
         path = f"/sys/devices/system/cpu/cpu{core}/online"
         try:
-            core_type = "p-core" if p_core else "e-core"
-            action = "Enabling" if state else "Disabling"
-            value = "1" if state else "0"
+            if os.path.exists(path) != 0:
+                with open(path, "r") as f:
+                    enabled = int(f.read().strip()) == 1
 
-            decky.logger.debug(
-                f"{action} {core_type} {core} by writing {value} to {path}"
-            )
-            if core != 0:
-                with open(path, "w") as f:
-                    f.write(value)
+                if enabled != state:
+                    core_type = "p-core" if p_core else "e-core"
+                    action = "Enabling" if state else "Disabling"
+                    value = "1" if state else "0"
+
+                    decky.logger.debug(
+                        f"{action} {core_type} {core} by writing {value} to {path}"
+                    )
+                    with open(path, "w") as f:
+                        f.write(value)
         except Exception as e:
             decky.logger.error(f"Cannot enable core {core}: {e}")
 

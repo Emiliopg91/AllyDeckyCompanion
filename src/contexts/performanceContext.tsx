@@ -44,16 +44,13 @@ const defaultValue: PerformanceContextType = {
     cpu: {
       boost: false,
       epp: Constants.DEFAULT_EPP,
-      governor: Constants.DEFAULT_GOVERNOR,
       tdp: { fppl: 5, spl: 5, sppl: 5 },
       smt: Constants.DEFAULT_SMT,
-      scheduler: ''
+      scheduler: '',
+      pcores: WhiteBoardUtils.getPCores(),
+      ecores: WhiteBoardUtils.getECores()
     },
-    gpu: { frequency: { min: 800, max: 2700 } },
-    display: {},
-    audio: {
-      devices: {}
-    }
+    gpu: { frequency: { min: 800, max: 2700 } }
   },
   tdpRange: WhiteBoardUtils.getTdpRange(),
   setProfile() {},

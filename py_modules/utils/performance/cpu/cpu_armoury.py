@@ -65,17 +65,20 @@ class CpuPerformance(BaseCpuPerformance):
         }
 
     def set_tdp(self, spl, sppt, fppt):
+        ranges = self.get_tdp_ranges()
         sleep(0.1)
-        self._set_tdp("FAST", self.FPPT_FN, fppt)
+        self._set_tdp("FPPT", self.FPPT_FN, ranges["fppt"][1])
+        self._set_tdp("SPPT", self.SPPT_FN, ranges["sppt"][1])
+        self._set_tdp("SPL ", self.SPL_FN, ranges["spl"][1])
         sleep(0.1)
-        self._set_tdp("SLOW", self.SPPT_FN, sppt)
-        sleep(0.1)
-        self._set_tdp("STEADY", self.SPL_FN, spl)
+        self._set_tdp("SPL ", self.SPL_FN, spl)
+        self._set_tdp("SPPT", self.SPPT_FN, sppt)
+        self._set_tdp("FPPT", self.FPPT_FN, fppt)
         sleep(0.1)
 
     def _set_tdp(self, pretty: str, fn: str, val: int):
         """Set CPU TDP"""
-        decky.logger.debug(f"Setting tdp value '{pretty}' to {val} by writing to {fn}")
+        decky.logger.debug(f"Setting {pretty} to {val} by writing to {fn}")
         with open(fn, "w") as f:
             f.write(f"{val}\n")
 

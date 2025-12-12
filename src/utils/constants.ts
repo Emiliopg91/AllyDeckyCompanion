@@ -1,6 +1,6 @@
 import pckage from '../../package.json';
 import plugin from '../../plugin.json';
-import { Epp, Governor, Mode } from './models';
+import { Epp, Mode, TdpPresets } from './models';
 
 export class Constants {
   public static PLUGIN_NAME = plugin.name;
@@ -12,7 +12,7 @@ export class Constants {
   public static SUFIX_AC = '.acpower';
   public static SUFIX_BAT = '.battery';
 
-  public static DEFAULT_DEFAULT = 'default';
+  public static DEFAULT_DEFAULT = 'SteamOS';
   public static DEFAULT_ID = Constants.DEFAULT_DEFAULT + Constants.SUFIX_BAT;
   public static DEFAULT_ID_AC = Constants.DEFAULT_DEFAULT + Constants.SUFIX_AC;
 
@@ -28,29 +28,34 @@ export class Constants {
 
   public static DEFAULT_SMT = true;
   public static DEFAULT_EPP = Epp.BALANCE_POWER;
-  public static DEFAULT_GOVERNOR = Governor.POWERSAVE;
 
-  public static AllySilentSPL = 13;
-  public static AllySilentSPPL = 15;
-  public static AllySilentFPPL = 17;
-  public static AllyPerformanceSPL = 17;
-  public static AllyPerformanceSPPL = 20;
-  public static AllyPerformanceFPPL = 25;
-  public static AllyTurboSPL = 25;
-  public static AllyTurboSPPL = 27;
-  public static AllyTurboFPPL = 30;
+  public static AllyTdpPresets: TdpPresets = {
+    [Mode.SILENT]: { spl: 13, sppl: 15, fppl: 17 },
+    [Mode.PERFORMANCE]: { spl: 17, sppl: 20, fppl: 25 },
+    [Mode.TURBO]: { spl: 25, sppl: 27, fppl: 30 },
+    [Mode.CUSTOM]: { spl: 17, sppl: 20, fppl: 25 }
+  };
 
-  public static AllyXSilentSPL = 10;
-  public static AllyXPerformanceSPL = 15;
-  public static AllyXTurboSPL = 25;
+  public static AllyXTdpPresets: TdpPresets = {
+    [Mode.SILENT]: { spl: 10, sppl: 15, fppl: 17 },
+    [Mode.PERFORMANCE]: { spl: 15, sppl: 20, fppl: 25 },
+    [Mode.TURBO]: { spl: 25, sppl: 27, fppl: 30 },
+    [Mode.CUSTOM]: { spl: 15, sppl: 20, fppl: 25 }
+  };
 
-  public static XboxAllyXSilentSPL = 13;
-  public static XboxAllyXPerformanceSPL = 17;
-  public static XboxAllyXTurboSPL = 25;
+  public static XboxAllyTdpPresets: TdpPresets = {
+    [Mode.SILENT]: { spl: 6, sppl: 6, fppl: 6 },
+    [Mode.PERFORMANCE]: { spl: 15, sppl: 15, fppl: 15 },
+    [Mode.TURBO]: { spl: 25, sppl: 25, fppl: 25 },
+    [Mode.CUSTOM]: { spl: 15, sppl: 15, fppl: 15 }
+  };
 
-  public static XboxAllySilentSPL = 6;
-  public static XboxAllyPerformanceSPL = 15;
-  public static XboxAllyTurboSPL = 20;
+  public static XboxAllyXTdpPresets: TdpPresets = {
+    [Mode.SILENT]: { spl: 13, sppl: 15, fppl: 19 },
+    [Mode.PERFORMANCE]: { spl: 17, sppl: 20, fppl: 25 },
+    [Mode.TURBO]: { spl: 25, sppl: 27, fppl: 30 },
+    [Mode.CUSTOM]: { spl: 17, sppl: 20, fppl: 25 }
+  };
 
   public static ALLY_BIOS_URL =
     'https://rog.asus.com/support/webapi/product/GetPDBIOS?website=global&model=rog-ally-2023&pdid=0&m1id=23629&cpu=RC71L&LevelTagId=220680&systemCode=rog';

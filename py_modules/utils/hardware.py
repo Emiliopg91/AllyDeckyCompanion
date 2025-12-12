@@ -1,7 +1,7 @@
 # pylint: disable=missing-module-docstring, line-too-long, broad-exception-caught, too-few-public-methods , unspecified-encoding
 
 import os
-
+import glob
 import decky  # pylint: disable=import-error
 
 
@@ -37,6 +37,14 @@ class Hardware:
                 )
                 file.write("1" if enabled else "0")
                 file.close()
+
+    def is_ac_connected(self):
+        """Check if AC is online"""
+        for p in glob.glob("/sys/class/power_supply/AC*/online"):
+            with open(p, "r") as f:
+                return int(f.read().strip()) == 1
+
+        return False
 
 
 HARDWARE = Hardware()

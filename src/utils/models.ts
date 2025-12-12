@@ -25,16 +25,6 @@ export interface Profile {
   mode: Mode;
   cpu: CpuProfile;
   gpu: GpuProfile;
-  display: Display;
-  audio: Audio;
-}
-
-export interface Audio {
-  devices: Record<string, AudioDevice>;
-}
-
-export interface AudioDevice {
-  volume: number | undefined;
 }
 
 export interface Settings {
@@ -46,20 +36,14 @@ export interface Settings {
 export interface GameEntry {
   name: string;
   battery: Profile;
-  acpower: Profile;
-}
-
-export interface Display {
-  brightness?: number;
 }
 
 export interface CpuProfile {
   boost: boolean;
   tdp: TdpCpuProfile;
-  governor: Governor;
   epp: Epp;
-  scheduler: string;
   smt: boolean;
+  scheduler: string;
   pcores: number;
   ecores: number;
 }
@@ -71,14 +55,8 @@ export enum Mode {
   CUSTOM
 }
 
-export enum Governor {
-  POWERSAVE,
-  PERFORMANCE
-}
-
 export enum CpuImpl {
   ARMOURY,
-  RYZENADJ,
   WMI
 }
 
@@ -104,16 +82,6 @@ export interface TdpCpuProfile {
   fppl: number;
 }
 
-export interface SdtdpSettingsTdpProfile {
-  tdp: number;
-  cpuBoost: boolean;
-  smt: boolean;
-}
-
-export interface SdtdpSettings {
-  tdpProfiles: Record<string, SdtdpSettingsTdpProfile>;
-}
-
 export enum Acpi {
   LOW_POWER,
   BALANCED,
@@ -127,3 +95,5 @@ export interface SystemInfoSchema {
   isXboxAlly: boolean;
   isXboxAllyX: boolean;
 }
+
+export type TdpPresets = Record<Mode, TdpCpuProfile>;

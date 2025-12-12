@@ -1,3 +1,4 @@
+import { sleep } from '@decky/ui';
 import {
   EventBus,
   EventData,
@@ -7,7 +8,6 @@ import {
   SuspendEventData,
   WhiteBoardEventData
 } from 'decky-plugin-framework';
-import { debounce } from 'lodash';
 
 import { Profiles } from '../settings/profiles';
 import { AsyncUtils } from './async';
@@ -15,7 +15,6 @@ import { BackendUtils } from './backend';
 import { Constants } from './constants';
 import { PluginSettings } from './settings';
 import { WhiteBoardUtils } from './whiteboard';
-import { sleep } from '@decky/ui';
 
 export class Listeners {
   private static unsubscribeGameEvents: (() => void) | undefined = undefined;
@@ -23,60 +22,6 @@ export class Listeners {
   private static unsubscribeGameIdEvents: (() => void) | undefined = undefined;
   private static unsubscribeShutdownEvents: (() => void) | undefined = undefined;
   private static unsubscribeSuspendEvents: (() => void) | undefined = undefined;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static debouncedBrightnessListener = debounce((event: any) => {
-    AsyncUtils.runMutexForProfile((release) => {
-      if (event.flBrightness != WhiteBoardUtils.getBrightness()) {
-        WhiteBoardUtils.setBrightness(event.flBrightness);
-        Profiles.setBrightnessForProfileId(WhiteBoardUtils.getRunningGameId(), event.flBrightness);
-      }
-      release();
-    });
-  }, 1000);
-
-  private static debouncedVolumeListener = debounce((id: number) => {
-    AsyncUtils.runMutexForProfile((release) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      SteamClient.System.Audio.GetDevices().then((devs: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dev = devs.vecDevices.filter((dev: any) => dev.id == id)[0];
-        const devName = dev.sName;
-        const volume = dev.flOutputVolume;
-        if (volume != WhiteBoardUtils.getVolume()) {
-          WhiteBoardUtils.setAudioDevice(devName);
-          WhiteBoardUtils.setVolume(volume);
-          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
-        }
-        release();
-      });
-    });
-  }, 1000);
-
-  private static debouncedAudioDevListener = debounce(() => {
-    AsyncUtils.runMutexForProfile((release) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      SteamClient.System.Audio.GetDevices().then((devs: any) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const dev = devs.vecDevices.filter((dev: any) => dev.id == devs.activeOutputDeviceId)[0];
-        const devName = dev.sName;
-        if (devName != WhiteBoardUtils.getAudioDevice()) {
-          Logger.info('Changed audio sink to ' + devName);
-          let volume = dev.flOutputVolume;
-
-          const profile = Profiles.getProfileForId(WhiteBoardUtils.getRunningGameId());
-          if (profile.audio.devices[devName]) {
-            volume = profile.audio.devices[devName].volume;
-          }
-
-          WhiteBoardUtils.setAudioDevice(devName);
-          WhiteBoardUtils.setVolume(volume);
-          Profiles.setAudioForProfileId(WhiteBoardUtils.getRunningGameId(), devName, volume);
-        }
-        release();
-      });
-    });
-  }, 1000);
 
   public static bind(): void {
     Listeners.unsubscribeSuspendEvents = EventBus.subscribe(EventType.SUSPEND, (e: EventData) => {
@@ -105,19 +50,6 @@ export class Listeners {
       });
     }).unregister;
 
-    Listeners.unsubscribeBrightnessEvents = SteamClient.System.Display.RegisterForBrightnessChanges(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (event: any) => {
-        if (WhiteBoardUtils.getBrightness() == undefined) {
-          WhiteBoardUtils.setBrightness(event.flBrightness);
-        } else {
-          if (!AsyncUtils.isDisplayLocked()) {
-            Listeners.debouncedBrightnessListener(event);
-          }
-        }
-      }
-    ).unregister;
-
     Listeners.unsubscribeGameEvents = EventBus.subscribe(EventType.GAME_LIFE, (e: EventData) => {
       const event = e as GameLifeEventData;
       Logger.info('New game event');
@@ -125,30 +57,20 @@ export class Listeners {
         BackendUtils.renice(event.getPID());
       }
       if (PluginSettings.getProfilePerGame()) {
-        const prevId = WhiteBoardUtils.getRunningGameId();
-        const newId = event.isRunning()
-          ? String(event.getGameId()) +
-            (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
-          : WhiteBoardUtils.getOnBattery()
-            ? Constants.DEFAULT_ID
-            : Constants.DEFAULT_ID_AC;
-        if (prevId != newId) {
-          WhiteBoardUtils.setRunningGameId(newId);
-        }
+        event.getDetails().then((data) => {
+          const prevId = WhiteBoardUtils.getRunningGameId();
+          const newId = event.isRunning()
+            ? String(data.getDisplayName()) +
+              (WhiteBoardUtils.getOnBattery() ? Constants.SUFIX_BAT : Constants.SUFIX_AC)
+            : WhiteBoardUtils.getOnBattery()
+              ? Constants.DEFAULT_ID
+              : Constants.DEFAULT_ID_AC;
+          if (prevId != newId) {
+            WhiteBoardUtils.setRunningGameId(newId);
+          }
+        });
       }
     }).unsubscribe;
-
-    SteamClient.System.Audio.RegisterForDeviceVolumeChanged((e: number) => {
-      Listeners.debouncedVolumeListener(e);
-    });
-
-    SteamClient.System.Audio.RegisterForDeviceAdded(() => {
-      Listeners.debouncedAudioDevListener();
-    });
-
-    SteamClient.System.Audio.RegisterForDeviceRemoved(() => {
-      Listeners.debouncedAudioDevListener();
-    });
 
     SteamClient.System.RegisterForBatteryStateChanges(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

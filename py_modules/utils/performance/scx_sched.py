@@ -1,12 +1,13 @@
 import json
 import shutil
 import subprocess
-import time
+import os
 
 import decky  # pylint: disable=import-error
 
 
 class ScxSched:
+    """Class for management of schedulers"""
 
     SCHEDULERS_CONFIG = {
         "bpfland": "-m performance",
@@ -21,7 +22,9 @@ class ScxSched:
 
         if shutil.which("scxctl"):
             output = (
-                subprocess.run(["scxctl", "list"], capture_output=True, text=True)
+                subprocess.run(
+                    ["scxctl", "list"], capture_output=True, text=True, check=True
+                )
                 .stdout.strip()
                 .replace("supported schedulers: ", "")
             )
@@ -33,7 +36,9 @@ class ScxSched:
             )
 
             output = (
-                subprocess.run(["scxctl", "get"], capture_output=True, text=True)
+                subprocess.run(
+                    ["scxctl", "get"], capture_output=True, text=True, check=True
+                )
                 .stdout.strip()
                 .replace("supported schedulers: ", "")
             )
@@ -45,6 +50,7 @@ class ScxSched:
                 decky.logger.info("No default scheduler")
 
     def start(self, scheduler: str):
+        """Start new scheduler run"""
         if self.__current == scheduler:
             return
 
@@ -52,27 +58,40 @@ class ScxSched:
         if self.__current is not None:
             action = "switch"
 
-        command = ["scxctl", action, "--sched", scheduler]
+        command = [
+            "scxctl",
+            action,
+            "--sched",
+            scheduler,
+            f'--args={self.SCHEDULERS_CONFIG[scheduler]}',
+        ]
 
-        if subprocess.run(command).returncode == 0:
+        if subprocess.run(command, check=True).returncode == 0:
             self.__current = scheduler
 
     def stop(self):
-        if self.__current == None:
+        """Stop running scheduler"""
+        if self.__current is None:
             return
 
-        if subprocess.run(["scxctl", "stop"]).returncode == 0:
+        if subprocess.run(["scxctl", "stop"], check=True).returncode == 0:
             self.__current = None
 
     @property
     def available(self):
+        """Get available schedulers"""
         return self.__schedulers
+
+    @property
+    def default_name(self):
+        """Get default scheduler name"""
+        path = "/proc/sys/kernel/sched_bore"
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                if f.read().strip() == "1":
+                    return "bore"
+
+        return "eevdf"
 
 
 SCX_SCHED = ScxSched()
-
-SCX_SCHED.start("lavd")
-time.sleep(3)
-SCX_SCHED.start("bpfland")
-time.sleep(3)
-SCX_SCHED.stop()

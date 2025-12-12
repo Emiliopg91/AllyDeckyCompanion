@@ -1,7 +1,6 @@
 import { Settings } from 'decky-plugin-framework';
 
 import { Configuration, GameEntry, Profile } from './models';
-import { WhiteBoardUtils } from './whiteboard';
 
 export class PluginSettings {
   public static settings: Configuration;
@@ -79,62 +78,36 @@ export class PluginSettings {
     if (!PluginSettings.settings.profiles[appId] || !PluginSettings.settings.profiles[appId][pwr]) {
       return undefined;
     } else {
-      const profile = PluginSettings.settings.profiles[appId][pwr] as Profile;
-      if (!profile.display) {
-        PluginSettings.createParents(profile, 'display');
-      }
-      if (profile.display.brightness == undefined) {
-        profile.display.brightness = WhiteBoardUtils.getBrightness();
-      }
-      if (!profile.audio || !profile.audio.devices) {
-        PluginSettings.createParents(profile, 'audio.devices');
-      }
-      if (profile.audio.devices == undefined || Object.keys(profile.audio.devices).length == 0) {
-        profile.audio.devices = {};
-      }
-      if (!profile.audio.devices[WhiteBoardUtils.getAudioDevice()]) {
-        profile.audio.devices[WhiteBoardUtils.getAudioDevice()] = {
-          volume: WhiteBoardUtils.getVolume()
-        };
-      }
-
-      return JSON.parse(JSON.stringify(profile));
+      return JSON.parse(JSON.stringify(PluginSettings.settings.profiles[appId][pwr] as Profile));
     }
   }
 
-  public static setProfileForId(id: string, name: string, profile: Profile): void {
-    const appId = id.split('.')[0];
+  public static setProfileForId(id: string, profile: Profile): void {
+    const appName = id.split('.')[0];
     const pwr = id.split('.')[1] as keyof GameEntry;
 
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
     }
 
-    if (!PluginSettings.settings.profiles[appId]) {
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appId);
+    if (!PluginSettings.settings.profiles[appName]) {
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName);
     }
 
-    if (!PluginSettings.settings.profiles[appId][pwr]) {
+    if (!PluginSettings.settings.profiles[appName][pwr]) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id);
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.cpu.tdp');
       PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.gpu.frequency');
-      PluginSettings.createParents(
-        PluginSettings.settings,
-        'profiles.' + id + '.display.brightness'
-      );
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.audio.devices');
     }
 
-    const gameEntry = PluginSettings.settings.profiles[appId];
+    const gameEntry = PluginSettings.settings.profiles[appName];
     const prof = gameEntry[pwr as keyof GameEntry] as Profile;
 
-    gameEntry.name = name;
     prof.mode = profile.mode;
     prof.cpu.boost = profile.cpu.boost;
     prof.cpu.epp = profile.cpu.epp;
-    prof.cpu.governor = profile.cpu.governor;
-    prof.cpu.scheduler = profile.cpu.scheduler;
     prof.cpu.smt = profile.cpu.smt;
+    prof.cpu.scheduler = profile.cpu.scheduler;
     prof.cpu.ecores = profile.cpu.ecores;
     prof.cpu.pcores = profile.cpu.pcores;
     prof.cpu.tdp.spl = profile.cpu.tdp.spl;
@@ -142,7 +115,5 @@ export class PluginSettings {
     prof.cpu.tdp.fppl = profile.cpu.tdp.fppl;
     prof.gpu.frequency.min = profile.gpu.frequency.min;
     prof.gpu.frequency.max = profile.gpu.frequency.max;
-    prof.display.brightness = profile.display.brightness;
-    prof.audio.devices = profile.audio.devices;
   }
 }

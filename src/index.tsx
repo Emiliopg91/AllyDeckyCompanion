@@ -121,60 +121,24 @@ const checkBiosLatestVersion = async (): Promise<void> => {
   }
 };
 
-const checkSdtdp = (): Promise<void> => {
-  return new Promise<void>((resolve) => {
-    BackendUtils.isSdtdpEnabled().then((res) => {
-      if (res) {
-        showModal(
-          <ConfirmModal
-            strTitle={Constants.PLUGIN_NAME}
-            strDescription={Translator.translate('disable.sdtdp.ask')}
-            strCancelButtonText={Translator.translate('enable')}
-            strOKButtonText={Translator.translate('disable')}
-            onCancel={() => {
-              WhiteBoardUtils.setSdtdpEnabled(true);
-              Logger.info('SimpleDeckyTDP not disabled');
-              resolve();
-            }}
-            onOK={() => {
-              Logger.info('Disabling SimpleDeckyTDP');
-              BackendUtils.disableSDTDP();
-            }}
-          />
-        );
-      } else {
-        resolve();
-      }
-    });
-  });
-};
-
 const getGpuRanges = (): Promise<void> => {
   return new Promise<void>((resolve) => {
-    if (WhiteBoardUtils.getIsAlly()) {
-      BackendUtils.getGpuFrequencyRange().then(([min, max]) => {
-        WhiteBoardUtils.setGpuMinFreq(min);
-        WhiteBoardUtils.setGpuMaxFreq(max);
-        Logger.info('GPU frequency range: ' + min + ' to ' + max + ' MHz');
-        resolve();
-      });
-    } else {
+    BackendUtils.getGpuFrequencyRange().then(([min, max]) => {
+      WhiteBoardUtils.setGpuMinFreq(min);
+      WhiteBoardUtils.setGpuMaxFreq(max);
+      Logger.info('GPU frequency range: ' + min + ' to ' + max + ' MHz');
       resolve();
-    }
+    });
   });
 };
 
 const getCpuRanges = (): Promise<void> => {
   return new Promise<void>((resolve) => {
-    if (WhiteBoardUtils.getIsAlly()) {
-      BackendUtils.getCpuTdpRange().then((data) => {
-        WhiteBoardUtils.setTdpRange(data);
-        Logger.info('CPU TDP ranges: ' + JSON.stringify(data));
-        resolve();
-      });
-    } else {
+    BackendUtils.getCpuTdpRange().then((data) => {
+      WhiteBoardUtils.setTdpRange(data);
+      Logger.info('CPU TDP ranges: ' + JSON.stringify(data));
       resolve();
-    }
+    });
   });
 };
 
@@ -193,7 +157,10 @@ const getSchedulers = (): Promise<void> => {
     BackendUtils.getSchedulers().then((data) => {
       WhiteBoardUtils.setSchedulers(data);
       Logger.info('Schedulers: ' + JSON.stringify(data));
-      resolve();
+      BackendUtils.getDefaultSchedulerName().then((data) => {
+        WhiteBoardUtils.setDefaultScheduler(data);
+        resolve();
+      });
     });
   });
 };
@@ -223,6 +190,21 @@ const getSystemInfo = (): Promise<SystemInfoSchema> => {
       const biosVersion = isAlly ? biosVersionStr.split('.')[1] : '';
 
       resolve({ isAlly, isAllyX, isXboxAllyX, isXboxAlly, biosVersion });
+    })();
+  });
+};
+
+const getACOnline = (): Promise<void> => {
+  return new Promise((resolve) => {
+    (async (): Promise<void> => {
+      const online = await BackendUtils.isAcOnline();
+      WhiteBoardUtils.setOnBattery(!online);
+      if (online) {
+        WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_ID_AC);
+      } else {
+        WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_ID);
+      }
+      resolve();
     })();
   });
 };
@@ -265,54 +247,39 @@ export default definePlugin(() => {
     }
     PluginSettings.setSchemaVersion(Constants.CFG_SCHEMA_VERS);
 
-    checkSdtdp().then(() => {
-      checkProfilePerGame().then(() => {
-        Logger.info(
-          'Profile per-game ' + (PluginSettings.getProfilePerGame() ? 'en' : 'dis') + 'abled'
-        );
+    checkProfilePerGame().then(() => {
+      Logger.info(
+        'Profile per-game ' + (PluginSettings.getProfilePerGame() ? 'en' : 'dis') + 'abled'
+      );
 
-        getSystemInfo().then((result) => {
-          WhiteBoardUtils.setIsAlly(result.isAlly);
-          WhiteBoardUtils.setisAllyX(result.isAllyX);
-          WhiteBoardUtils.setisXboxAllyX(result.isXboxAllyX);
-          WhiteBoardUtils.setBiosVersion(result.biosVersion);
+      getSystemInfo().then((result) => {
+        WhiteBoardUtils.setIsAlly(result.isAlly);
+        WhiteBoardUtils.setisAllyX(result.isAllyX);
+        WhiteBoardUtils.setisXboxAllyX(result.isXboxAllyX);
+        WhiteBoardUtils.setBiosVersion(result.biosVersion);
 
-          let prod = 'Unknown';
-          if (WhiteBoardUtils.getIsAlly()) {
-            prod = 'ASUS ROG';
-            if (WhiteBoardUtils.getIsAllyX()) {
-              prod += ' Ally X';
-            } else if (WhiteBoardUtils.getIsXboxAlly()) {
-              prod += ' Xbox Ally';
-            } else if (WhiteBoardUtils.getIsXboxAllyX()) {
-              prod += ' Xbox Ally X';
-            } else {
-              prod += ' Ally';
-            }
-          }
-          Logger.info('Product: ' + prod);
+        let prod = 'ASUS ROG';
+        if (WhiteBoardUtils.getIsAlly()) {
+          prod += ' Ally';
+        } else if (WhiteBoardUtils.getIsAllyX()) {
+          prod += ' Ally X';
+        } else if (WhiteBoardUtils.getIsXboxAlly()) {
+          prod += ' Xbox Ally';
+        } else if (WhiteBoardUtils.getIsXboxAllyX()) {
+          prod += ' Xbox Ally X';
+        }
+        Logger.info('Product: ' + prod);
 
-          if (result.isAlly) {
-            Logger.info('BIOS version: ' + result.biosVersion);
-          }
+        if (result.isAlly) {
+          Logger.info('BIOS version: ' + result.biosVersion);
+        }
 
-          getCpuImpl().then(() => {
-            getCpuRanges().then(() => {
-              getGpuRanges().then(() => {
-                getSchedulers().then(() => {
+        getACOnline().then(() => {
+          getSchedulers().then(() => {
+            getCpuImpl().then(() => {
+              getCpuRanges().then(() => {
+                getGpuRanges().then(() => {
                   getCoresCount().then(() => {
-                    WhiteBoardUtils.setOnlyGui(
-                      !WhiteBoardUtils.getIsAlly() || WhiteBoardUtils.getSdtdpEnabled()
-                    );
-                    Logger.info(
-                      'Mode ONLY_GUI ' + (WhiteBoardUtils.getOnlyGui() ? 'en' : 'dis') + 'abled'
-                    );
-
-                    BackendUtils.isSdtdpPresent().then((res) => {
-                      Logger.info('SDTDP ' + (res ? '' : 'no ') + 'present');
-                      WhiteBoardUtils.setSdtdpSettingsPresent(res);
-                    });
-
                     sleep(5000).then(() => {
                       if (!Constants.PLUGIN_VERSION.endsWith('-dev')) {
                         pluginUpdateCheckTimer = setInterval(
@@ -327,26 +294,15 @@ export default definePlugin(() => {
                       });
                     });
 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    SteamClient.System.Audio.GetDevices().then((devs: any) => {
-                      const dev = devs.vecDevices.filter(
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (dev: any) => dev.id == devs.activeOutputDeviceId
-                      )[0];
-                      WhiteBoardUtils.setAudioDevice(dev.sName);
-                      WhiteBoardUtils.setVolume(dev.flOutputVolume);
-                      Listeners.bind();
+                    Listeners.bind();
 
-                      BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
-                      BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
-                      if (WhiteBoardUtils.getIsAlly()) {
-                        sleep(100).then(() => {
-                          Profiles.getDefaultProfile();
-                          Profiles.getDefaultACProfile();
-                          Profiles.summary();
-                          Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
-                        });
-                      }
+                    BackendUtils.setBatteryLimit(SystemSettings.getLimitBattery());
+                    BackendUtils.setMcuPowersave(SystemSettings.getMcuPowersave());
+                    sleep(100).then(() => {
+                      Profiles.getDefaultProfile();
+                      Profiles.getDefaultACProfile();
+                      Profiles.summary();
+                      Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
                     });
                   });
                 });

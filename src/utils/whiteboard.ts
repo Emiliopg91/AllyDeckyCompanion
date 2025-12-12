@@ -5,6 +5,13 @@ import { Constants } from './constants';
 import { CpuImpl } from './models';
 
 export class WhiteBoardUtils {
+  public static getDefaultScheduler(): string {
+    return WhiteBoard.get('defaultScheduler')!;
+  }
+
+  public static setDefaultScheduler(scheds: string): void {
+    WhiteBoard.set('defaultScheduler', scheds);
+  }
   public static getScheduler(): string {
     return WhiteBoard.get('scheduler')!;
   }
@@ -86,30 +93,6 @@ export class WhiteBoardUtils {
     WhiteBoard.set('tab', value);
   }
 
-  public static getSdtdpSettingsPresent(): boolean {
-    return WhiteBoard.get('sdtdpSettingsPresent') || false;
-  }
-
-  public static setSdtdpSettingsPresent(value: boolean): void {
-    WhiteBoard.set('sdtdpSettingsPresent', value);
-  }
-
-  public static getSdtdpEnabled(): boolean {
-    return WhiteBoard.get('sdtdpEnabled') || false;
-  }
-
-  public static setSdtdpEnabled(value: boolean): void {
-    WhiteBoard.set('sdtdpEnabled', value);
-  }
-
-  public static getOnlyGui(): boolean {
-    return WhiteBoard.get('onlyGui') || false;
-  }
-
-  public static setOnlyGui(value: boolean): void {
-    WhiteBoard.set('onlyGui', value);
-  }
-
   public static getPluginLatestVersion(): string {
     return WhiteBoard.get('pluginLatestVersion') || '';
   }
@@ -177,69 +160,8 @@ export class WhiteBoardUtils {
   public static setCpuImpl(value: CpuImpl): void {
     WhiteBoard.set('cpuImpl', value);
   }
-  /*
-  public static getSplMin(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['spl'][0] || 7);
-  }
 
-  public static getSplMax(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['spl'][1] || 25);
-  }
-
-  public static getSpptMin(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['sppt'][0] || 15);
-  }
-
-  public static getSpptMax(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['sppt'][1] || 30);
-  }
-
-  public static getFpptMin(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['fppt'][0] || 15);
-  }
-
-  public static getFpptMax(): number {
-    return Number(WhiteBoardUtils.getTdpRange()['fppt'][1] || 35);
-  }
-*/
   public static setGpuMaxFreq(value: number): void {
     WhiteBoard.set('gpuMaxFreq', value);
-  }
-
-  public static getPrevBrightness(): number | undefined {
-    const val = WhiteBoard.get<number>('prevBrightness');
-    if (val == undefined || val == null) {
-      return WhiteBoardUtils.getBrightness();
-    }
-    return val;
-  }
-
-  public static getBrightness(): number | undefined {
-    const val = WhiteBoard.get<number>('brightness');
-    if (val == undefined || val == null) {
-      return undefined;
-    }
-    return val;
-  }
-
-  public static setBrightness(value: number): void {
-    WhiteBoard.set('prevBrightness', WhiteBoardUtils.getBrightness());
-    WhiteBoard.set('brightness', value);
-  }
-
-  public static setVolume(value: number): void {
-    WhiteBoard.set('volume', value);
-  }
-
-  public static getVolume(): number {
-    return WhiteBoard.get<number>('volume')!;
-  }
-
-  public static setAudioDevice(value: number): void {
-    WhiteBoard.set('audioDevice', value);
-  }
-
-  public static getAudioDevice(): string {
-    return WhiteBoard.get<string>('audioDevice')!;
   }
 }
