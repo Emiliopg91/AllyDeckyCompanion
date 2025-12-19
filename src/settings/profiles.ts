@@ -124,18 +124,8 @@ export class Profiles {
       Logger.info('');*/
   }
 
-  public static getAppId(id: string): number {
-    const name = Profiles.getAppName(id);
+  public static getAppId(name: string): number {
     return name == Constants.DEFAULT_DEFAULT ? -1 : (PluginSettings.getAppIdForName(name) ?? -1);
-  }
-
-  public static getAppName(id: string): string {
-    const name = id.substring(0, id.lastIndexOf('.'));
-    if (name == Constants.DEFAULT_DEFAULT) {
-      return Constants.DEFAULT_DEFAULT;
-    } else {
-      return name;
-    }
   }
 
   public static getFullPowerProfile(): Profile {

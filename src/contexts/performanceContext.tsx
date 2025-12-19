@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable @typescript-eslint/no-empty-function*/
-import { Router, SteamAppOverview } from '@decky/ui';
 import {
   EventBus,
   EventData,
@@ -15,8 +14,7 @@ import { createContext, useEffect, useState } from 'react';
 import { Profiles } from '../settings/profiles';
 import { BackendUtils } from '../utils/backend';
 import { Constants } from '../utils/constants';
-import { CorsClient } from '../utils/cors';
-import { AppOverviewExt, Mode, Profile } from '../utils/models';
+import { Mode, Profile } from '../utils/models';
 import { WhiteBoardUtils } from '../utils/whiteboard';
 
 declare const appStore: any;
@@ -24,7 +22,6 @@ declare const appStore: any;
 interface PerformanceContextType {
   appId: number;
   name: string;
-  icon: string | undefined;
   onBattery: boolean;
   profile: Profile;
   tdpRange: Record<string, number[]>;
@@ -35,7 +32,6 @@ interface PerformanceContextType {
 const defaultValue: PerformanceContextType = {
   appId: -1,
   name: Constants.DEFAULT_DEFAULT,
-  icon: undefined,
   onBattery: WhiteBoardUtils.getOnBattery() ?? false,
   profile: {
     mode: Mode.PERFORMANCE,
@@ -57,53 +53,6 @@ const defaultValue: PerformanceContextType = {
 
 export const PerformanceContext = createContext(defaultValue);
 
-const loadIcon = async (
-  appId: number,
-  setIcon: (icon: string | undefined) => void
-): Promise<void> => {
-  let appDetail: AppOverviewExt | undefined = undefined;
-  (Router.RunningApps as AppOverviewExt[]).forEach((app: AppOverviewExt) => {
-    if (app.appid == appId) {
-      appDetail = app;
-    }
-  });
-
-  if (appDetail) {
-    const app = appDetail as AppOverviewExt;
-    if (app.icon_data) {
-      setIcon('data:image/' + app.icon_data_format + ';base64,' + app.icon_data);
-    } else {
-      if (app.icon_hash) {
-        const icon = await BackendUtils.getIconForApp(String(appId));
-        if (icon) {
-          setIcon(icon);
-        } else {
-          try {
-            const iconUrl = appStore.GetIconURLForApp(app as SteamAppOverview);
-            const response = await CorsClient.fetchUrl(iconUrl);
-            if (response.ok) {
-              const reader = new FileReader();
-              reader.onload = (): void => {
-                const newIconSrc = reader.result as string;
-                BackendUtils.setIconForApp(String(appId), newIconSrc);
-                setIcon(newIconSrc);
-              };
-              reader.readAsDataURL(await response.blob());
-            } else {
-              throw new Error(response.statusText);
-            }
-          } catch (e) {
-            Logger.error('Error getting icon from URL: ', e);
-            setIcon(undefined);
-          }
-        }
-      } else {
-        setIcon(undefined);
-      }
-    }
-  }
-};
-
 const saveProfile = debounce((name: string, profile: Profile) => {
   Logger.info('Saving profile ' + name);
   Profiles.saveProfileForId(name, profile);
@@ -114,7 +63,6 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
   const [onBattery, setOnBattery] = useState(WhiteBoardUtils.getOnBattery());
   const [name, setName] = useState(WhiteBoardUtils.getRunningGameId());
   const [appId, setAppId] = useState(Profiles.getAppId(name));
-  const [icon, setIcon] = useState<string | undefined>(undefined);
   const [profile, setProfile] = useState<Profile>(Profiles.getProfileForId(name));
   const [tdpRange, setTdpRange] = useState<Record<string, number[]>>(WhiteBoardUtils.getTdpRange());
 
@@ -140,8 +88,7 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
         if (id != (data.getValue() as string)) {
           setProfile(Profiles.getProfileForId(data.getValue()));
           setAppId(Profiles.getAppId(data.getValue()));
-          setName(Profiles.getAppName(data.getValue()));
-          loadIcon(Profiles.getAppId(data.getValue()), setIcon);
+          setName(data.getValue());
         }
         return String(data.getValue() as string);
       });
@@ -151,7 +98,6 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
   useEffect(() => {
     const unsBat = EventBus.subscribe(EventType.WHITEBOARD, (e) => onBatteryEffect(e)).unsubscribe;
     const unsID = EventBus.subscribe(EventType.WHITEBOARD, (e) => onIdEffect(e)).unsubscribe;
-    loadIcon(appId, setIcon);
 
     return (): void => {
       unsBat();
@@ -164,7 +110,6 @@ export function PerformanceProvider({ children }: { children: JSX.Element }): JS
       value={{
         appId,
         name,
-        icon,
         onBattery: onBattery ?? false,
         profile,
         setProfile,

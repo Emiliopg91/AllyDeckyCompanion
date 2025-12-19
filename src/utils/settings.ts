@@ -68,16 +68,14 @@ export class PluginSettings {
   }
 
   public static getProfileForId(id: string): Profile | undefined {
-    const appId = id.split('.')[0];
-
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
     }
 
-    if (!PluginSettings.settings.profiles[appId] || !PluginSettings.settings.profiles[appId]) {
+    if (!PluginSettings.settings.profiles[id] || !PluginSettings.settings.profiles[id]) {
       return undefined;
     } else {
-      return JSON.parse(JSON.stringify(PluginSettings.settings.profiles[appId] as Profile));
+      return JSON.parse(JSON.stringify(PluginSettings.settings.profiles[id] as Profile));
     }
   }
 
@@ -98,10 +96,6 @@ export class PluginSettings {
 
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
-    }
-
-    if (!PluginSettings.settings.profiles[appName]) {
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName);
     }
 
     if (!PluginSettings.settings.profiles[appName]) {

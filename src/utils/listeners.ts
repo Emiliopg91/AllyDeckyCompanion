@@ -80,6 +80,7 @@ export class Listeners {
           Logger.info('New AC state: ' + state.eACState);
           WhiteBoardUtils.setOnBattery(onBattery);
           WhiteBoardUtils.setRunningGameId(WhiteBoardUtils.getRunningGameId());
+          Profiles.applyGameProfile(WhiteBoardUtils.getRunningGameId());
         }
       }
     );
