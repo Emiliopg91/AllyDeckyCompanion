@@ -9,18 +9,17 @@ export class Constants {
   public static CFG_SCHEMA_VERS = Constants.PLUGIN_VERSION;
   public static CFG_SCHEMA_PROP = 'schema';
 
-  public static DEFAULT_DEFAULT = 'SteamOS';
-
-  public static TDP_DEFAULT_MODE = Mode.PERFORMANCE;
-  public static TDP_AC_DEFAULT_MODE = Mode.TURBO;
-  public static CPU_DEFAULT_BOOST = false;
-  public static DEFAULT_BATTERY_LIMIT = 100;
+  public static STEAM_OS = 'SteamOS';
 
   public static PROFILE_SILENT = 'silent';
   public static PROFILE_PERFORMANCE = 'performance';
   public static PROFILE_TURBO = 'turbo';
   public static PROFILE_CUSTOM = 'custom';
 
+  public static DEFAULT_MODE = Mode.PERFORMANCE;
+  public static DEFAULT_AC_MODE = Mode.TURBO;
+  public static DEFAULT_CPU_BOOST = false;
+  public static DEFAULT_BATTERY_LIMIT = 100;
   public static DEFAULT_SMT = true;
   public static DEFAULT_EPP = Epp.BALANCE_POWER;
 

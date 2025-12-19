@@ -59,10 +59,15 @@ export class Listeners {
       if (PluginSettings.getProfilePerGame()) {
         event.getDetails().then((data) => {
           const prevId = WhiteBoardUtils.getRunningGameId();
-          const newId = event.isRunning()
-            ? String(data.getDisplayName())
-            : Constants.DEFAULT_DEFAULT;
+          const newId = event.isRunning() ? String(data.getDisplayName()) : Constants.STEAM_OS;
           if (prevId != newId) {
+            if (!PluginSettings.existsProfile(newId)) {
+              Logger.info('No profile found for ' + newId + ', creating');
+
+              const tmpProf = Profiles.getProfileForMode(Constants.DEFAULT_MODE);
+              Profiles.saveProfileForId(newId, tmpProf);
+              PluginSettings.setAppIdForName(newId, event.getGameId());
+            }
             WhiteBoardUtils.setRunningGameId(newId);
           }
         });

@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import json
+import yaml
 
 import decky  # pylint: disable=import-error
 
@@ -13,6 +14,7 @@ class PluginConfig:
     package_json_file = Path(decky.DECKY_PLUGIN_DIR) / "package.json"
     config_dir = Path(decky.DECKY_PLUGIN_SETTINGS_DIR)
     cfg_property_file = config_dir / "plugin.json"
+    cfg_property_file_yml = config_dir / "plugin.yaml"
 
     @staticmethod
     def convert_value(value):
@@ -47,8 +49,10 @@ class PluginConfig:
     @staticmethod
     def get_config():
         """Get configuration from file"""
-        with open(PluginConfig.cfg_property_file, "r", encoding="utf-8") as json_file:
-            config_data = json.load(json_file)
+        with open(
+            PluginConfig.cfg_property_file_yml, "r", encoding="utf-8"
+        ) as yaml_file:
+            config_data = yaml.safe_load(yaml_file)
 
         flat_config = {}
 
@@ -70,8 +74,10 @@ class PluginConfig:
     def set_config(key: str, value):
         """Set configuration entry"""
         value = PluginConfig.convert_value(value)
-        with open(PluginConfig.cfg_property_file, "r+", encoding="utf-8") as json_file:
-            data = json.load(json_file)
+        with open(
+            PluginConfig.cfg_property_file_yml, "r+", encoding="utf-8"
+        ) as json_file:
+            data = yaml.safe_load(json_file)
 
             keys = key.split(".")
             d = data
@@ -84,14 +90,16 @@ class PluginConfig:
             d[keys[-1]] = value
 
             json_file.seek(0)
-            json.dump(data, json_file, indent=4)
+            yaml.safe_dump(data, json_file, indent=4)
             json_file.truncate()
 
     @staticmethod
     def delete_config(key: str):
         """Delete config entry"""
-        with open(PluginConfig.cfg_property_file, "r+", encoding="utf-8") as json_file:
-            data = json.load(json_file)
+        with open(
+            PluginConfig.cfg_property_file_yml, "r+", encoding="utf-8"
+        ) as json_file:
+            data = yaml.safe_load(json_file)
 
             keys = key.split(".")
             d = data
@@ -109,14 +117,16 @@ class PluginConfig:
                 print(f"Key '{key}' does not exist.")
 
             json_file.seek(0)
-            json.dump(data, json_file, indent=4)
+            yaml.safe_dump(data, json_file, indent=4)
             json_file.truncate()
 
     @staticmethod
     def get_config_item(name: str, default: str = None):
         """Get configuration entry"""
-        with open(PluginConfig.cfg_property_file, "r", encoding="utf-8") as json_file:
-            data = json.load(json_file)
+        with open(
+            PluginConfig.cfg_property_file_yml, "r", encoding="utf-8"
+        ) as json_file:
+            data = yaml.safe_load(json_file)
 
             keys = name.split(".")
             d = data
@@ -132,33 +142,65 @@ class PluginConfig:
     @staticmethod
     def migrate():
         """Migrate configuration between version"""
+
         data = {}
         if not PluginConfig.config_dir.is_dir():
             os.makedirs(PluginConfig.config_dir, exist_ok=True)
 
-        if not PluginConfig.cfg_property_file.is_file():
-            PluginConfig.cfg_property_file.touch()
-            data = {"log_level": "INFO", "settings": {"remote": {}}, "profiles": {}}
+        if PluginConfig.cfg_property_file.is_file():
+            with open(
+                PluginConfig.cfg_property_file, "r", encoding="utf-8"
+            ) as json_file:
+                data = json.load(json_file)
+            with open(
+                PluginConfig.cfg_property_file_yml, "w", encoding="utf-8"
+            ) as outfile:
+                yaml.safe_dump(data, outfile, indent=4)
+            os.unlink(PluginConfig.cfg_property_file)
+        elif PluginConfig.cfg_property_file_yml.is_file():
+            with open(
+                PluginConfig.cfg_property_file_yml, "r", encoding="utf-8"
+            ) as yaml_file:
+                data = yaml.safe_load(yaml_file)
         else:
-            with open(PluginConfig.cfg_property_file, "r", encoding="utf-8") as infile:
-                data = json.load(infile)
+            PluginConfig.cfg_property_file_yml.touch()
+            data = {"log_level": "INFO", "settings": {"remote": {}}, "profiles": {}}
 
-            if "appids" not in data:
-                data["appids"] = {}
+        if "appids" in data:
+            del data["appids"]
 
-            for prof in data["profiles"]:
-                if "battery" in data["profiles"][prof]:
-                    data["profiles"][prof] = data["profiles"][prof]["battery"]
+        for prof in data["profiles"]:
+            profile = data["profiles"][prof]
+            cpu = profile["cpu"]
+            if "battery" in profile:
+                profile = profile["battery"]
 
-        with open(PluginConfig.cfg_property_file, "w", encoding="utf-8") as outfile:
-            json.dump(data, outfile, indent=4)
+            if "cores" not in cpu:
+                cpu["cores"] = {
+                    "performance": cpu["pcores"],
+                    "eficiency": cpu["ecores"],
+                    "smt": cpu["smt"],
+                }
+                del cpu["smt"]
+                del cpu["ecores"]
+                del cpu["pcores"]
+
+            if "epp" not in profile:
+                profile["epp"] = cpu["epp"]
+                del cpu["epp"]
+
+            if cpu["scheduler"] == "":
+                cpu["scheduler"] = None
+
+        with open(PluginConfig.cfg_property_file_yml, "w", encoding="utf-8") as outfile:
+            yaml.safe_dump(data, outfile, indent=4)
 
     @staticmethod
     def get_git_data():
         """Get git data from config"""
         package_json_data = {}
         with open(PluginConfig.package_json_file, "r", encoding="utf-8") as file:
-            package_json_data = json.load(file)
+            package_json_data = yaml.safe_load(file)
 
         return {
             "repoUrl": f"https://github.com/{package_json_data['author']}/{decky.DECKY_PLUGIN_NAME}",

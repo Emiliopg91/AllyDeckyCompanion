@@ -63,7 +63,7 @@ export const HeaderBlock: FC = () => {
   const [icon, setIcon] = useState<string>('');
 
   useEffect(() => {
-    if (name == Constants.DEFAULT_DEFAULT) {
+    if (name == Constants.STEAM_OS) {
       setIcon('');
       return;
     }
@@ -72,7 +72,7 @@ export const HeaderBlock: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (name == Constants.DEFAULT_DEFAULT) {
+    if (name == Constants.STEAM_OS) {
       setIcon('');
       return;
     }
@@ -86,7 +86,7 @@ export const HeaderBlock: FC = () => {
         <Field label={Translator.translate('profile.for')} bottomSeparator="standard">
           {onBattery && <FaBatteryFull />}
           {!onBattery && <PiPlugFill />}
-          {name != Constants.DEFAULT_DEFAULT && icon != '' && (
+          {name != Constants.STEAM_OS && icon != '' && (
             <>
               <span> </span>
               <img
@@ -99,7 +99,7 @@ export const HeaderBlock: FC = () => {
               />
             </>
           )}
-          {name == Constants.DEFAULT_DEFAULT && <FaSteamSquare />}
+          {name == Constants.STEAM_OS && <FaSteamSquare />}
           <span> </span>
           {name}
         </Field>

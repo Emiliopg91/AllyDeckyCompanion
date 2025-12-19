@@ -47,13 +47,13 @@ export class BackendUtils {
     const oldProfile = BackendUtils.currentProfile;
     if (oldProfile) {
       cpuTdpChanged = JSON.stringify(oldProfile.cpu.tdp) != JSON.stringify(profile.cpu.tdp);
-      cpuEppChanged = oldProfile.cpu.epp != profile.cpu.epp;
+      cpuEppChanged = oldProfile.epp != profile.epp;
       cpuBoostChanged = oldProfile.cpu.boost != profile.cpu.boost;
       cpuSchedChanged = oldProfile.cpu.scheduler != profile.cpu.scheduler;
       cpuCoresChanged =
-        oldProfile.cpu.ecores != profile.cpu.ecores ||
-        oldProfile.cpu.pcores != profile.cpu.pcores ||
-        oldProfile.cpu.smt != profile.cpu.smt;
+        oldProfile.cpu.cores.eficiency != profile.cpu.cores.eficiency ||
+        oldProfile.cpu.cores.performance != profile.cpu.cores.performance ||
+        oldProfile.cpu.cores.smt != profile.cpu.cores.smt;
 
       cpuChanged =
         cpuTdpChanged || cpuEppChanged || cpuBoostChanged || cpuCoresChanged || cpuSchedChanged;
@@ -93,10 +93,7 @@ export class BackendUtils {
           }
 
           if (cpuEppChanged) {
-            await Backend.backend_call<[string], void>(
-              'set_epp',
-              Epp[profile.cpu.epp].toLowerCase()
-            );
+            await Backend.backend_call<[string], void>('set_epp', Epp[profile.epp].toLowerCase());
           }
 
           await Backend.backend_call<[string], number>('set_platform_profile', acpi);
@@ -112,9 +109,9 @@ export class BackendUtils {
 
           await Backend.backend_call<[number, number, boolean], void>(
             'enable_cores',
-            profile.cpu.pcores,
-            profile.cpu.ecores,
-            profile.cpu.smt
+            profile.cpu.cores.performance,
+            profile.cpu.cores.eficiency,
+            profile.cpu.cores.smt
           );
 
           if (cpuSchedChanged) {

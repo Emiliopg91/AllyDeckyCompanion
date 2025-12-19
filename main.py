@@ -113,7 +113,11 @@ class Plugin:
 
     async def enable_cores(self, p_cores, e_cores, smt):
         """Enable CPU Cores"""
-        return CPU_PERFORMANCE.enable_cores(p_cores, e_cores, smt)
+        try:
+            return CPU_PERFORMANCE.enable_cores(p_cores, e_cores, smt)
+        except Exception as e:
+            decky.logger.error(f"{e}")
+            raise e
 
     # Schedulers
     async def get_schedulers(self):

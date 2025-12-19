@@ -31,18 +31,21 @@ interface PerformanceContextType {
 
 const defaultValue: PerformanceContextType = {
   appId: -1,
-  name: Constants.DEFAULT_DEFAULT,
+  name: Constants.STEAM_OS,
   onBattery: WhiteBoardUtils.getOnBattery() ?? false,
   profile: {
+    appId: -1,
     mode: Mode.PERFORMANCE,
     cpu: {
       boost: false,
       epp: Constants.DEFAULT_EPP,
       tdp: { fppl: 5, spl: 5, sppl: 5 },
-      smt: Constants.DEFAULT_SMT,
       scheduler: '',
-      pcores: WhiteBoardUtils.getPCores(),
-      ecores: WhiteBoardUtils.getECores()
+      cores: {
+        smt: Constants.DEFAULT_SMT,
+        performance: WhiteBoardUtils.getPCores(),
+        eficiency: WhiteBoardUtils.getECores()
+      }
     },
     gpu: { frequency: { min: 800, max: 2700 } }
   },

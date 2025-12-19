@@ -62,10 +62,7 @@ export const AdvancedBlock: FC = () => {
   const onEppChange = (newVal: number): void => {
     const newProf = {
       ...profile,
-      cpu: {
-        ...profile.cpu,
-        epp: newVal
-      }
+      epp: newVal
     };
     saveProfile(name, newProf);
     setProfile(newProf);
@@ -88,7 +85,7 @@ export const AdvancedBlock: FC = () => {
       ...profile,
       cpu: {
         ...profile.cpu,
-        pcores: newVal
+        cores: { ...profile.cpu.cores, performance: newVal }
       }
     };
     saveProfile(name, newProf);
@@ -100,7 +97,7 @@ export const AdvancedBlock: FC = () => {
       ...profile,
       cpu: {
         ...profile.cpu,
-        ecores: newVal
+        cores: { ...profile.cpu.cores, eficiency: newVal }
       }
     };
     saveProfile(name, newProf);
@@ -114,7 +111,10 @@ export const AdvancedBlock: FC = () => {
   };
 
   const onSmtChange = (newVal: boolean): void => {
-    const newProf = { ...profile, cpu: { ...profile.cpu, smt: newVal } };
+    const newProf = {
+      ...profile,
+      cpu: { ...profile.cpu, cores: { ...profile.cpu.cores, smt: newVal } }
+    };
     saveProfile(name, newProf);
     setProfile(newProf);
   };
@@ -124,7 +124,7 @@ export const AdvancedBlock: FC = () => {
       <PanelSectionRow>
         <SliderField
           label={Translator.translate('cpu.epp')}
-          value={profile.cpu.epp}
+          value={profile.epp}
           min={0}
           max={eppLabels.length - 1}
           step={1}
@@ -154,7 +154,7 @@ export const AdvancedBlock: FC = () => {
       <PanelSectionRow>
         <SliderField
           label="P-Cores"
-          value={profile.cpu.pcores}
+          value={profile.cpu.cores.performance}
           min={1}
           max={WhiteBoardUtils.getPCores()}
           step={1}
@@ -169,7 +169,7 @@ export const AdvancedBlock: FC = () => {
         <PanelSectionRow>
           <SliderField
             label="E-Cores"
-            value={profile.cpu.ecores}
+            value={profile.cpu.cores.eficiency}
             min={0}
             max={WhiteBoardUtils.getECores()}
             step={1}
@@ -185,7 +185,7 @@ export const AdvancedBlock: FC = () => {
         <ToggleField
           label="SMT"
           description={Translator.translate('smt.description')}
-          checked={profile.cpu.smt}
+          checked={profile.cpu.cores.smt}
           onChange={onSmtChange}
           highlightOnFocus
         />

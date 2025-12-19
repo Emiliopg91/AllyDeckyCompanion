@@ -80,41 +80,36 @@ export class PluginSettings {
   }
 
   public static getAppIdForName(name: string): number | undefined {
-    if (PluginSettings.settings.appids[name]) {
-      return PluginSettings.settings.appids[name];
+    if (PluginSettings.settings.profiles[name].appId) {
+      return PluginSettings.settings.profiles[name].appId;
     }
 
     return undefined;
   }
 
   public static setAppIdForName(name: string, appid: number) {
-    PluginSettings.settings.appids[name] = appid;
+    PluginSettings.settings.profiles[name].appId = appid;
   }
 
   public static setProfileForId(id: string, profile: Profile): void {
-    const appName = id.split('.')[0];
-
     if (!PluginSettings.settings.profiles) {
       PluginSettings.createParents(PluginSettings.settings, 'profiles');
     }
 
-    if (!PluginSettings.settings.profiles[appName]) {
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName);
-      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + appName + '.cpu.tdp');
-      PluginSettings.createParents(
-        PluginSettings.settings,
-        'profiles.' + appName + '.gpu.frequency'
-      );
+    if (!PluginSettings.settings.profiles[id]) {
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id);
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.cpu.tdp');
+      PluginSettings.createParents(PluginSettings.settings, 'profiles.' + id + '.gpu.frequency');
     }
 
-    const prof = PluginSettings.settings.profiles[appName];
+    const prof = PluginSettings.settings.profiles[id];
+    prof.epp = profile.epp;
     prof.mode = profile.mode;
     prof.cpu.boost = profile.cpu.boost;
-    prof.cpu.epp = profile.cpu.epp;
-    prof.cpu.smt = profile.cpu.smt;
-    prof.cpu.scheduler = profile.cpu.scheduler;
-    prof.cpu.ecores = profile.cpu.ecores;
-    prof.cpu.pcores = profile.cpu.pcores;
+    prof.cpu.scheduler = profile.cpu.scheduler == '' ? undefined : profile.cpu.scheduler;
+    prof.cpu.cores.smt = profile.cpu.cores.smt;
+    prof.cpu.cores.eficiency = profile.cpu.cores.eficiency;
+    prof.cpu.cores.performance = profile.cpu.cores.performance;
     prof.cpu.tdp.spl = profile.cpu.tdp.spl;
     prof.cpu.tdp.sppl = profile.cpu.tdp.sppl;
     prof.cpu.tdp.fppl = profile.cpu.tdp.fppl;

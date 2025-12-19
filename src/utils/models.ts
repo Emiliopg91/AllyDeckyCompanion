@@ -19,10 +19,11 @@ export interface Configuration {
   schema: string;
   profiles: Record<string, Profile>;
   settings: Settings;
-  appids: Record<string, number>;
 }
 
 export interface Profile {
+  appId: number;
+  epp: Epp;
   mode: Mode;
   cpu: CpuProfile;
   gpu: GpuProfile;
@@ -34,14 +35,17 @@ export interface Settings {
   mcu_powersave?: boolean;
 }
 
+export interface Cores {
+  performance: number;
+  smt: boolean;
+  eficiency: number;
+}
+
 export interface CpuProfile {
   boost: boolean;
+  cores: Cores;
   tdp: TdpCpuProfile;
-  epp: Epp;
-  smt: boolean;
-  scheduler: string;
-  pcores: number;
-  ecores: number;
+  scheduler: string | undefined;
 }
 
 export enum Mode {
@@ -72,12 +76,6 @@ export interface GpuProfile {
   frequency: GpuFreqProfile;
 }
 
-export interface TdpCpuProfile {
-  spl: number;
-  sppl: number;
-  fppl: number;
-}
-
 export enum Acpi {
   LOW_POWER,
   BALANCED,
@@ -90,6 +88,12 @@ export interface SystemInfoSchema {
   isAllyX: boolean;
   isXboxAlly: boolean;
   isXboxAllyX: boolean;
+}
+
+export interface TdpCpuProfile {
+  spl: number;
+  sppl: number;
+  fppl: number;
 }
 
 export type TdpPresets = Record<Mode, TdpCpuProfile>;

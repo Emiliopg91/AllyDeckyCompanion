@@ -297,7 +297,7 @@ export default definePlugin(() => {
                     sleep(100).then(() => {
                       Profiles.getDefaultProfile();
                       Profiles.summary();
-                      WhiteBoardUtils.setRunningGameId(Constants.DEFAULT_DEFAULT);
+                      WhiteBoardUtils.setRunningGameId(Constants.STEAM_OS);
                     });
                   });
                 });
